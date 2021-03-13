@@ -7,8 +7,8 @@ and may not be redistributed without written permission.*/
 #include <string>
 
 //Screen dimension constants
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_WIDTH = 1280;
+const int SCREEN_HEIGHT = 800;
 
 //Starts up SDL and creates window
 bool init();
@@ -67,7 +67,7 @@ bool loadMedia()
     bool success = true;
 
     //Load stretching surface
-    gStretchedSurface = loadSurface( "05_optimized_surface_loading_and_soft_stretching/stretch.bmp" );
+    gStretchedSurface = loadSurface( "../maps/world.bmp" );
     if( gStretchedSurface == NULL )
     {
         printf( "Failed to load stretching image!\n" );
