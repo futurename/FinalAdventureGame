@@ -4,7 +4,7 @@
 #include "Swordsman.h"
 #include "Horseman.h"
 
-class Army{
+class Army {
 private:
     int nbSwordsman;
     int nbHorseman;

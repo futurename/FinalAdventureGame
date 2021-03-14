@@ -1,5 +1,5 @@
-#inlude "imports.h"
-#inlude "Soldier.h"
+#include "imports.h"
+#include "Soldier.h"
 
 class Swordsman: public Soldier{
 private:
