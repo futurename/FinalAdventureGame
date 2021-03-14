@@ -1,0 +1,57 @@
+PROJECT CHARTER FOR CONQUEST THE EARTH
+Authors:        Kishan Patel, Ji Shen, Wei Wang
+Date Published: March 12, 2021
+Deadline:       March 19, 2021 @ 12:00 PM
+
+**************** PRELIMINARY NOTES ****************
+- Murphy's Law: If anything can go wrong, it will
+- Pareto's Law: 80% of outcomes result from 20% of all causes
+- Parkinson's Law: Work expands to fill the time available for its completion
+
+***************** NOTES *****************
+- Create a story DONE
+- Each country should have attackPoints, defensePoints, armyLevel armySize, ...
+- RollDie() function to return increase in armySize
+-
+
+
+**************** GAME DESCRIPTION *****************
+-
+-
+-
+
+******************** TIMELINE *********************
+~~~~ Friday, March 12 ~~~~
+- Design notes should be finalized
+- Finish schedule for next week
+-
+
+~~~~ Monday, March 15 ~~~~
+-
+-
+-
+
+~~~~ Tuesday, March 16 ~~~~
+-
+-
+-
+
+~~~~ Wednesday, March 17 ~~~~
+-
+-
+-
+
+~~~~ Thursday, March 18 ~~~~
+-
+-
+-
+
+~~~~ Friday, March 19 ~~~~
+-
+-
+-
+
+******************** RESOURCES *********************
+- https://www.youtube.com/watch?v=Y4gU2vttNTo
+-
+-

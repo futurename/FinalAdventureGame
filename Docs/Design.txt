@@ -1,0 +1,71 @@
+class Game
+  attr:
+    - vector<Country>
+    - vector<Player>
+    - card ???
+
+
+// FIXME: to-Do
+class Continent
+  - name
+  -
+
+
+class Country
+  attr:
+  - name
+  - continentName
+  - colour
+  - owner
+
+
+class Army
+  attr:
+  - nbSwordsman
+  - nbHorseman
+  - nbArcher
+  - level
+  -
+
+
+
+virtual class Soldier
+  attr:
+  - nbSoldiers (int)
+  - attackValue (int)
+  - defenseValue (int)
+  - attackRange (int)
+
+
+class Swordsman public Soldier
+  - range...
+
+class Horseman public Soldier
+  - range...
+
+class Archer public Soldier
+  - range...
+
+class Player
+  - name
+  - vector<Country> conqueredCountries
+  - colour
+  -
+
+
+
+
+class Card
+- Random card generator // Deck of cards
+-
+
+class Policy
+  -
+  -
+  -
+
+
+class Battle
+- Country defender
+- Country attacker
+
