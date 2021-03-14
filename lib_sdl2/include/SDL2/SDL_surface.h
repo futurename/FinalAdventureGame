@@ -393,7 +393,7 @@ extern DECLSPEC void SDLCALL SDL_GetClipRect(SDL_Surface * surface,
 extern DECLSPEC SDL_Surface *SDLCALL SDL_DuplicateSurface(SDL_Surface * surface);
 
 /**
- *  Creates a new surface of the specified format, and then copies and maps
+ *  Creates a new surface of the specified format, and then copies and Maps
  *  the given surface to it so the blit of the converted surface will be as
  *  fast as possible.  If this function fails, it returns NULL.
  *

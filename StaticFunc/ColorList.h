@@ -2,17 +2,13 @@
 #include "imports.h"
 
 class ColorList {
-private:
-    static tuple<int, int, int, int> RED;
-    static tuple<int, int, int, int> GREEN;
-    static tuple<int, int, int, int> BLUE;
-    static tuple<int, int, int, int> YELLOW;
 public:
-    static tuple<int, int, int, int> getRed();
+    const static tuple<int, int, int, int> RED;
+    const static tuple<int, int, int, int> GREEN;
+    const static tuple<int, int, int, int> BLUE;
+    const static tuple<int, int, int, int> YELLOW;
+    const static tuple<int, int, int, int> WHITE;
+    const static tuple<int, int, int, int> BLACK;
+    const static tuple<int, int, int, int> LIGHTER_YELLOW;
 
-    static tuple<int, int, int, int> getGreen();
-
-    static tuple<int, int, int, int> getBlue();
-
-    static tuple<int, int, int, int> getYellow();
 };

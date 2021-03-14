@@ -4,19 +4,21 @@
 
 using namespace std;
 
-const string MapManager::DEFAULT_MAP = "../maps/World.bmp";
+const string MapManager::DEFAULT_MAP = "../Maps/World.bmp";
 
-const string MapManager::DEFAULT_MAP_CONFIG = "../maps/World.map";
+const string MapManager::DEFAULT_MAP_CONFIG = "../Maps/World.map";
 
 SDL_Window *MapManager::gWindow = NULL;
 
 SDL_Renderer *MapManager::gRenderer = NULL;
 
-SDL_Texture *MapManager::gTexture = NULL;
+SDL_Texture *MapManager::gMapTexture = NULL;
 
 SDL_Surface *MapManager::gScreenSurface = NULL;
 
-SDL_Surface *MapManager::gStretchedSurface = NULL;
+TTF_Font *MapManager::gFont = NULL;
+
+const tuple<int, int, int, int> MapManager::DEFAULT_BACKGROUND_COLOR = ColorList::WHITE;
 
 void MapManager::readMapFromFile(string filename) {
 
@@ -58,12 +60,20 @@ bool MapManager::SDLInit() {
                 success = false;
             } else {
                 //Initialize renderer color
-                SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
+                tuple<int, int, int, int> bgColor = ColorList::WHITE;
+                SDL_SetRenderDrawColor(gRenderer, get<0>(bgColor), get<1>(bgColor), get<2>(bgColor),
+                                       get<3>(bgColor));
 
                 //Initialize PNG loading
                 int imgFlags = IMG_INIT_PNG;
                 if (!(IMG_Init(imgFlags) & imgFlags)) {
                     printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
+                    success = false;
+                }
+
+                //Initialize SDL_ttf
+                if (TTF_Init() == -1) {
+                    printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
                     success = false;
                 }
             }
@@ -73,17 +83,16 @@ bool MapManager::SDLInit() {
     return success;
 }
 
-bool MapManager::SDLLoadMediaToTexture(string mapPath) {
+bool MapManager::SDLLoadMedia(string mapPath) {
     //Loading success flag
     bool success = true;
 
     //Load PNG texture
-    gTexture = loadTexture(mapPath);
-    if (gTexture == NULL) {
+    gMapTexture = loadTexture(mapPath);
+    if (gMapTexture == NULL) {
         printf("Failed to load texture image!\n");
         success = false;
     }
-
     return success;
 }
 
@@ -109,10 +118,10 @@ SDL_Surface *MapManager::loadSurface(std::string path) {
     return optimizedSurface;
 }
 
-void MapManager::SDLCloseForTexture() {
+void MapManager::SDLClose() {
     //Free loaded image
-    SDL_DestroyTexture(gTexture);
-    gTexture = NULL;
+    SDL_DestroyTexture(gMapTexture);
+    gMapTexture = NULL;
 
     //Destroy window
     SDL_DestroyRenderer(gRenderer);
@@ -120,7 +129,13 @@ void MapManager::SDLCloseForTexture() {
     gWindow = NULL;
     gRenderer = NULL;
 
+    //Free global font
+    TTF_CloseFont(gFont);
+    gFont = NULL;
+
+
     //Quit SDL subsystems
+    TTF_Quit();
     IMG_Quit();
     SDL_Quit();
 }
@@ -174,7 +189,7 @@ void MapManager::start() {
         printf("Failed to initialize!\n");
     } else {
         //Load media
-        if (!SDLLoadMediaToTexture()) {
+        if (!SDLLoadMedia()) {
             printf("Failed to load media!\n");
         } else {
             //Main loop flag
@@ -193,22 +208,25 @@ void MapManager::start() {
                     }
                 }
 
-                //Clear screen
-                //SDL_RenderClear( gRenderer );
-
-                tuple<int,int,int,int> red = ColorList::getBlue();
-                SDL_SetRenderDrawColor(gRenderer, get<0>(red), get<1>(red), get<2>(red), get<3>(red));
+                SDL_RenderClear(gRenderer);
 
 
-                //Render texture to screen
-                SDL_RenderCopy(gRenderer, gTexture, NULL, NULL);
+                //*******************************************
+                //Rendering map vew port
+                renderMapViewPort();
+                tuple<int, int, int, int> paintColor = ColorList::BLUE;
+                setOwnerColorMark(300, 400, paintColor);
 
 
-                for (int i = 200; i < 400; i++) {
-                    for (int j = 300; j < 400; j++) {
-                        SDL_RenderDrawPoint(gRenderer, i, j);
-                    }
-                }
+
+                //*******************************************
+                //rendering text view port
+                renderTextViewPort();
+
+
+
+                //******************************************
+                //render font
 
 
                 //Update screen
@@ -218,6 +236,83 @@ void MapManager::start() {
     }
 
     //Free resources and close SDL
-    SDLCloseForTexture();
+    SDLClose();
+}
+
+void MapManager::renderMapViewPort() {
+    SDL_Rect mapViewPort;
+    mapViewPort.x = 0;
+    mapViewPort.y = 0;
+    mapViewPort.w = MAP_VIEW_PORT_WIDTH;
+    mapViewPort.h = SCREEN_HEIGHT;
+    SDL_RenderSetViewport(gRenderer, &mapViewPort);
+
+    SDL_RenderCopy(gRenderer, gMapTexture, NULL, NULL);
+
+    renderMessage(0,0, "Hello world", ColorList::RED, 18);
+}
+
+void MapManager::setOwnerColorMark(int centerX, int centerY, tuple<int, int, int, int> color) {
+    SDL_SetRenderDrawColor(gRenderer, get<0>(color), get<1>(color), get<2>(color),
+                           get<3>(color));
+    SDL_Rect sdlRect;
+    sdlRect.x = centerX - COUNTRY_MARK_LENGTH / 2;
+    sdlRect.y = centerY - COUNTRY_MARK_LENGTH / 2;
+    sdlRect.w = COUNTRY_MARK_LENGTH;
+    sdlRect.h = COUNTRY_MARK_LENGTH;
+
+    SDL_RenderFillRect(gRenderer, &sdlRect);
+
+    SDL_SetRenderDrawColor(gRenderer, get<0>(DEFAULT_BACKGROUND_COLOR),
+                           get<1>(DEFAULT_BACKGROUND_COLOR),
+                           get<2>(DEFAULT_BACKGROUND_COLOR),
+                           get<3>(DEFAULT_BACKGROUND_COLOR));
+}
+
+void MapManager::renderTextViewPort() {
+
+    SDL_Rect textVeiewPort{MAP_VIEW_PORT_WIDTH, 0, SCREEN_WIDTH - MAP_VIEW_PORT_WIDTH, SCREEN_HEIGHT};
+
+    SDL_RenderSetViewport(gRenderer, &textVeiewPort);
+
+    tuple<int, int, int, int> bgColor = ColorList::LIGHTER_YELLOW;
+    SDL_SetRenderDrawColor(gRenderer, get<0>(bgColor), get<1>(bgColor), get<2>(bgColor), get<3>(bgColor));
+
+    SDL_RenderFillRect(gRenderer, nullptr);
+
+    tuple<int, int, int, int> borderColor = ColorList::BLACK;
+    SDL_SetRenderDrawColor(gRenderer, get<0>(borderColor), get<1>(borderColor), get<2>(borderColor),
+                           get<3>(borderColor));
+
+    SDL_RenderDrawRect(gRenderer, nullptr);
+
+    renderMessage(0,0, "Hello world", ColorList::RED, 18);
+
+    setOwnerColorMark(100, 100, ColorList::RED);
+}
+
+
+void MapManager::renderMessage(int x, int y, const char *message, tuple<int, int, int, int> color, int fontSize, const char *fontPath) {
+    SDL_Surface *text;
+    gFont = TTF_OpenFont(fontPath, fontSize);
+// Set color to black
+    SDL_Color textColor = {(Uint8) get<0>(color), (Uint8) get<1>(color),
+                           (Uint8) get<2>(color)};
+
+
+    text = TTF_RenderText_Solid(gFont, message, textColor);
+    if (!text) {
+        cout << "Failed to render text: " << TTF_GetError() << endl;
+    }
+    SDL_Texture *text_texture;
+
+    text_texture = SDL_CreateTextureFromSurface(gRenderer, text);
+
+    SDL_Rect dest = {x, y, text->w, text->h};
+
+    SDL_RenderCopy(gRenderer, text_texture, NULL, &dest);
+
+    SDL_DestroyTexture(text_texture);
+    SDL_FreeSurface(text);
 }
 

@@ -25,4 +25,6 @@ private:
     string continentName;
     string countryColour;
     string ownerName;
+    int coordinateX;
+    int coordinateY;
 };
