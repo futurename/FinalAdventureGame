@@ -1,5 +1,5 @@
-#include "imports.h"
-#include "MapManager.h"
+#include "StaticFunc/imports.h"
+#include "StaticFunc/MapManager.h"
 
 using namespace std;
 

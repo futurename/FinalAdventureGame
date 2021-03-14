@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.17)
 project(FinalGameDesign)
 
 add_executable(FinalGameDesign main.cpp Archer.cpp Archer.h Army.h Army.cpp Soldier.cpp Soldier.h Continent.cpp Continent.h Country.cpp Country.h Horseman.cpp Horseman.h
-        Swordsman.cpp Swordsman.h imports.h Player.cpp Player.h MapManager.cpp MapManager.h ColorList.h ColorList.cpp)
+        Swordsman.cpp Swordsman.h StaticFunc/imports.h Player.cpp Player.h StaticFunc/MapManager.cpp StaticFunc/MapManager.h StaticFunc/ColorList.h StaticFunc/ColorList.cpp)
 #[[
 
 add_executable(FinalGameDesign SDL2SampleCodes/40_texture_manipulation/40_texture_manipulation.cpp)
