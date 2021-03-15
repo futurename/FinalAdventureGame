@@ -13,8 +13,11 @@ public:
     string GetPlayerName();
 
     void GetPlayerCaptures();
+
     void addCard(Card card);
+
     void setCards(vector<Card> cards);
+
     vector<Card> getCards();
 
 private:

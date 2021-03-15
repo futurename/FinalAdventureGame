@@ -1,20 +1,12 @@
-//
-// Created by Kishan on 2021-03-15.
-//
 #include "Random.h"
 #include <cstdlib>
 #include <ctime>
 
-int Random::RollDie(){
-    srand((unsigned) time(0));
-    int roll;
-    roll = (rand() % maxValue) + minValue;
-    return roll;
+int Random::RollDie(int low, int high){
+    return GenerateRandomNum(low, high);
 }
 
-int Random::GenerateRandomNum(){
+int Random::GenerateRandomNum(int low, int high){
     srand((unsigned) time(nullptr));
-    int rand;
-    rand = (rand() % 42) + 1;
-    return rand;
+    return rand() % (high - low) + low;
 }

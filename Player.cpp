@@ -1,6 +1,5 @@
 #include "Player.h"
 #include "Country.h"
-#include "Card.h"
 
 Player::Player(){
     playerName = "player";
