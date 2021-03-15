@@ -3,7 +3,7 @@
 #include "Card.h"
 
 Player::Player(){
-
+    playerName = "player";
 }
 
 

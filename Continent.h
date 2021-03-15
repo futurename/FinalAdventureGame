@@ -6,22 +6,22 @@
 class Continent {
 private:
     string continentName;
-    int continentOwnerIndex;
-    int continentBonusValue;
-    map<string, Country> continentCountryGraph;
+    int ownerIndex;
+    int bonus;
+    vector<string> countryNames;
 
 public:
-    Continent();
-
     Continent(string cName, int cBonusValue);
 
     string getContinentName();
 
-    int getContinentOwnerIndex();
+    int getOwnerIndex();
 
-    int getContinentBonusValue();
+    int getBonus();
 
-    map<string, Country> getContinentCountryGraph();
+    void addCountryName(string &countryName);
 
+    vector<string> &getCountryNames();
 
+    void setCountryNames(vector<string>& countryNames);
 };
