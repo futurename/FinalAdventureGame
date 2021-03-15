@@ -7,7 +7,7 @@
 
 
 class Card{
-    enum PlayerCard { infantry, cavalry, artillery };
+    enum PlayerCard { INFANTRY, CALVARY, artillery };
 
     private:
         PlayerCard cardType;
