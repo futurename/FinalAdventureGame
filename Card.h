@@ -1,23 +1,17 @@
-//
-// Created by Frank on 03/15/2021.
-//
 
-#ifndef FINALGAMEDESIGN_CARD_H
-#define FINALGAMEDESIGN_CARD_H
-
-
-class Card{
-    enum PlayerCard { INFANTRY, CALVARY, artillery };
-
-    private:
-        PlayerCard cardType;
-    public:
-        Card(PlayerCard card);
-        PlayerCard getCard();
-        void setCard(PlayerCard newCardType);
+enum CardType {
+    INFANTRY, CALVARY, ARTILLERY
 };
 
+class Card {
 
+private:
+    CardType cardType;
+public:
 
+    Card(CardType card);
 
-#endif //FINALGAMEDESIGN_CARD_H
+    CardType getCard();
+
+    void setCard(CardType newCardType);
+};

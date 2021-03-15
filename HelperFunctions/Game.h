@@ -24,4 +24,6 @@ public:
     static void printAllCountries() ;
 
     static void printAllContinents();
+
+    static void attackFrom(Country attacker, int army, Country defender);
 };
