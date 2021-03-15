@@ -1,3 +1,0 @@
-C:/Users/Kishan/Desktop/FinalGameDesign/cmake-build-debug/CMakeFiles/FinalGameDesign.dir
-C:/Users/Kishan/Desktop/FinalGameDesign/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/Kishan/Desktop/FinalGameDesign/cmake-build-debug/CMakeFiles/rebuild_cache.dir
