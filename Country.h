@@ -1,30 +1,40 @@
-#pragma once
 
 #include "StaticFunc/imports.h"
 
+
+
 class Country {
 public:
-    string GetCountryName();
+    Country(string name, int x, int y, vector<string>& adjacentCountries);
 
-    string GetContinentName();
+    string getCountryName();
 
-    string GetCountryColour();
+    string getContinentName();
 
-    string GetOwnerName();
+    tuple<int,int,int,int> getCountryColour();
 
-    void SetCountryName(string inCountryName);
+    string getOwnerName();
 
-    void SetContinentName(string inContinentName);
+    int getX();
 
-    void SetCountryColour(string inCountryColour);
+    int getY();
 
-    void SetCountryOwner(string inOwnerName);
+    vector<string>& getAdjacentCountires();
+
+    void setCountryName(string inCountryName);
+
+    void setContinentName(string inContinentName);
+
+    void setCountryColour(tuple<int,int,int,int> inCountryColour);
+
+    void setCountryOwner(string inOwnerName);
 
 private:
     string countryName;
     string continentName;
-    string countryColour;
+    tuple<int,int,int,int> countryColour;
     string ownerName;
     int coordinateX;
     int coordinateY;
+    vector<string> adjacentCountries;
 };

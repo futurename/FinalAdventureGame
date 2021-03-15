@@ -1,5 +1,4 @@
 #include "Continent.h"
-#include "Country.h"
 
 Continent::Continent(string cName, int cBonusValue){
     continentName = cName;

@@ -1,6 +1,5 @@
-#pragma once
 #include "StaticFunc/imports.h"
-#include "Country.h"
+class Country;
 
 class Player{
 public:

@@ -1,8 +1,9 @@
 #pragma once
+
 #include "StaticFunc/imports.h"
 #include "Country.h"
 
-class Continent{
+class Continent {
 private:
     string continentName;
     int continentOwnerIndex;
@@ -11,12 +12,16 @@ private:
 
 public:
     Continent();
-    Continent(string cName, int cBonusValue);
-    string getContinentName();
-    int getContinentOwnerIndex();
-    int getContinentBonusValue();
-    map<string, Country> getContinentCountryGraph();
 
+    Continent(string cName, int cBonusValue);
+
+    string getContinentName();
+
+    int getContinentOwnerIndex();
+
+    int getContinentBonusValue();
+
+    map<string, Country> getContinentCountryGraph();
 
 
 };

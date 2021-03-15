@@ -1,26 +1,58 @@
 #include "Country.h"
+#include "StaticFunc/ColorList.h"
 
-string Country::GetCountryName() {
+string Country::getCountryName() {
     return countryName;
 }
-void Country::SetCountryName(string inCountryName){
+
+void Country::setCountryName(string inCountryName) {
     countryName = inCountryName;
 }
-string Country:: GetContinentName(){
+
+string Country::getContinentName() {
     return continentName;
 }
-void Country::SetContinentName(string inContinentName){
+
+void Country::setContinentName(string inContinentName) {
     continentName = inContinentName;
 }
-string Country::GetCountryColour(){
+
+tuple<int, int, int, int> Country::getCountryColour() {
     return countryColour;
 }
-void Country::SetCountryColour(string inCountryColour){
+
+void Country::setCountryColour(tuple<int, int, int, int> inCountryColour) {
     countryColour = inCountryColour;
 }
-string Country::GetOwnerName(){
+
+string Country::getOwnerName() {
     return ownerName;
 }
-void Country::SetCountryOwner(string inOwnerName){
+
+void Country::setCountryOwner(string inOwnerName) {
     ownerName = inOwnerName;
+}
+
+Country::Country(string name, int x, int y, vector<string> &countries) {
+    this->countryName = name;
+    this->coordinateX = x;
+    this->coordinateY = y;
+    this->countryColour = ColorList::GREEN;
+    vector<string> adjacentCountries;
+    for (string str: countries) {
+        adjacentCountries.push_back(str);
+    }
+    this->adjacentCountries = adjacentCountries;
+}
+
+int Country::getX() {
+    return coordinateX;
+}
+
+int Country::getY() {
+    return coordinateY;
+}
+
+vector<string> &Country::getAdjacentCountires() {
+    return adjacentCountries;
 }

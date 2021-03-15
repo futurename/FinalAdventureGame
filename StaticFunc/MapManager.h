@@ -2,21 +2,27 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <string>
-#include "ColorList.h"
 #include <SDL_ttf.h>
 
 class MapManager {
 private:
-    const static string DEFAULT_MAP;
-    const static string DEFAULT_MAP_CONFIG;
     const static int SCREEN_WIDTH = 1600;
     const static int SCREEN_HEIGHT = 900;
     const static int MAP_VIEW_PORT_WIDTH = 1300;
     const static int MAP_VIEW_PORT_HEIGHT = SCREEN_HEIGHT;
     const static int TEXT_VIEW_PORT_WIDTH = SCREEN_WIDTH - MAP_VIEW_PORT_WIDTH;
     const static int TEXT_VIEW_PORT_HEIGHT = SCREEN_HEIGHT;
-    const static int COUNTRY_MARK_LENGTH = 30;
+    const static int COUNTRY_MARK_LENGTH = 40;
     const static tuple<int, int, int, int> DEFAULT_BACKGROUND_COLOR;
+    const static string DEFAULT_MAP;
+    const static string DEFAULT_MAP_CONFIG;
+    const static string TERRITORIES_HEADER;
+    const static int COUNTRY_NAME_INDEX = 0;
+    const static int COUNTRY_COORDINATE_X = 1;
+    const static int COUNTRY_COORDINATE_Y = 2;
+    const static int ADJACENT_COUNTRIES_STARTS = 3;
+    static double IMAGE_WIDTH_RATIO;
+    static double IMAGE_HEIGHT_RATIO;
 
     //Loads individual image as texture
     static SDL_Texture *loadTexture(std::string path);
@@ -38,7 +44,7 @@ private:
 
     bool static SDLInit();
 
-    bool static SDLLoadMedia(string mapPath = DEFAULT_MAP);
+    bool static SDLLoadMedia(const string mapPath = DEFAULT_MAP);
 
     void static SDLClose();
 
@@ -47,20 +53,20 @@ private:
     static SDL_Surface *loadSurface(std::string path);
 
 public:
-    static void readMapFromFile(string filename = DEFAULT_MAP);
+    static void initWorldMarks();
 
-    static void readMapConfigFromFile(string filename = DEFAULT_MAP_CONFIG);
-
-    static void initMap(string mapName);
-
-    static void start();
+    static void start(string mapPath);
 
     static void renderMapViewPort();
 
-    static void setOwnerColorMark(int centerX, int centerY, tuple<int, int, int, int> tuple);
+    static void setOwnerColorMark(int centerX, int centerY, tuple<int, int, int, int> color);
 
     static void renderTextViewPort();
 
     static void renderMessage(int x, int y, const char *message, tuple<int, int, int, int> color, int fontSize,
                               const char *fontPath = "../Fonts/Rubik-ExtraBold.ttf");
+
+    static void readMapConfigFromFile(string filePath = DEFAULT_MAP_CONFIG);
+
+    static void detectRawImageWidthHeightRatio(string& mapPath);
 };

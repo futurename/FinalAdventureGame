@@ -1,12 +1,7 @@
-
 #include "MapManager.h"
-
-
-using namespace std;
-
-const string MapManager::DEFAULT_MAP = "../Maps/World.bmp";
-
-const string MapManager::DEFAULT_MAP_CONFIG = "../Maps/World.map";
+#include "Game.h"
+#include "ColorList.h"
+#include "../Country.h"
 
 SDL_Window *MapManager::gWindow = NULL;
 
@@ -18,18 +13,29 @@ SDL_Surface *MapManager::gScreenSurface = NULL;
 
 TTF_Font *MapManager::gFont = NULL;
 
+const string MapManager::DEFAULT_MAP = "../Maps/World.bmp";
+
+const string MapManager::DEFAULT_MAP_CONFIG = "../Maps/World.map";
+
+const string MapManager::TERRITORIES_HEADER = "Territories";
+
 const tuple<int, int, int, int> MapManager::DEFAULT_BACKGROUND_COLOR = ColorList::WHITE;
 
-void MapManager::readMapFromFile(string filename) {
+double MapManager::IMAGE_WIDTH_RATIO = 1.0;
 
-}
+double MapManager::IMAGE_HEIGHT_RATIO = 1.0;
 
-void MapManager::readMapConfigFromFile(string filename) {
+void MapManager::initWorldMarks() {
+    readMapConfigFromFile();
 
-}
+    vector<Country> allCountries = Game::getAllCountries();
 
-void MapManager::initMap(string mapName) {
+    for (Country country: Game::getAllCountries()) {
+        int x = country.getX() * IMAGE_WIDTH_RATIO;
+        int y = country.getY() * IMAGE_HEIGHT_RATIO;
 
+        setOwnerColorMark(x, y, country.getCountryColour());
+    }
 }
 
 bool MapManager::SDLInit() {
@@ -93,6 +99,7 @@ bool MapManager::SDLLoadMedia(string mapPath) {
         printf("Failed to load texture image!\n");
         success = false;
     }
+
     return success;
 }
 
@@ -140,7 +147,7 @@ void MapManager::SDLClose() {
     SDL_Quit();
 }
 
-SDL_Texture *MapManager::loadTexture(std::string path) {
+SDL_Texture *MapManager::loadTexture(string path) {
     //The final texture
     SDL_Texture *newTexture = NULL;
 
@@ -183,13 +190,13 @@ Uint32 MapManager::getPixel(SDL_Surface *surface, int x, int y) {
     }
 }
 
-void MapManager::start() {
+void MapManager::start(string mapPath) {
     //Start up SDL and create window
     if (!SDLInit()) {
         printf("Failed to initialize!\n");
     } else {
         //Load media
-        if (!SDLLoadMedia()) {
+        if (!SDLLoadMedia(mapPath)) {
             printf("Failed to load media!\n");
         } else {
             //Main loop flag
@@ -210,12 +217,17 @@ void MapManager::start() {
 
                 SDL_RenderClear(gRenderer);
 
+                //get raw image width/height vs display ratio
+                detectRawImageWidthHeightRatio(mapPath);
 
                 //*******************************************
                 //Rendering map vew port
                 renderMapViewPort();
-                tuple<int, int, int, int> paintColor = ColorList::BLUE;
-                setOwnerColorMark(300, 400, paintColor);
+
+                initWorldMarks();
+
+                /*tuple<int, int, int, int> paintColor = ColorList::BLUE;
+                setOwnerColorMark(300, 400, paintColor);*/
 
 
 
@@ -249,7 +261,7 @@ void MapManager::renderMapViewPort() {
 
     SDL_RenderCopy(gRenderer, gMapTexture, NULL, NULL);
 
-    renderMessage(0,0, "Hello world", ColorList::RED, 18);
+    renderMessage(0, 0, "Hello world", ColorList::RED, 18);
 }
 
 void MapManager::setOwnerColorMark(int centerX, int centerY, tuple<int, int, int, int> color) {
@@ -286,13 +298,14 @@ void MapManager::renderTextViewPort() {
 
     SDL_RenderDrawRect(gRenderer, nullptr);
 
-    renderMessage(0,0, "Hello world", ColorList::RED, 18);
+    renderMessage(0, 0, "Hello world", ColorList::RED, 18);
 
     setOwnerColorMark(100, 100, ColorList::RED);
 }
 
 
-void MapManager::renderMessage(int x, int y, const char *message, tuple<int, int, int, int> color, int fontSize, const char *fontPath) {
+void MapManager::renderMessage(int x, int y, const char *message, tuple<int, int, int, int> color, int fontSize,
+                               const char *fontPath) {
     SDL_Surface *text;
     gFont = TTF_OpenFont(fontPath, fontSize);
 // Set color to black
@@ -316,3 +329,52 @@ void MapManager::renderMessage(int x, int y, const char *message, tuple<int, int
     SDL_FreeSurface(text);
 }
 
+
+void MapManager::readMapConfigFromFile(string filePath) {
+    fstream inFIle(filePath);
+    if (!inFIle.is_open()) {
+        cout << "Failed reading file from the path: " << filePath << endl;
+    } else {
+        string line;
+        vector<Country> allCountries;
+        while (getline(inFIle, line)) {
+            if (line.find(TERRITORIES_HEADER) != string::npos) {
+                while (getline(inFIle, line)) {
+                    if (line.length() == 0) {
+                        //FIXME different continent
+                        continue;
+                    } else {
+                        stringstream ss(line);
+                        vector<string> countryTokens;
+                        while (ss.good()) {
+                            string subString;
+                            getline(ss, subString, ',');
+                            countryTokens.push_back(subString);
+                        }
+                        ss.str("");
+                        ss.clear();
+
+                        string countryName = countryTokens.at(COUNTRY_NAME_INDEX);
+                        int coordinateX = stoi(countryTokens.at(COUNTRY_COORDINATE_X));
+                        int coordinateY = stoi(countryTokens.at(COUNTRY_COORDINATE_Y));
+                        vector<string> adjacentCountries;
+                        for(int i = ADJACENT_COUNTRIES_STARTS; i<countryTokens.size();i++){
+                            adjacentCountries.push_back(countryTokens.at(i));
+                        }
+                        Country country(countryName, coordinateX, coordinateY, adjacentCountries);
+                        allCountries.push_back(country);
+
+
+                    }
+                }
+            }
+        }
+        Game::setAllCountries(allCountries);
+    }
+}
+
+void MapManager::detectRawImageWidthHeightRatio(string& mapPath) {
+    SDL_Surface* surface = IMG_Load(mapPath.c_str());
+    IMAGE_WIDTH_RATIO = (double)MAP_VIEW_PORT_WIDTH / surface->w;
+    IMAGE_HEIGHT_RATIO = (double)MAP_VIEW_PORT_HEIGHT / surface->h;
+}
