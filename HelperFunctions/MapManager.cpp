@@ -23,6 +23,8 @@ const char *MapManager::DEFAULT_FONT_PATH = "../Fonts/FiraSans-Regular.ttf";
 
 const tuple<int, int, int, int> MapManager::DEFAULT_BACKGROUND_COLOR = ColorList::WHITE;
 
+map<string, SDL_Texture *> MapManager::countryTextures{map<string, SDL_Texture *>()};
+
 double MapManager::IMAGE_WIDTH_RATIO = 1.0;
 
 double MapManager::IMAGE_HEIGHT_RATIO = 1.0;
@@ -201,19 +203,27 @@ void MapManager::start(string mapPath) {
                 while (SDL_PollEvent(&e) != 0) {
                     //User requests quit
                     string message;
-                    Country pickedCountry;
+                    Country *pickedCountry;
+
                     switch (e.type) {
                         case SDL_QUIT:
                             quit = true;
                             break;
                         case SDL_MOUSEMOTION:
                             message = to_string(e.motion.x) + ":" + to_string(e.motion.y);
+                            if (!getCountryNameFromCoordinates(e.motion.x, e.motion.y).empty()) {
+                                message = getCountryNameFromCoordinates(e.motion.x, e.motion.y);
+                                pickedCountry = &Game::getAllCountries().find(message.c_str())->second;
+                                clearTextViewPort();
+                                renderMapViewPort(*pickedCountry);
+                                renderCountryMark(pickedCountry->getX(), pickedCountry->getY(), *pickedCountry, 22);
+                            }
                             SDL_SetWindowTitle(gWindow, message.c_str());
                             break;
                         case SDL_MOUSEBUTTONDOWN:
                             switch (e.button.button) {
                                 case SDL_BUTTON_LEFT:
-                                    message = getCountryNameWhenMouseClick(e.motion.x, e.motion.y);
+                                    message = getCountryNameFromCoordinates(e.motion.x, e.motion.y);
                                     SDL_ShowSimpleMessageBox(0, "check range", message.c_str(), gWindow);
                                     break;
                             }
@@ -259,7 +269,6 @@ void MapManager::setOwnerColorMark(int centerX, int centerY, tuple<int, int, int
 }
 
 void MapManager::renderTextViewPort() {
-
     SDL_Rect textVeiewPort{MAP_VIEW_PORT_WIDTH, 0, SCREEN_WIDTH - MAP_VIEW_PORT_WIDTH, SCREEN_HEIGHT};
 
     SDL_RenderSetViewport(gRenderer, &textVeiewPort);
@@ -276,34 +285,59 @@ void MapManager::renderTextViewPort() {
     SDL_RenderDrawRect(gRenderer, nullptr);
 
     renderMessage(0, 10, "Hello world", ColorList::RED, 18);
-
-    setOwnerColorMark(100, 100, ColorList::RED);
 }
 
+void MapManager::renderMapViewPort(Country &country) {
+    SDL_Rect textVeiewPort{MAP_VIEW_PORT_WIDTH, 0, SCREEN_WIDTH - MAP_VIEW_PORT_WIDTH, SCREEN_HEIGHT / 2};
+
+    SDL_RenderSetViewport(gRenderer, &textVeiewPort);
+
+    tuple<int, int, int, int> bgColor = ColorList::LIGHTER_YELLOW;
+    SDL_SetRenderDrawColor(gRenderer, get<0>(bgColor), get<1>(bgColor), get<2>(bgColor), get<3>(bgColor));
+
+    SDL_RenderFillRect(gRenderer, nullptr);
+
+    tuple<int, int, int, int> borderColor = ColorList::BLACK;
+    SDL_SetRenderDrawColor(gRenderer, get<0>(borderColor), get<1>(borderColor), get<2>(borderColor),
+                           get<3>(borderColor));
+
+    SDL_RenderDrawRect(gRenderer, nullptr);
+
+    renderMessage(0, 10, "Hello world", ColorList::RED, 18);
+
+    renderMessage(50, 50, country.getCountryName().c_str(), ColorList::RED, 18);
+    renderMessage(50, 80, to_string(country.getCountryArmy()).c_str(), ColorList::RED, 18);
+
+    SDL_RenderCopy(gRenderer, gMapTexture, NULL, NULL);
+}
 
 void MapManager::renderMessage(int x, int y, const char *message, tuple<int, int, int, int> color, int fontSize,
                                const char *fontPath) {
-    SDL_Surface *text;
+    SDL_Surface *textSurface;
     gFont = TTF_OpenFont(fontPath, fontSize);
-// Set color to black
+
     SDL_Color textColor = {(Uint8) get<0>(color), (Uint8) get<1>(color),
                            (Uint8) get<2>(color)};
 
-
-    text = TTF_RenderText_Solid(gFont, message, textColor);
-    if (!text) {
-        cout << "Failed to render text: " << TTF_GetError() << endl;
+    textSurface = TTF_RenderText_Solid(gFont, message, textColor);
+    if (!textSurface) {
+        cout << "Failed to render textSurface: " << TTF_GetError() << endl;
     }
-    SDL_Texture *text_texture;
 
-    text_texture = SDL_CreateTextureFromSurface(gRenderer, text);
+    SDL_Texture *textTexture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
 
-    SDL_Rect dest = {x - text->w / 2, y - text->h / 2, text->w, text->h};
+    SDL_SetRenderTarget(gRenderer, textTexture);
+    /*SDL_BlendMode blending;
+    SDL_SetTextureBlendMode(textTexture, blending);*/
 
-    SDL_RenderCopy(gRenderer, text_texture, NULL, &dest);
+    SDL_Rect dest = {x - textSurface->w / 2, y - textSurface->h / 2, textSurface->w, textSurface->h};
 
-    SDL_DestroyTexture(text_texture);
-    SDL_FreeSurface(text);
+    SDL_RenderCopy(gRenderer, textTexture, NULL, &dest);
+
+    SDL_SetRenderTarget(gRenderer, NULL);
+
+    SDL_DestroyTexture(textTexture);
+    SDL_FreeSurface(textSurface);
 }
 
 void MapManager::readMapConfigFromFile(string filePath) {
@@ -354,7 +388,7 @@ void MapManager::detectImageWidthHeightRatio(string &mapPath) {
     IMAGE_HEIGHT_RATIO = (double) MAP_VIEW_PORT_HEIGHT / surface->h;
 }
 
-string MapManager::getCountryNameWhenMouseClick(int x, int y) {
+string MapManager::getCountryNameFromCoordinates(int x, int y) {
     for (auto itr = Game::getAllCountries().begin(); itr != Game::getAllCountries().end(); itr++) {
         int coorX = itr->second.getX();
         int coorY = itr->second.getY();
@@ -373,3 +407,14 @@ void MapManager::renderCountryMark(int x, int y, Country &country, const int fon
     renderMessage(x, y + COUNTRY_TEXT_HEIGHT_SHIFT, to_string(country.getCountryArmy()).c_str(), ColorList::RED,
                   COUNTRY_NAME_FONT_SIZE);
 }
+
+void MapManager::clearTextViewPort() {
+
+    SDL_Texture *textTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+                                                 SCREEN_WIDTH - MAP_VIEW_PORT_WIDTH, SCREEN_HEIGHT);
+
+
+    SDL_RenderCopy(gRenderer, textTexture, NULL, NULL);
+
+}
+

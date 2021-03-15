@@ -2,7 +2,7 @@
 #include "Country.h"
 
 Player::Player(){
-
+    playerName = "player";
 }
 
 

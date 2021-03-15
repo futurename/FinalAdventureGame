@@ -10,7 +10,7 @@ class MapManager {
 private:
     const static int SCREEN_WIDTH = 1800;
     const static int SCREEN_HEIGHT = 900;
-    const static int MAP_VIEW_PORT_WIDTH = 1400;
+    const static int MAP_VIEW_PORT_WIDTH = 1500;
     const static int MAP_VIEW_PORT_HEIGHT = SCREEN_HEIGHT;
     const static int TEXT_VIEW_PORT_WIDTH = SCREEN_WIDTH - MAP_VIEW_PORT_WIDTH;
     const static int TEXT_VIEW_PORT_HEIGHT = SCREEN_HEIGHT;
@@ -54,12 +54,16 @@ private:
 
     void static SDLClose();
 
+    static map<string, SDL_Texture*> countryTextures;
+
 public:
     static void initWorldMarks();
 
     static void start(string mapPath);
 
     static void renderMapViewPort();
+
+    static void renderMapViewPort(Country& country);
 
     static void setOwnerColorMark(int centerX, int centerY, tuple<int, int, int, int> color);
 
@@ -72,7 +76,9 @@ public:
 
     static void detectImageWidthHeightRatio(string& mapPath);
 
-    static string getCountryNameWhenMouseClick(int x, int y);
+    static string getCountryNameFromCoordinates(int x, int y);
 
     static void renderCountryMark(int x, int y, Country &country, const int fontSize);
+
+    static void clearTextViewPort();
 };

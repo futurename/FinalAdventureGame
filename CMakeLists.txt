@@ -5,8 +5,10 @@ add_executable(FinalGameDesign main.cpp Archer.cpp Archer.h Army.h Army.cpp Sold
         Swordsman.cpp Swordsman.h HelperFunctions/imports.h Player.cpp Player.h HelperFunctions/MapManager.cpp HelperFunctions/MapManager.h HelperFunctions/ColorList.h HelperFunctions/ColorList.cpp
         HelperFunctions/Game.h HelperFunctions/Game.cpp)
 
-
-#[[add_executable(FinalGameDesign SDL2SampleCodes/17_mouse_events/17_mouse_events.cpp)]]
+#[[
+add_executable(FinalGameDesign SDL2SampleCodes/17_mouse_events/17_mouse_events.cpp)]]
+#[[
+add_executable(FinalGameDesign SDL2SampleCodes/43_render_to_texture/43_render_to_texture.cpp)]]
 
 
 set(SDL2_LIB_DIR lib_sdl2/lib)
