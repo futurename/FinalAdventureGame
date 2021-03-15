@@ -1,8 +1,6 @@
 
 #include "HelperFunctions/imports.h"
 
-
-
 class Country {
 public:
     Country(string name, int x, int y, vector<string>& adjacentCountries);
