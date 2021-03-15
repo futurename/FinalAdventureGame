@@ -1,6 +1,8 @@
+#include "HelperFunctions/imports.h"
 
-class Random{
+class Random {
 public:
-    static int RollDie(int low = 1, int high = 6);
+    static pair<int, int> RollDie(int numOfDices, int low = 1, int high = 6);
+
     static int GenerateRandomNum(int low, int high);
 };

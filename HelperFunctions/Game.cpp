@@ -50,6 +50,8 @@ void Game::printAllContinents() {
 }
 
 void Game::attackFrom(Country attacker, int army, Country defender) {
-    
+    while(true){
+
+    }
 }
 
