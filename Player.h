@@ -16,8 +16,7 @@ public:
 private:
     string playerName;
     vector<Country> capturedCountries;
-    tuple<int,int,int,int> bgColour;
-    tuple<int,int,int,int> textColour;
-
+    tuple<int, int, int, int> bgColour;
+    tuple<int, int, int, int> textColour;
 
 };

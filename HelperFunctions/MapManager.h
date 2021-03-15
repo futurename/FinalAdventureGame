@@ -4,6 +4,8 @@
 #include <string>
 #include <SDL_ttf.h>
 
+class Country;
+
 class MapManager {
 private:
     const static int SCREEN_WIDTH = 1800;
@@ -14,6 +16,7 @@ private:
     const static int TEXT_VIEW_PORT_HEIGHT = SCREEN_HEIGHT;
     const static int COUNTRY_MARK_WIDTH = 70;
     const static int COUNTRY_MARK_HEIGHT = 50;
+    const static int COUNTRY_TEXT_HEIGHT_SHIFT = 10;
     const static int COUNTRY_NAME_FONT_SIZE = 14;
     const static tuple<int, int, int, int> DEFAULT_BACKGROUND_COLOR;
     const static string DEFAULT_MAP;
@@ -51,10 +54,6 @@ private:
 
     void static SDLClose();
 
-    static Uint32 getPixel(SDL_Surface *surface, int x, int y);
-
-    static SDL_Surface *loadSurface(std::string path);
-
 public:
     static void initWorldMarks();
 
@@ -72,4 +71,8 @@ public:
     static void readMapConfigFromFile(string filePath = DEFAULT_MAP_CONFIG);
 
     static void detectImageWidthHeightRatio(string& mapPath);
+
+    static string getCountryNameWhenMouseClick(int x, int y);
+
+    static void renderCountryMark(int x, int y, Country &country, const int fontSize);
 };

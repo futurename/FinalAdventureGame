@@ -38,6 +38,7 @@ Country::Country(string name, int x, int y, vector<string> &countries) {
     this->coordinateX = x;
     this->coordinateY = y;
     this->countryColour = ColorList::GREEN;
+    this->numOfArmy = 3;
     vector<string> adjacentCountries;
     for (string str: countries) {
         adjacentCountries.push_back(str);
@@ -55,4 +56,11 @@ int Country::getY() {
 
 vector<string> &Country::getAdjacentCountires() {
     return adjacentCountries;
+}
+
+Country::Country() {
+}
+
+int Country::getCountryArmy() {
+    return numOfArmy;
 }
