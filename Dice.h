@@ -2,8 +2,6 @@
 // Created by Kishan on 2021-03-15.
 //
 
-#include "imports.h"
-
 #ifndef FINALGAMEDESIGN_DICE_H
 #define FINALGAMEDESIGN_DICE_H
 
@@ -13,18 +11,10 @@
 class Dice{
 public:
     int RollDie();
-
-    int GetMinValue();
-    int GetMaxValue();
-
-
-private:
     int roll;
-    int min = 1;
-    int max = 6;
-
+    int maxValue = 6;
+    int minValue = 1;
 
 };
-
 
 #endif //FINALGAMEDESIGN_DICE_H
