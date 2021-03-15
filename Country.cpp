@@ -64,3 +64,7 @@ Country::Country() {
 int Country::getCountryArmy() {
     return numOfArmy;
 }
+
+tuple<int, int, int, int> Country::getTextColor() {
+    return textColor;
+}

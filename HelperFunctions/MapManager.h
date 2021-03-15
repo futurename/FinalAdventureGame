@@ -21,11 +21,13 @@ private:
     const static tuple<int, int, int, int> DEFAULT_BACKGROUND_COLOR;
     const static string DEFAULT_MAP;
     const static string DEFAULT_MAP_CONFIG;
-    const static string TERRITORIES_HEADER;
+    const static string TERRITORIES_TITLE;
+    const static string CONTINENT_TITLE;
     const static int COUNTRY_NAME_INDEX = 0;
     const static int COUNTRY_COORDINATE_X = 1;
     const static int COUNTRY_COORDINATE_Y = 2;
-    const static int ADJACENT_COUNTRIES_STARTS = 3;
+    const static int CONTINENT_NAME_INDEX = 3;
+    const static int ADJACENT_COUNTRIES_STARTS = 4;
     const static char* DEFAULT_FONT_PATH;
     static double IMAGE_WIDTH_RATIO;
     static double IMAGE_HEIGHT_RATIO;

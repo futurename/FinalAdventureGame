@@ -32,10 +32,13 @@ public:
 
     int getCountryArmy();
 
+    tuple<int,int,int,int> getTextColor();
+
 private:
     string countryName;
     string continentName;
     tuple<int, int, int, int> countryColour;
+    tuple<int,int,int,int> textColor;
     string ownerName;
     int coordinateX;
     int coordinateY;

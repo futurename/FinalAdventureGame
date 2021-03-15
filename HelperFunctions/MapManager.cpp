@@ -1,7 +1,7 @@
 #include "MapManager.h"
 #include "Game.h"
 #include "ColorList.h"
-#include "../Country.h"
+#include "../Continent.h"
 
 SDL_Window *MapManager::gWindow = NULL;
 
@@ -17,7 +17,9 @@ const string MapManager::DEFAULT_MAP = "../Maps/World.bmp";
 
 const string MapManager::DEFAULT_MAP_CONFIG = "../Maps/World.map";
 
-const string MapManager::TERRITORIES_HEADER = "Territories";
+const string MapManager::TERRITORIES_TITLE = "Territories";
+
+const string MapManager::CONTINENT_TITLE = "Continents";
 
 const char *MapManager::DEFAULT_FONT_PATH = "../Fonts/FiraSans-Regular.ttf";
 
@@ -348,15 +350,34 @@ void MapManager::readMapConfigFromFile(string filePath) {
         string line;
         map<string, Country> allCountries;
         while (getline(inFIle, line)) {
-            if (line.find(TERRITORIES_HEADER) != string::npos) {
+            if (line.find(CONTINENT_TITLE) != string::npos) {
+                map<string, Continent> allContinents;
                 while (getline(inFIle, line)) {
                     if (line.length() == 0) {
+                        break;
+                    } else {
+                        stringstream ss(line);
+                        string continentName;
+                        string bonus;
 
-                        //FIXME different continent
+                        getline(ss, continentName, '=');
+                        getline(ss, bonus, '=');
+
+                        Continent continent(continentName, stoi(bonus));
+                        allContinents.insert({continentName, continent});
+                    }
+                }
+                Game::setAllContinents(allContinents);
+            }
+
+            if (line.find(TERRITORIES_TITLE) != string::npos) {
+                while (getline(inFIle, line)) {
+                    if (line.length() == 0) {
                         continue;
                     } else {
                         stringstream ss(line);
                         vector<string> countryTokens;
+
                         while (ss.good()) {
                             string subString;
                             getline(ss, subString, ',');
@@ -368,11 +389,16 @@ void MapManager::readMapConfigFromFile(string filePath) {
                         string countryName = countryTokens.at(COUNTRY_NAME_INDEX);
                         int coordinateX = stoi(countryTokens.at(COUNTRY_COORDINATE_X)) * IMAGE_WIDTH_RATIO;
                         int coordinateY = stoi(countryTokens.at(COUNTRY_COORDINATE_Y)) * IMAGE_HEIGHT_RATIO;
+                        string continentName = countryTokens.at(CONTINENT_NAME_INDEX);
+
+                        Game::getAllContinents().find(continentName)->second.addCountryName(countryName);
+
                         vector<string> adjacentCountries;
                         for (int i = ADJACENT_COUNTRIES_STARTS; i < countryTokens.size(); i++) {
                             adjacentCountries.push_back(countryTokens.at(i));
                         }
                         Country country(countryName, coordinateX, coordinateY, adjacentCountries);
+                        country.setContinentName(continentName);
                         allCountries.insert({countryName, country});
                     }
                 }
