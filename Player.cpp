@@ -7,12 +7,6 @@ Player::Player(){
 }
 
 
-
-
-
-
-
-
 void Player::SetPlayerName(string inPlayerName){
     playerName = inPlayerName;
 }

@@ -1,7 +1,6 @@
 
 #include "HelperFunctions/imports.h"
 
-
 class Country {
 public:
     Country();
