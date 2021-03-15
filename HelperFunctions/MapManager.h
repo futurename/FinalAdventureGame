@@ -4,25 +4,30 @@
 #include <string>
 #include <SDL_ttf.h>
 
+class Country;
+
 class MapManager {
 private:
     const static int SCREEN_WIDTH = 1800;
     const static int SCREEN_HEIGHT = 900;
-    const static int MAP_VIEW_PORT_WIDTH = 1400;
+    const static int MAP_VIEW_PORT_WIDTH = 1500;
     const static int MAP_VIEW_PORT_HEIGHT = SCREEN_HEIGHT;
     const static int TEXT_VIEW_PORT_WIDTH = SCREEN_WIDTH - MAP_VIEW_PORT_WIDTH;
     const static int TEXT_VIEW_PORT_HEIGHT = SCREEN_HEIGHT;
     const static int COUNTRY_MARK_WIDTH = 70;
     const static int COUNTRY_MARK_HEIGHT = 50;
+    const static int COUNTRY_TEXT_HEIGHT_SHIFT = 10;
     const static int COUNTRY_NAME_FONT_SIZE = 14;
     const static tuple<int, int, int, int> DEFAULT_BACKGROUND_COLOR;
     const static string DEFAULT_MAP;
     const static string DEFAULT_MAP_CONFIG;
-    const static string TERRITORIES_HEADER;
+    const static string TERRITORIES_TITLE;
+    const static string CONTINENT_TITLE;
     const static int COUNTRY_NAME_INDEX = 0;
     const static int COUNTRY_COORDINATE_X = 1;
     const static int COUNTRY_COORDINATE_Y = 2;
-    const static int ADJACENT_COUNTRIES_STARTS = 3;
+    const static int CONTINENT_NAME_INDEX = 3;
+    const static int ADJACENT_COUNTRIES_STARTS = 4;
     const static char* DEFAULT_FONT_PATH;
     static double IMAGE_WIDTH_RATIO;
     static double IMAGE_HEIGHT_RATIO;
@@ -51,9 +56,7 @@ private:
 
     void static SDLClose();
 
-    static Uint32 getPixel(SDL_Surface *surface, int x, int y);
-
-    static SDL_Surface *loadSurface(std::string path);
+    static map<string, SDL_Texture*> countryTextures;
 
 public:
     static void initWorldMarks();
@@ -61,6 +64,8 @@ public:
     static void start(string mapPath);
 
     static void renderMapViewPort();
+
+    static void renderMapViewPort(Country& country);
 
     static void setOwnerColorMark(int centerX, int centerY, tuple<int, int, int, int> color);
 
@@ -72,4 +77,10 @@ public:
     static void readMapConfigFromFile(string filePath = DEFAULT_MAP_CONFIG);
 
     static void detectImageWidthHeightRatio(string& mapPath);
+
+    static string getCountryNameFromCoordinates(int x, int y);
+
+    static void renderCountryMark(int x, int y, Country &country, const int fontSize);
+
+    static void clearTextViewPort();
 };

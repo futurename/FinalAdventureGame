@@ -2,9 +2,9 @@
 
 Continent::Continent(string cName, int cBonusValue){
     continentName = cName;
-    continentOwnerIndex = -1;
-    continentBonusValue = cBonusValue;
-    map<string, Country> continentCountryGraph;
+    ownerIndex = -1;
+    bonus = cBonusValue;
+
 }
 
 
@@ -12,15 +12,24 @@ string Continent::getContinentName(){
     return continentName;
 }
 
-int Continent::getContinentOwnerIndex(){
-    return continentOwnerIndex;
+int Continent::getOwnerIndex(){
+    return ownerIndex;
 }
 
-int Continent::getContinentBonusValue(){
-    return continentBonusValue;
+int Continent::getBonus(){
+    return bonus;
 }
 
-map<string, Country> Continent::getContinentCountryGraph(){
-    return continentCountryGraph;
+void Continent::addCountryName(string& countryName) {
+    countryNames.push_back(countryName);
 }
+
+vector<string>& Continent::getCountryNames() {
+    return countryNames;
+}
+
+void Continent::setCountryNames(vector<string>& countryNames) {
+    this->countryNames = countryNames;
+}
+
 
