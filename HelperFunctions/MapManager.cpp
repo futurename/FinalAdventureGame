@@ -249,6 +249,9 @@ void MapManager::start(string mapPath) {
                             string str = to_string(e.motion.x) + ":" + to_string(e.motion.y);
                             SDL_SetWindowTitle(gWindow, str.c_str());
                             break;
+
+                           // SDL_ShowSimpleMessageBox(0,"Mouse", "moving", gWindow);
+                            break;
                     }
 
 
