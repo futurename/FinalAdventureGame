@@ -1,0 +1,8 @@
+//
+// Created by Kishan on 2021-03-15.
+//
+
+#ifndef FINALGAMEDESIGN_DICE_H
+#define FINALGAMEDESIGN_DICE_H
+
+#endif //FINALGAMEDESIGN_DICE_H
