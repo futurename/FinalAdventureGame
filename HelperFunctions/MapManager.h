@@ -71,5 +71,5 @@ public:
 
     static void readMapConfigFromFile(string filePath = DEFAULT_MAP_CONFIG);
 
-    static void detectRawImageWidthHeightRatio(string& mapPath);
+    static void detectImageWidthHeightRatio(string& mapPath);
 };

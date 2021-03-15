@@ -19,7 +19,7 @@ const string MapManager::DEFAULT_MAP_CONFIG = "../Maps/World.map";
 
 const string MapManager::TERRITORIES_HEADER = "Territories";
 
-const char* MapManager::DEFAULT_FONT_PATH = "../Fonts/FiraSans-Regular.ttf";
+const char *MapManager::DEFAULT_FONT_PATH = "../Fonts/FiraSans-Regular.ttf";
 
 const tuple<int, int, int, int> MapManager::DEFAULT_BACKGROUND_COLOR = ColorList::WHITE;
 
@@ -210,16 +210,23 @@ void MapManager::start(string mapPath) {
                 //Handle events on queue
                 while (SDL_PollEvent(&e) != 0) {
                     //User requests quit
-                    if (e.type == SDL_QUIT) {
-                        quit = true;
+                    switch (e.type) {
+                        case SDL_QUIT:
+                            quit = true;
+                            break;
+                        case SDL_MOUSEMOTION:
+                            string str = to_string(e.motion.x) + ":" + to_string(e.motion.y);
+                            SDL_SetWindowTitle(gWindow, str.c_str());
+                            break;
                     }
+
 
                 }
 
                 SDL_RenderClear(gRenderer);
 
                 //get raw image width/height vs display ratio
-                detectRawImageWidthHeightRatio(mapPath);
+                detectImageWidthHeightRatio(mapPath);
 
                 //*******************************************
                 //Rendering map vew port
@@ -374,7 +381,7 @@ void MapManager::readMapConfigFromFile(string filePath) {
     }
 }
 
-void MapManager::detectRawImageWidthHeightRatio(string &mapPath) {
+void MapManager::detectImageWidthHeightRatio(string &mapPath) {
     SDL_Surface *surface = IMG_Load(mapPath.c_str());
     IMAGE_WIDTH_RATIO = (double) MAP_VIEW_PORT_WIDTH / surface->w;
     IMAGE_HEIGHT_RATIO = (double) MAP_VIEW_PORT_HEIGHT / surface->h;
