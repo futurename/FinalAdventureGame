@@ -19,6 +19,8 @@ const string MapManager::DEFAULT_MAP_CONFIG = "../Maps/World.map";
 
 const string MapManager::TERRITORIES_HEADER = "Territories";
 
+const char* MapManager::DEFAULT_FONT_PATH = "../Fonts/FiraSans-Regular.ttf";
+
 const tuple<int, int, int, int> MapManager::DEFAULT_BACKGROUND_COLOR = ColorList::WHITE;
 
 double MapManager::IMAGE_WIDTH_RATIO = 1.0;
@@ -35,6 +37,8 @@ void MapManager::initWorldMarks() {
         int y = country.getY() * IMAGE_HEIGHT_RATIO;
 
         setOwnerColorMark(x, y, country.getCountryColour());
+
+        renderMessage(x, y, country.getCountryName().c_str(), ColorList::RED, COUNTRY_NAME_FONT_SIZE);
     }
 }
 
@@ -268,10 +272,10 @@ void MapManager::setOwnerColorMark(int centerX, int centerY, tuple<int, int, int
     SDL_SetRenderDrawColor(gRenderer, get<0>(color), get<1>(color), get<2>(color),
                            get<3>(color));
     SDL_Rect sdlRect;
-    sdlRect.x = centerX - COUNTRY_MARK_LENGTH / 2;
-    sdlRect.y = centerY - COUNTRY_MARK_LENGTH / 2;
-    sdlRect.w = COUNTRY_MARK_LENGTH;
-    sdlRect.h = COUNTRY_MARK_LENGTH;
+    sdlRect.x = centerX - COUNTRY_MARK_WIDTH / 2;
+    sdlRect.y = centerY - COUNTRY_MARK_HEIGHT / 2;
+    sdlRect.w = COUNTRY_MARK_WIDTH;
+    sdlRect.h = COUNTRY_MARK_HEIGHT;
 
     SDL_RenderFillRect(gRenderer, &sdlRect);
 
@@ -321,7 +325,7 @@ void MapManager::renderMessage(int x, int y, const char *message, tuple<int, int
 
     text_texture = SDL_CreateTextureFromSurface(gRenderer, text);
 
-    SDL_Rect dest = {x, y, text->w, text->h};
+    SDL_Rect dest = {x - text->w / 2, y - text->h / 2, text->w, text->h};
 
     SDL_RenderCopy(gRenderer, text_texture, NULL, &dest);
 
@@ -330,6 +334,7 @@ void MapManager::renderMessage(int x, int y, const char *message, tuple<int, int
 }
 
 
+//FIXME add continent
 void MapManager::readMapConfigFromFile(string filePath) {
     fstream inFIle(filePath);
     if (!inFIle.is_open()) {
@@ -358,12 +363,11 @@ void MapManager::readMapConfigFromFile(string filePath) {
                         int coordinateX = stoi(countryTokens.at(COUNTRY_COORDINATE_X));
                         int coordinateY = stoi(countryTokens.at(COUNTRY_COORDINATE_Y));
                         vector<string> adjacentCountries;
-                        for(int i = ADJACENT_COUNTRIES_STARTS; i<countryTokens.size();i++){
+                        for (int i = ADJACENT_COUNTRIES_STARTS; i < countryTokens.size(); i++) {
                             adjacentCountries.push_back(countryTokens.at(i));
                         }
                         Country country(countryName, coordinateX, coordinateY, adjacentCountries);
                         allCountries.push_back(country);
-
 
                     }
                 }
@@ -373,8 +377,8 @@ void MapManager::readMapConfigFromFile(string filePath) {
     }
 }
 
-void MapManager::detectRawImageWidthHeightRatio(string& mapPath) {
-    SDL_Surface* surface = IMG_Load(mapPath.c_str());
-    IMAGE_WIDTH_RATIO = (double)MAP_VIEW_PORT_WIDTH / surface->w;
-    IMAGE_HEIGHT_RATIO = (double)MAP_VIEW_PORT_HEIGHT / surface->h;
+void MapManager::detectRawImageWidthHeightRatio(string &mapPath) {
+    SDL_Surface *surface = IMG_Load(mapPath.c_str());
+    IMAGE_WIDTH_RATIO = (double) MAP_VIEW_PORT_WIDTH / surface->w;
+    IMAGE_HEIGHT_RATIO = (double) MAP_VIEW_PORT_HEIGHT / surface->h;
 }

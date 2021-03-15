@@ -6,13 +6,15 @@
 
 class MapManager {
 private:
-    const static int SCREEN_WIDTH = 1600;
+    const static int SCREEN_WIDTH = 1800;
     const static int SCREEN_HEIGHT = 900;
-    const static int MAP_VIEW_PORT_WIDTH = 1300;
+    const static int MAP_VIEW_PORT_WIDTH = 1400;
     const static int MAP_VIEW_PORT_HEIGHT = SCREEN_HEIGHT;
     const static int TEXT_VIEW_PORT_WIDTH = SCREEN_WIDTH - MAP_VIEW_PORT_WIDTH;
     const static int TEXT_VIEW_PORT_HEIGHT = SCREEN_HEIGHT;
-    const static int COUNTRY_MARK_LENGTH = 40;
+    const static int COUNTRY_MARK_WIDTH = 70;
+    const static int COUNTRY_MARK_HEIGHT = 50;
+    const static int COUNTRY_NAME_FONT_SIZE = 14;
     const static tuple<int, int, int, int> DEFAULT_BACKGROUND_COLOR;
     const static string DEFAULT_MAP;
     const static string DEFAULT_MAP_CONFIG;
@@ -21,6 +23,7 @@ private:
     const static int COUNTRY_COORDINATE_X = 1;
     const static int COUNTRY_COORDINATE_Y = 2;
     const static int ADJACENT_COUNTRIES_STARTS = 3;
+    const static char* DEFAULT_FONT_PATH;
     static double IMAGE_WIDTH_RATIO;
     static double IMAGE_HEIGHT_RATIO;
 
@@ -64,7 +67,7 @@ public:
     static void renderTextViewPort();
 
     static void renderMessage(int x, int y, const char *message, tuple<int, int, int, int> color, int fontSize,
-                              const char *fontPath = "../Fonts/Rubik-ExtraBold.ttf");
+                              const char *fontPath = DEFAULT_FONT_PATH);
 
     static void readMapConfigFromFile(string filePath = DEFAULT_MAP_CONFIG);
 

@@ -6,7 +6,7 @@ add_executable(FinalGameDesign main.cpp Archer.cpp Archer.h Army.h Army.cpp Sold
         StaticFunc/Game.h StaticFunc/Game.cpp)
 
 
-#[[add_executable(FinalGameDesign SDL2SampleCodes/08_geometry_rendering/08_geometry_rendering.cpp)]]
+#[[add_executable(FinalGameDesign SDL2SampleCodes/17_mouse_events/17_mouse_events.cpp)]]
 
 
 set(SDL2_LIB_DIR lib_sdl2/lib)
