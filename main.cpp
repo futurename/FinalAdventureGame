@@ -1,6 +1,6 @@
 
-#include "StaticFunc/MapManager.h"
-#include "StaticFunc/Game.h"
+#include "HelperFunctions//MapManager.h"
+#include "HelperFunctions/Game.h"
 
 using namespace std;
 

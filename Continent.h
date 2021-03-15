@@ -1,6 +1,6 @@
 #pragma once
 
-#include "StaticFunc/imports.h"
+#include "HelperFunctions/imports.h"
 #include "Country.h"
 
 class Continent {

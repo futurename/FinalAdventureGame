@@ -89,7 +89,6 @@ bool MapManager::SDLInit() {
             }
         }
     }
-
     return success;
 }
 
@@ -103,7 +102,6 @@ bool MapManager::SDLLoadMedia(string mapPath) {
         printf("Failed to load texture image!\n");
         success = false;
     }
-
     return success;
 }
 
@@ -125,7 +123,6 @@ SDL_Surface *MapManager::loadSurface(std::string path) {
         //Get rid of old loaded surface
         SDL_FreeSurface(loadedSurface);
     }
-
     return optimizedSurface;
 }
 
@@ -143,7 +140,6 @@ void MapManager::SDLClose() {
     //Free global font
     TTF_CloseFont(gFont);
     gFont = NULL;
-
 
     //Quit SDL subsystems
     TTF_Quit();
@@ -217,6 +213,7 @@ void MapManager::start(string mapPath) {
                     if (e.type == SDL_QUIT) {
                         quit = true;
                     }
+
                 }
 
                 SDL_RenderClear(gRenderer);

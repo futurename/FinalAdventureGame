@@ -1,5 +1,5 @@
 #pragma once
-#include "StaticFunc/imports.h"
+#include "HelperFunctions/imports.h"
 
 class Soldier{
 private:

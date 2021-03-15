@@ -1,5 +1,5 @@
 #include "Country.h"
-#include "StaticFunc/ColorList.h"
+#include "HelperFunctions/ColorList.h"
 
 string Country::getCountryName() {
     return countryName;

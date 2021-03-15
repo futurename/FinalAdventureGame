@@ -1,5 +1,5 @@
 
-#include "StaticFunc/imports.h"
+#include "HelperFunctions/imports.h"
 #include "Archer.h"
 #include "Swordsman.h"
 #include "Horseman.h"
