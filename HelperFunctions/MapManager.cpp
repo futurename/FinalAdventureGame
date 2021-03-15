@@ -30,15 +30,17 @@ double MapManager::IMAGE_HEIGHT_RATIO = 1.0;
 void MapManager::initWorldMarks() {
     readMapConfigFromFile();
 
-    vector<Country> allCountries = Game::getAllCountries();
+    map<string, Country> allCountries = Game::getAllCountries();
 
-    for (Country country: Game::getAllCountries()) {
-        int x = country.getX() * IMAGE_WIDTH_RATIO;
-        int y = country.getY() * IMAGE_HEIGHT_RATIO;
+    for (auto itr = allCountries.begin(); itr != allCountries.end(); itr++) {
+        Country &country = itr->second;
+        int x = country.getX();
+        int y = country.getY();
 
         setOwnerColorMark(x, y, country.getCountryColour());
 
-        renderMessage(x, y, country.getCountryName().c_str(), ColorList::RED, COUNTRY_NAME_FONT_SIZE);
+        renderCountryMark(x, y, country, COUNTRY_NAME_FONT_SIZE);
+
     }
 }
 
@@ -105,27 +107,6 @@ bool MapManager::SDLLoadMedia(string mapPath) {
     return success;
 }
 
-SDL_Surface *MapManager::loadSurface(std::string path) {
-    //The final optimized image
-    SDL_Surface *optimizedSurface = NULL;
-
-    //Load image at specified path
-    SDL_Surface *loadedSurface = SDL_LoadBMP(path.c_str());
-    if (loadedSurface == NULL) {
-        printf("Unable to load image %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
-    } else {
-        //Convert surface to screen format
-        optimizedSurface = SDL_ConvertSurface(loadedSurface, gScreenSurface->format, 0);
-        if (optimizedSurface == NULL) {
-            printf("Unable to optimize image %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
-        }
-
-        //Get rid of old loaded surface
-        SDL_FreeSurface(loadedSurface);
-    }
-    return optimizedSurface;
-}
-
 void MapManager::SDLClose() {
     //Free loaded image
     SDL_DestroyTexture(gMapTexture);
@@ -166,28 +147,6 @@ SDL_Texture *MapManager::loadTexture(string path) {
         SDL_FreeSurface(loadedSurface);
     }
     return newTexture;
-}
-
-Uint32 MapManager::getPixel(SDL_Surface *surface, int x, int y) {
-    int bpp = surface->format->BytesPerPixel;
-    /* Here p is the address to the pixel we want to retrieve */
-    Uint8 *p = (Uint8 *) surface->pixels + y * surface->pitch + x * bpp;
-
-    switch (bpp) {
-        case 1:
-            return *p;
-        case 2:
-            return *(Uint16 *) p;
-        case 3:
-            if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
-                return p[0] << 16 | p[1] << 8 | p[2];
-            else
-                return p[0] | p[1] << 8 | p[2] << 16;
-        case 4:
-            return *(Uint32 *) p;
-        default:
-            return 0;       /* shouldn't happen, but avoids warnings */
-    }
 }
 
 void MapManager::start(string mapPath) {
@@ -241,23 +200,26 @@ void MapManager::start(string mapPath) {
                 //Handle events on queue
                 while (SDL_PollEvent(&e) != 0) {
                     //User requests quit
+                    string message;
+                    Country pickedCountry;
                     switch (e.type) {
                         case SDL_QUIT:
                             quit = true;
                             break;
                         case SDL_MOUSEMOTION:
-                            string str = to_string(e.motion.x) + ":" + to_string(e.motion.y);
-                            SDL_SetWindowTitle(gWindow, str.c_str());
+                            message = to_string(e.motion.x) + ":" + to_string(e.motion.y);
+                            SDL_SetWindowTitle(gWindow, message.c_str());
                             break;
+                        case SDL_MOUSEBUTTONDOWN:
+                            switch (e.button.button) {
+                                case SDL_BUTTON_LEFT:
+                                    message = getCountryNameWhenMouseClick(e.motion.x, e.motion.y);
+                                    SDL_ShowSimpleMessageBox(0, "check range", message.c_str(), gWindow);
+                                    break;
+                            }
 
-                           // SDL_ShowSimpleMessageBox(0,"Mouse", "moving", gWindow);
-                            break;
                     }
-
-
                 }
-
-
             }
         }
     }
@@ -276,7 +238,7 @@ void MapManager::renderMapViewPort() {
 
     SDL_RenderCopy(gRenderer, gMapTexture, NULL, NULL);
 
-    renderMessage(0, 0, "Hello world", ColorList::RED, 18);
+    renderMessage(0, 10, "Hello world", ColorList::RED, 18);
 }
 
 void MapManager::setOwnerColorMark(int centerX, int centerY, tuple<int, int, int, int> color) {
@@ -313,7 +275,7 @@ void MapManager::renderTextViewPort() {
 
     SDL_RenderDrawRect(gRenderer, nullptr);
 
-    renderMessage(0, 0, "Hello world", ColorList::RED, 18);
+    renderMessage(0, 10, "Hello world", ColorList::RED, 18);
 
     setOwnerColorMark(100, 100, ColorList::RED);
 }
@@ -344,19 +306,18 @@ void MapManager::renderMessage(int x, int y, const char *message, tuple<int, int
     SDL_FreeSurface(text);
 }
 
-
-//FIXME add continent
 void MapManager::readMapConfigFromFile(string filePath) {
     fstream inFIle(filePath);
     if (!inFIle.is_open()) {
         cout << "Failed reading file from the path: " << filePath << endl;
     } else {
         string line;
-        vector<Country> allCountries;
+        map<string, Country> allCountries;
         while (getline(inFIle, line)) {
             if (line.find(TERRITORIES_HEADER) != string::npos) {
                 while (getline(inFIle, line)) {
                     if (line.length() == 0) {
+
                         //FIXME different continent
                         continue;
                     } else {
@@ -371,15 +332,14 @@ void MapManager::readMapConfigFromFile(string filePath) {
                         ss.clear();
 
                         string countryName = countryTokens.at(COUNTRY_NAME_INDEX);
-                        int coordinateX = stoi(countryTokens.at(COUNTRY_COORDINATE_X));
-                        int coordinateY = stoi(countryTokens.at(COUNTRY_COORDINATE_Y));
+                        int coordinateX = stoi(countryTokens.at(COUNTRY_COORDINATE_X)) * IMAGE_WIDTH_RATIO;
+                        int coordinateY = stoi(countryTokens.at(COUNTRY_COORDINATE_Y)) * IMAGE_HEIGHT_RATIO;
                         vector<string> adjacentCountries;
                         for (int i = ADJACENT_COUNTRIES_STARTS; i < countryTokens.size(); i++) {
                             adjacentCountries.push_back(countryTokens.at(i));
                         }
                         Country country(countryName, coordinateX, coordinateY, adjacentCountries);
-                        allCountries.push_back(country);
-
+                        allCountries.insert({countryName, country});
                     }
                 }
             }
@@ -392,4 +352,24 @@ void MapManager::detectImageWidthHeightRatio(string &mapPath) {
     SDL_Surface *surface = IMG_Load(mapPath.c_str());
     IMAGE_WIDTH_RATIO = (double) MAP_VIEW_PORT_WIDTH / surface->w;
     IMAGE_HEIGHT_RATIO = (double) MAP_VIEW_PORT_HEIGHT / surface->h;
+}
+
+string MapManager::getCountryNameWhenMouseClick(int x, int y) {
+    for (auto itr = Game::getAllCountries().begin(); itr != Game::getAllCountries().end(); itr++) {
+        int coorX = itr->second.getX();
+        int coorY = itr->second.getY();
+        int widthDia = COUNTRY_MARK_WIDTH / 2;
+        int heightDia = COUNTRY_MARK_HEIGHT / 2;
+        if (x <= coorX + widthDia && x >= coorX - widthDia && y >= coorY - heightDia && y <= coorY + heightDia) {
+            return itr->first;
+        }
+    }
+    return "";
+}
+
+void MapManager::renderCountryMark(int x, int y, Country &country, const int fontSize) {
+    renderMessage(x, y - COUNTRY_TEXT_HEIGHT_SHIFT, country.getCountryName().c_str(), ColorList::RED,
+                  COUNTRY_NAME_FONT_SIZE);
+    renderMessage(x, y + COUNTRY_TEXT_HEIGHT_SHIFT, to_string(country.getCountryArmy()).c_str(), ColorList::RED,
+                  COUNTRY_NAME_FONT_SIZE);
 }
