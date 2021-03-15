@@ -202,6 +202,37 @@ void MapManager::start(string mapPath) {
             //Main loop flag
             bool quit = false;
 
+            SDL_RenderClear(gRenderer);
+
+            //get raw image width/height vs display ratio
+            detectImageWidthHeightRatio(mapPath);
+
+            //*******************************************
+            //Rendering map vew port
+            renderMapViewPort();
+
+            initWorldMarks();
+
+            /*tuple<int, int, int, int> paintColor = ColorList::BLUE;
+            setOwnerColorMark(300, 400, paintColor);*/
+
+
+
+            //*******************************************
+            //rendering text view port
+            renderTextViewPort();
+
+
+
+            //******************************************
+            //render font
+
+
+            //Update screen
+            SDL_RenderPresent(gRenderer);
+
+
+
             //Event handler
             SDL_Event e;
 
@@ -223,34 +254,7 @@ void MapManager::start(string mapPath) {
 
                 }
 
-                SDL_RenderClear(gRenderer);
 
-                //get raw image width/height vs display ratio
-                detectImageWidthHeightRatio(mapPath);
-
-                //*******************************************
-                //Rendering map vew port
-                renderMapViewPort();
-
-                initWorldMarks();
-
-                /*tuple<int, int, int, int> paintColor = ColorList::BLUE;
-                setOwnerColorMark(300, 400, paintColor);*/
-
-
-
-                //*******************************************
-                //rendering text view port
-                renderTextViewPort();
-
-
-
-                //******************************************
-                //render font
-
-
-                //Update screen
-                SDL_RenderPresent(gRenderer);
             }
         }
     }
