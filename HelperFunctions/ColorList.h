@@ -10,4 +10,9 @@ public:
     const static tuple<int, int, int, int> WHITE;
     const static tuple<int, int, int, int> BLACK;
     const static tuple<int, int, int, int> LIGHTER_YELLOW;
+
+    static vector<pair<tuple<int, int, int, int>, tuple<int, int, int, int>>> colorPairs;
+
+    void generateColorPairs(int numOfPlayers);
+
 };
