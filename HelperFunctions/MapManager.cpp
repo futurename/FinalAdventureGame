@@ -184,7 +184,7 @@ void MapManager::start(string mapPath) {
 
             //*******************************************
             //rendering text view port
-            renderTextViewPort();
+            initTextViewPort();
 
 
 
@@ -217,7 +217,7 @@ void MapManager::start(string mapPath) {
                             if (!getCountryNameFromCoordinates(e.motion.x, e.motion.y).empty()) {
                                 message = getCountryNameFromCoordinates(e.motion.x, e.motion.y);
                                 pickedCountry = &Game::getAllCountries().find(message.c_str())->second;
-                                //clearTextViewPort();
+                                //updateTextViewPort();
                                 // renderMapViewPort(*pickedCountry);
                                 //renderCountryMark(pickedCountry->getX(), pickedCountry->getY(), *pickedCountry, 22);
                             }
@@ -229,8 +229,12 @@ void MapManager::start(string mapPath) {
                                     message = getCountryNameFromCoordinates(e.motion.x, e.motion.y);
                                     SDL_ShowSimpleMessageBox(0, "check range", message.c_str(), gWindow);
 
-                                    //renderMapViewPort(*pickedCountry);
-                                    //clearTextViewPort();
+                                    vector<string> messages;
+                                    messages.push_back(pickedCountry->getCountryName());
+                                    messages.push_back(to_string(pickedCountry->getOwnerIndex()));
+                                    messages.push_back(pickedCountry->getContinentName());
+                                    messages.push_back(to_string(pickedCountry->getCountryArmy()));
+                                    updateTextViewPort(messages);
                                     break;
                             }
 
@@ -274,86 +278,10 @@ void MapManager::setOwnerColorMark(int centerX, int centerY, tuple<int, int, int
                            get<3>(DEFAULT_BACKGROUND_COLOR));
 }
 
-void MapManager::renderTextViewPort() {
+void MapManager::initTextViewPort() {
     SDL_Rect textVeiewPort{MAP_VIEW_PORT_WIDTH, 0, SCREEN_WIDTH - MAP_VIEW_PORT_WIDTH, SCREEN_HEIGHT};
-
     SDL_RenderSetViewport(gRenderer, &textVeiewPort);
-
-    tuple<int, int, int, int> bgColor = ColorList::LIGHTER_YELLOW;
-    SDL_SetRenderDrawColor(gRenderer, get<0>(bgColor), get<1>(bgColor), get<2>(bgColor), get<3>(bgColor));
-
-    SDL_RenderFillRect(gRenderer, nullptr);
-
-    tuple<int, int, int, int> borderColor = ColorList::BLACK;
-    SDL_SetRenderDrawColor(gRenderer, get<0>(borderColor), get<1>(borderColor), get<2>(borderColor),
-                           get<3>(borderColor));
-
-    SDL_RenderDrawRect(gRenderer, nullptr);
-
-    renderMessage(0, 10, "Hello world", ColorList::RED, 18);
-}
-
-void MapManager::renderMapViewPort(Country &country) {
-    SDL_Texture *textTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING,
-                                                 SCREEN_WIDTH - MAP_VIEW_PORT_WIDTH, SCREEN_HEIGHT);
-
-    SDL_SetRenderDrawColor(gRenderer, get<0>(ColorList::LIGHTER_YELLOW), get<1>(ColorList::LIGHTER_YELLOW),
-                           get<2>(ColorList::LIGHTER_YELLOW), get<3>(ColorList::LIGHTER_YELLOW));
-    SDL_Rect dst;
-    dst.x = MAP_VIEW_PORT_WIDTH;
-    dst.y = 0;
-    dst.w = SCREEN_WIDTH - MAP_VIEW_PORT_WIDTH;
-    dst.h = SCREEN_HEIGHT;
-
-    SDL_RenderSetViewport(gRenderer, &dst);
-
-    // SDL_RenderFillRect(gRenderer, nullptr);
-
-    /*SDL_SetRenderDrawColor(gRenderer, get<0>(ColorList::BLACK), get<1>(ColorList::BLACK),
-                           get<2>(ColorList::BLACK), get<3>(ColorList::BLACK));
-
-    SDL_RenderDrawRect(gRenderer, nullptr);*/
-
-    string textureText = "rendering text";
-    SDL_Color textColor = {255, 255, 0, 0};
-    SDL_SetRenderTarget(gRenderer, textTexture);
-    SDL_Surface *textSurface = TTF_RenderText_Solid(gFont, textureText.c_str(), textColor);
-
-    SDL_Texture *mTexture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
-
-    //Get rid of old surface
-    // SDL_FreeSurface(textSurface);
-
-    //SDL_RenderClear( gRenderer );
-    SDL_RenderCopyEx(gRenderer, mTexture, NULL, &dst, 0, NULL, SDL_FLIP_HORIZONTAL);
-
-    SDL_SetRenderTarget(gRenderer, NULL);
-
-    SDL_RenderPresent(gRenderer);
-
-
-    SDL_DestroyTexture(textTexture);
-    //SDL_FreeSurface(textSurface);
-
-    //SDL_RenderSetViewport(gRenderer, &textVeiewPort);
-/*
-    tuple<int, int, int, int> bgColor = ColorList::LIGHTER_YELLOW;
-    SDL_SetRenderDrawColor(gRenderer, get<0>(bgColor), get<1>(bgColor), get<2>(bgColor), get<3>(bgColor));
-
-    SDL_RenderFillRect(gRenderer, nullptr);
-
-    tuple<int, int, int, int> borderColor = ColorList::BLACK;
-    SDL_SetRenderDrawColor(gRenderer, get<0>(borderColor), get<1>(borderColor), get<2>(borderColor),
-                           get<3>(borderColor));
-
-    SDL_RenderDrawRect(gRenderer, nullptr);
-
-    renderMessage(0, 10, "Hello world", ColorList::RED, 18);
-
-    renderMessage(50, 50, country.getCountryName().c_str(), ColorList::RED, 18);
-    renderMessage(50, 80, to_string(country.getCountryArmy()).c_str(), ColorList::RED, 18);
-
-    SDL_RenderCopy(gRenderer, gMapTexture, NULL, NULL);*/
+    resetTextViewPortBackground();
 }
 
 void MapManager::renderMessage(int x, int y, const char *message, tuple<int, int, int, int> color, int fontSize,
@@ -370,7 +298,7 @@ void MapManager::renderMessage(int x, int y, const char *message, tuple<int, int
 
     SDL_Texture *textTexture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
 
-    SDL_SetRenderTarget(gRenderer, textTexture);
+    //SDL_SetRenderTarget(gRenderer, textTexture);
     /*SDL_BlendMode blending;
     SDL_SetTextureBlendMode(textTexture, blending);*/
 
@@ -378,7 +306,7 @@ void MapManager::renderMessage(int x, int y, const char *message, tuple<int, int
 
     SDL_RenderCopy(gRenderer, textTexture, NULL, &dest);
 
-    SDL_SetRenderTarget(gRenderer, NULL);
+    // SDL_SetRenderTarget(gRenderer, NULL);
 
     SDL_DestroyTexture(textTexture);
     SDL_FreeSurface(textSurface);
@@ -479,33 +407,43 @@ void MapManager::renderCountryMark(int x, int y, Country &country, const int fon
                   fontSize);
 }
 
-void MapManager::clearTextViewPort() {
+void MapManager::updateTextViewPort(vector<string> &messages) {
 
-    SDL_Texture *textTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
-                                                 400,600);
+    SDL_Rect textViewPort{MAP_VIEW_PORT_WIDTH, 0, SCREEN_WIDTH - MAP_VIEW_PORT_WIDTH, SCREEN_HEIGHT};
 
-    //SDL_SetRenderTarget( gRenderer, textTexture );
+    SDL_Texture *textBgTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+                                                   SCREEN_WIDTH - MAP_VIEW_PORT_WIDTH, SCREEN_HEIGHT);
+    SDL_SetRenderTarget(gRenderer, textBgTexture);
+    // SDL_RenderSetViewport(gRenderer,&textViewPort);
 
-    SDL_Rect textRect{MAP_VIEW_PORT_WIDTH, 0, SCREEN_WIDTH - MAP_VIEW_PORT_WIDTH, SCREEN_HEIGHT};
-
-    SDL_Rect srcRect{200, 200, 300, 400};
-
-    SDL_SetRenderDrawColor(gRenderer, 255,255,255,255);
     SDL_RenderClear(gRenderer);
 
-    //SDL_RenderFillRect(gRenderer, &textRect);
-
-    //SDL_SetRenderTarget(gRenderer, textTexture);
+    resetTextViewPortBackground();
 
 
-    SDL_RenderCopy(gRenderer, textTexture,&textRect, NULL );
+    int y = 50;
+    int gap = 30;
 
-    SDL_SetRenderTarget( gRenderer, NULL );
+    for (string &msg: messages) {
+        renderMessage(TEXT_VIEWPORT_CENTER_X, y, msg.c_str(), ColorList::RED, 16);
+        y += 30;
+    }
 
-    SDL_RenderCopy(gRenderer,textTexture, NULL, NULL);
-    //SDL_RenderSetViewport(gRenderer, &srcRect);
+    SDL_SetRenderTarget(gRenderer, NULL);
 
-   SDL_RenderPresent(gRenderer);
+    SDL_RenderCopy(gRenderer, textBgTexture, NULL, NULL);
 
+    SDL_RenderPresent(gRenderer);
+}
+
+void MapManager::resetTextViewPortBackground() {
+    tuple<int, int, int, int> bgColor = ColorList::LIGHTER_YELLOW;
+    SDL_SetRenderDrawColor(gRenderer, get<0>(bgColor), get<1>(bgColor), get<2>(bgColor), get<3>(bgColor));
+    SDL_RenderFillRect(gRenderer, nullptr);
+
+    tuple<int, int, int, int> borderColor = ColorList::BLACK;
+    SDL_SetRenderDrawColor(gRenderer, get<0>(borderColor), get<1>(borderColor), get<2>(borderColor),
+                           get<3>(borderColor));
+    SDL_RenderDrawRect(gRenderer, nullptr);
 }
 

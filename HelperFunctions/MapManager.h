@@ -27,7 +27,8 @@ private:
     const static int COUNTRY_COORDINATE_Y = 2;
     const static int CONTINENT_NAME_INDEX = 3;
     const static int ADJACENT_COUNTRIES_STARTS = 4;
-    const static char* DEFAULT_FONT_PATH;
+    const static int TEXT_VIEWPORT_CENTER_X = (SCREEN_WIDTH - MAP_VIEW_PORT_WIDTH) / 2;
+    const static char *DEFAULT_FONT_PATH;
     static double IMAGE_WIDTH_RATIO;
     static double IMAGE_HEIGHT_RATIO;
 
@@ -55,7 +56,7 @@ private:
 
     void static SDLClose();
 
-    static map<string, SDL_Texture*> countryTextures;
+    static map<string, SDL_Texture *> countryTextures;
 
 public:
     static void initWorldMarks();
@@ -64,24 +65,24 @@ public:
 
     static void renderMapViewPort();
 
-    static void renderMapViewPort(Country& country);
-
     static void setOwnerColorMark(int centerX, int centerY, tuple<int, int, int, int> color);
 
-    static void renderTextViewPort();
+    static void initTextViewPort();
 
     static void renderMessage(int x, int y, const char *message, tuple<int, int, int, int> color, int fontSize,
                               const char *fontPath = DEFAULT_FONT_PATH);
 
     static void readMapConfigFromFile(string filePath = DEFAULT_MAP_CONFIG);
 
-    static void detectImageWidthHeightRatio(string& mapPath);
+    static void detectImageWidthHeightRatio(string &mapPath);
 
     static string getCountryNameFromCoordinates(int x, int y);
 
     static void renderCountryMark(int x, int y, Country &country, const int fontSize);
 
-    static void clearTextViewPort();
+    static void updateTextViewPort(vector<string> &messages);
 
     const static int COUNTRY_NAME_FONT_SIZE = 14;
+
+    static void resetTextViewPortBackground();
 };

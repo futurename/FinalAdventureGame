@@ -13,8 +13,6 @@ public:
 
     tuple<int, int, int, int> getCountryColour();
 
-    string getOwnerName();
-
     int getX();
 
     int getY();
