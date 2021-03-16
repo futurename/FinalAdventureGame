@@ -1,6 +1,5 @@
 #include "Random.h"
 #include <cstdlib>
-#include <ctime>
 
 pair<int, int> Random::RollDie(int numOfDices, int low, int high) {
     vector<int> numbers;
@@ -21,6 +20,5 @@ pair<int, int> Random::RollDie(int numOfDices, int low, int high) {
 }
 
 int Random::GenerateRandomNum(int low, int high) {
-
     return rand() % (high - low + 1) + low;
 }
