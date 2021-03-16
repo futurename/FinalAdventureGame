@@ -28,10 +28,14 @@ private:
     const static int ARYM_NUMBER_INDEX = 3;
     const static int CONTINENT_NAME_INDEX = 4;
     const static int ADJACENT_COUNTRIES_STARTS = 5;
+    const static int DEFAULT_MAP_FONT_SIZE = 12;
+    const static int DEFAULT_TEXT_FONT_SIZE = 18;
     const static int TEXT_VIEWPORT_CENTER_X = (SCREEN_WIDTH - MAP_VIEW_PORT_WIDTH) / 2;
     const static char *DEFAULT_FONT_PATH;
     static double IMAGE_WIDTH_RATIO;
     static double IMAGE_HEIGHT_RATIO;
+    static SDL_Rect textViewPort;
+    static SDL_Rect mapViewPort;
 
     //Loads individual image as texture
     static SDL_Texture *loadTexture(std::string path);
@@ -86,4 +90,8 @@ public:
     const static int COUNTRY_NAME_FONT_SIZE = 14;
 
     static void resetTextViewPortBackground();
+
+    static void updateMapViewPort();
+
+    static void resetToDefalutColor();
 };
