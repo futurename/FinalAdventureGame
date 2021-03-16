@@ -360,6 +360,7 @@ void MapManager::readMapConfigFromFile(string filePath) {
                         int coordinateX = stoi(countryTokens.at(COUNTRY_COORDINATE_X)) * IMAGE_WIDTH_RATIO;
                         int coordinateY = stoi(countryTokens.at(COUNTRY_COORDINATE_Y)) * IMAGE_HEIGHT_RATIO;
                         string continentName = countryTokens.at(CONTINENT_NAME_INDEX);
+                        int numOfArmy = stoi(countryTokens.at(ARYM_NUMBER_INDEX));
 
                         Game::getAllContinents().find(continentName)->second.addCountryName(countryName);
 
@@ -367,7 +368,7 @@ void MapManager::readMapConfigFromFile(string filePath) {
                         for (int i = ADJACENT_COUNTRIES_STARTS; i < countryTokens.size(); i++) {
                             adjacentCountries.push_back(countryTokens.at(i));
                         }
-                        Country country(countryName, coordinateX, coordinateY, adjacentCountries);
+                        Country country(countryName, coordinateX, coordinateY, adjacentCountries, numOfArmy);
                         country.setContinentName(continentName);
                         allCountries.insert({countryName, country});
                     }
@@ -398,9 +399,9 @@ string MapManager::getCountryNameFromCoordinates(int x, int y) {
 }
 
 void MapManager::renderCountryMark(int x, int y, Country &country, const int fontSize) {
-    stringstream ss;
-    ss << "P_" << to_string(country.getOwnerIndex() + 1).c_str();
-    renderMessage(x, y - COUNTRY_TEXT_HEIGHT_SHIFT, ss.str().c_str(), ColorList::RED,
+    int playerIndex = country.getOwnerIndex();
+    string playerName = Game::getPlayers().at(playerIndex).GetPlayerName();
+    renderMessage(x, y - COUNTRY_TEXT_HEIGHT_SHIFT, playerName.c_str(), ColorList::RED,
                   fontSize);
     renderMessage(x, y, country.getCountryName().c_str(), ColorList::RED, fontSize);
     renderMessage(x, y + COUNTRY_TEXT_HEIGHT_SHIFT, to_string(country.getCountryArmy()).c_str(), ColorList::RED,
@@ -412,7 +413,7 @@ void MapManager::updateTextViewPort(vector<string> &messages) {
     SDL_Rect textViewPort{MAP_VIEW_PORT_WIDTH, 0, SCREEN_WIDTH - MAP_VIEW_PORT_WIDTH, SCREEN_HEIGHT};
 
     SDL_Texture *textBgTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
-                                                   SCREEN_WIDTH - MAP_VIEW_PORT_WIDTH, SCREEN_HEIGHT);
+                                                   TEXT_VIEW_PORT_WIDTH, TEXT_VIEW_PORT_HEIGHT);
     SDL_SetRenderTarget(gRenderer, textBgTexture);
     // SDL_RenderSetViewport(gRenderer,&textViewPort);
 

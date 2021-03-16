@@ -7,6 +7,7 @@ string Country::getCountryName() {
 
 void Country::setCountryName(string inCountryName) {
     countryName = inCountryName;
+    this->numOfArmy = 1;
 }
 
 string Country::getContinentName() {
@@ -25,14 +26,15 @@ void Country::setCountryColour(tuple<int, int, int, int> inCountryColour) {
     countryColour = inCountryColour;
 }
 
-Country::Country(string name, int x, int y, vector<string> &countries) {
+Country::Country(string name, int x, int y, vector<string> &countries, int numOfArmy) {
     this->countryName = name;
     this->coordinateX = x;
     this->coordinateY = y;
     this->countryColour = ColorList::GREEN;
-    this->numOfArmy = 3;
+    this->numOfArmy = numOfArmy;
+    this->ownerIndex = NO_COUNTRY_OWNER;
     vector<string> adjacentCountries;
-    for (string str: countries) {
+    for (const string& str: countries) {
         adjacentCountries.push_back(str);
     }
     this->adjacentCountries = adjacentCountries;

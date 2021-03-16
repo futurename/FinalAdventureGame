@@ -7,6 +7,8 @@ public:
 
     Country(string name, int x, int y, vector<string> &adjacentCountries);
 
+    Country(string name, int x, int y, vector<string> &countries, int numOfArmy);
+
     string getCountryName();
 
     string getContinentName();
@@ -49,4 +51,5 @@ private:
     int coordinateY;
     vector<string> adjacentCountries;
     int numOfArmy;
+    const static int NO_COUNTRY_OWNER = -1;
 };

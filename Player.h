@@ -5,7 +5,7 @@ class Country;
 
 class Player {
 public:
-    Player(int index);
+    Player(int index, string name = "");
 
     // Accessors and mutators for private attributes
     void SetPlayerName(string inPlayerName);
@@ -33,4 +33,5 @@ private:
     int continentBonus;
     int cardExchangeTime;
     int playerIndex;
+    const static vector<string> DEFAULT_PLAYER_NAMES;
 };
