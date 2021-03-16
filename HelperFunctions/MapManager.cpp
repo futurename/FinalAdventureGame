@@ -31,9 +31,11 @@ double MapManager::IMAGE_WIDTH_RATIO = 1.0;
 
 double MapManager::IMAGE_HEIGHT_RATIO = 1.0;
 
-SDL_Rect MapManager::textViewPort{MAP_VIEW_PORT_WIDTH, 0, TEXT_VIEW_PORT_WIDTH, TEXT_VIEW_PORT_HEIGHT};
+SDL_Rect MapManager::textViewPort{MAP_VIEW_PORT_WIDTH, PLAYER_VIEW_PORT_HEIGHT, TEXT_VIEW_PORT_WIDTH, TEXT_VIEW_PORT_HEIGHT};
 
 SDL_Rect MapManager::mapViewPort{0, 0, MAP_VIEW_PORT_WIDTH, MAP_VIEW_PORT_HEIGHT};
+
+SDL_Rect MapManager::playerViewPort{MAP_VIEW_PORT_WIDTH, 0, PLAYER_VIEW_PORT_WIDTH, PLAYER_VIEW_PORT_HEIGHT};
 
 void MapManager::initWorldMarks() {
     readMapConfigFromFile();
@@ -49,9 +51,9 @@ void MapManager::initWorldMarks() {
 
         setOwnerColorMark(x, y, country.getCountryColour());
 
-        renderCountryMark(x, y, country, COUNTRY_NAME_FONT_SIZE);
+        renderCountryMark(x, y, country, DEFAULT_MAP_FONT_SIZE);
     }
-    resetToDefalutColor();
+    resetToDefaultColor();
 }
 
 bool MapManager::SDLInit() {
@@ -262,10 +264,9 @@ void MapManager::start(string mapPath) {
 
 void MapManager::renderMapViewPort() {
     //SDL_RenderSetViewport(gRenderer, &mapViewPort);
-
     SDL_RenderCopy(gRenderer, gMapTexture, NULL, &mapViewPort);
     SDL_RenderPresent(gRenderer);
-    resetToDefalutColor();
+    resetToDefaultColor();
 }
 
 void MapManager::setOwnerColorMark(int centerX, int centerY, tuple<int, int, int, int> color) {
@@ -302,7 +303,9 @@ void MapManager::initTextViewPort() {
     SDL_RenderCopy(gRenderer, textTexture,NULL, &textViewPort);
     SDL_RenderPresent(gRenderer);
 */
-    resetToDefalutColor();
+    renderPlayerInfo();
+
+    resetToDefaultColor();
 }
 
 void MapManager::renderMessage(int x, int y, const char *message, tuple<int, int, int, int> color, int fontSize,
@@ -331,7 +334,7 @@ void MapManager::renderMessage(int x, int y, const char *message, tuple<int, int
 
     SDL_DestroyTexture(textTexture);
     SDL_FreeSurface(textSurface);
-    resetToDefalutColor();
+    resetToDefaultColor();
 }
 
 void MapManager::readMapConfigFromFile(string filePath) {
@@ -438,7 +441,7 @@ void MapManager::updateTextViewPort(vector<string> &messages) {
 
     SDL_RenderClear(gRenderer);
 
-    int y = 50;
+    int y = 10;
     for (string &msg: messages) {
         renderMessage(TEXT_VIEWPORT_CENTER_X, y, msg.c_str(), ColorList::RED, DEFAULT_TEXT_FONT_SIZE);
         y += 30;
@@ -471,7 +474,7 @@ void MapManager::updateMapViewPort() {
 
         setOwnerColorMark(x, y, country.getCountryColour());
 
-        renderCountryMark(x, y, country, COUNTRY_NAME_FONT_SIZE);
+        renderCountryMark(x, y, country, DEFAULT_MAP_FONT_SIZE);
     }
 
     SDL_SetRenderTarget(gRenderer, NULL);
@@ -481,11 +484,38 @@ void MapManager::updateMapViewPort() {
 
     SDL_RenderPresent(gRenderer);
     //SDL_DestroyTexture(mapViewTexture);
+
+    renderPlayerInfo();
 }
 
-void MapManager::resetToDefalutColor() {
+void MapManager::resetToDefaultColor() {
     SDL_SetRenderDrawColor(gRenderer, get<0>(DEFAULT_BACKGROUND_COLOR), get<1>(DEFAULT_BACKGROUND_COLOR),
                            get<2>(DEFAULT_BACKGROUND_COLOR),
                            get<3>(DEFAULT_BACKGROUND_COLOR));
+}
+
+void MapManager::renderPlayerInfo() {
+    SDL_Texture *playerTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+                                                   TEXT_VIEW_PORT_WIDTH, PLAYER_INFO_HEIGHT);
+    SDL_SetRenderTarget(gRenderer, playerTexture);
+    SDL_RenderClear(gRenderer);
+    vector<Player> players = Game::getPlayers();
+    int startY = PLAYER_INFO_Y;
+    for (Player &player: players) {
+        SDL_Rect rect{PLAYER_INFO_X, startY - PLAYER_INFO_RECT_WIDTH / 2, PLAYER_INFO_RECT_WIDTH, PLAYER_INFO_RECT_WIDTH};
+        SDL_SetRenderDrawColor(gRenderer, get<0>(player.getBgColor()), get<1>(player.getBgColor()),
+                               get<2>(player.getBgColor()), get<3>(player.getBgColor()));
+        SDL_RenderFillRect(gRenderer, &rect);
+
+        renderMessage(PLAYER_INFO_X + PLAYER_INFO_SPACE, startY, player.getPlayerName().c_str(), player.getTextColor(),
+                      DEFAULT_PLAYER_INFO_FONT_SIZE);
+
+        startY += PLAYER_INFO_GAP;
+    }
+
+    SDL_SetRenderTarget(gRenderer, NULL);
+    SDL_RenderCopy(gRenderer, playerTexture, NULL, &playerViewPort);
+    SDL_RenderPresent(gRenderer);
+    SDL_DestroyTexture(playerTexture);
 }
 

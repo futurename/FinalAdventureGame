@@ -36,7 +36,7 @@ void Game::initPlayersAndCountries() {
 
         MapManager::setOwnerColorMark(x, y, country.getCountryColour());
 
-        MapManager::renderCountryMark(x, y, country, MapManager::COUNTRY_NAME_FONT_SIZE);
+        MapManager::renderCountryMark(x, y, country, MapManager::DEFAULT_MAP_FONT_SIZE);
     }*/
 
 

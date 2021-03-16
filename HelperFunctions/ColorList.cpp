@@ -9,10 +9,11 @@ const tuple<int, int, int, int> ColorList::YELLOW{255, 255, 0, 1};
 const tuple<int, int, int, int> ColorList::WHITE{255, 255, 255, 1};
 const tuple<int, int, int, int> ColorList::BLACK{0, 0, 0, 1};
 const tuple<int, int, int, int> ColorList::LIGHTER_YELLOW{255, 255, 240, 1};
+const tuple<int, int, int, int> ColorList::PINK{214, 44, 255, 1};
 
-vector<pair<tuple<int, int, int, int>, tuple<int, int, int, int>>> ColorList::colorPairs{{ColorList::RED,   ColorList::WHITE},
+vector<pair<tuple<int, int, int, int>, tuple<int, int, int, int>>> ColorList::colorPairs{{ColorList::RED,   ColorList::BLUE},
                                                                                          {ColorList::GREEN, ColorList::RED},
-                                                                                         {ColorList::BLUE, ColorList::YELLOW},
+                                                                                         {ColorList::YELLOW, ColorList::PINK},
                                                                                          {ColorList::YELLOW, ColorList::BLUE}};
 
 
