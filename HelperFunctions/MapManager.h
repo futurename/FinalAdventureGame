@@ -16,8 +16,7 @@ private:
     const static int TEXT_VIEW_PORT_HEIGHT = SCREEN_HEIGHT;
     const static int COUNTRY_MARK_WIDTH = 70;
     const static int COUNTRY_MARK_HEIGHT = 50;
-    const static int COUNTRY_TEXT_HEIGHT_SHIFT = 10;
-    const static int COUNTRY_NAME_FONT_SIZE = 14;
+    const static int COUNTRY_TEXT_HEIGHT_SHIFT = 16;
     const static tuple<int, int, int, int> DEFAULT_BACKGROUND_COLOR;
     const static string DEFAULT_MAP;
     const static string DEFAULT_MAP_CONFIG;
@@ -83,4 +82,6 @@ public:
     static void renderCountryMark(int x, int y, Country &country, const int fontSize);
 
     static void clearTextViewPort();
+
+    const static int COUNTRY_NAME_FONT_SIZE = 14;
 };

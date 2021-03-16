@@ -12,7 +12,7 @@ private:
 public:
     static vector<Player> getPlayers();
 
-    static void startGame();
+    static void initPlayersAndCountries();
 
     static map<string, Country> &getAllCountries();
 

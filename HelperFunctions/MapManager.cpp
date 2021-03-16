@@ -34,17 +34,18 @@ double MapManager::IMAGE_HEIGHT_RATIO = 1.0;
 void MapManager::initWorldMarks() {
     readMapConfigFromFile();
 
+    Game::initPlayersAndCountries();
+
     map<string, Country> allCountries = Game::getAllCountries();
 
-    for (auto itr = allCountries.begin(); itr != allCountries.end(); itr++) {
-        Country &country = itr->second;
+    for (auto & item : allCountries) {
+        Country &country = item.second;
         int x = country.getX();
         int y = country.getY();
 
         setOwnerColorMark(x, y, country.getCountryColour());
 
         renderCountryMark(x, y, country, COUNTRY_NAME_FONT_SIZE);
-
     }
 }
 
@@ -431,10 +432,11 @@ string MapManager::getCountryNameFromCoordinates(int x, int y) {
 }
 
 void MapManager::renderCountryMark(int x, int y, Country &country, const int fontSize) {
-    renderMessage(x, y - COUNTRY_TEXT_HEIGHT_SHIFT, country.getCountryName().c_str(), ColorList::RED,
-                  COUNTRY_NAME_FONT_SIZE);
+    renderMessage(x, y - COUNTRY_TEXT_HEIGHT_SHIFT,to_string(country.getOwnerIndex()).c_str() , ColorList::RED,
+                  fontSize);
+    renderMessage(x, y, country.getCountryName().c_str(), ColorList::RED, fontSize);
     renderMessage(x, y + COUNTRY_TEXT_HEIGHT_SHIFT, to_string(country.getCountryArmy()).c_str(), ColorList::RED,
-                  COUNTRY_NAME_FONT_SIZE);
+                  fontSize);
 }
 
 void MapManager::clearTextViewPort() {

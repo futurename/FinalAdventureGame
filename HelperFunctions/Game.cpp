@@ -12,20 +12,32 @@ vector<Player> Game::getPlayers() {
     return players;
 }
 
-void Game::startGame() {
+void Game::initPlayersAndCountries() {
     //init all players
     initPlayers();
 
     //load map file and world list
     //MapManager::start();
 
-    MapManager::readMapConfigFromFile();
+    //MapManager::readMapConfigFromFile();
 
     //randomly assign all countries to the players evenly
     assignCountriesToPlayers();
 
     //check whether a continent is owned by a player
     checkInitContinentsOwner();
+
+    //render country marks
+    /*for (auto &item : allCountries) {
+        Country &country = item.second;
+        int x = country.getX();
+        int y = country.getY();
+
+        MapManager::setOwnerColorMark(x, y, country.getCountryColour());
+
+        MapManager::renderCountryMark(x, y, country, MapManager::COUNTRY_NAME_FONT_SIZE);
+    }*/
+
 
 }
 

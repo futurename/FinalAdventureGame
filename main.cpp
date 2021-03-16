@@ -6,7 +6,7 @@
 int main(int argc, char *args[]) {
     srand((unsigned) time(nullptr));
 
-    //MapManager::start("../Maps/World.bmp");
+    MapManager::start("../Maps/World.bmp");
 
 /*      MapManager::readMapConfigFromFile();
       Game::printAllContinents();
@@ -21,7 +21,7 @@ int main(int argc, char *args[]) {
   cout << onePair2.first << ", " << onePair2.second << endl;
   cout << onePair3.first << ", " << onePair3.second << endl;*/
 
-    Game::startGame();
+    Game::initPlayersAndCountries();
     Game::printAllCountries();
     Game::printAllContinents();
 
