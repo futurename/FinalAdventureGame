@@ -199,7 +199,11 @@ void MapManager::start(string mapPath) {
                 while (SDL_PollEvent(&e) != 0) {
                     //User requests quit
                     string message;
-                    Country *pickedCountry;
+                    Country *clickedCountry;
+                    bool isMouseLeftDonw = false;
+                    SDL_Point dragStartPoint, dragEndPoint;
+                    stringstream ss;
+                    Country *fromCountry = nullptr, *toCountry = nullptr;
 
                     switch (e.type) {
                         case SDL_QUIT:
@@ -210,10 +214,10 @@ void MapManager::start(string mapPath) {
                             message = to_string(e.motion.x) + ":" + to_string(e.motion.y);
                             if (!getCountryNameFromCoordinates(e.motion.x, e.motion.y).empty()) {
                                 message = getCountryNameFromCoordinates(e.motion.x, e.motion.y);
-                                pickedCountry = &Game::getAllCountries().find(message.c_str())->second;
-                                drawCountryInfoOnTextViewport(pickedCountry);
+                                clickedCountry = &Game::getAllCountries().find(message)->second;
+                                drawCountryInfoOnTextViewport(clickedCountry);
                             } else {
-                                pickedCountry = nullptr;
+                                clickedCountry = nullptr;
                                 clearTextViewport();
                             }
                             SDL_SetWindowTitle(gWindow, message.c_str());
@@ -223,8 +227,10 @@ void MapManager::start(string mapPath) {
                         case SDL_MOUSEBUTTONDOWN:
                             switch (e.button.button) {
                                 case SDL_BUTTON_LEFT:
-                                    if (pickedCountry != nullptr) {
-                                        drawCountryInfoOnTextViewport(pickedCountry);
+                                    isMouseLeftDonw = true;
+                                    dragStartPoint = {e.motion.x, e.motion.y};
+                                    if (clickedCountry != nullptr) {
+                                        drawCountryInfoOnTextViewport(clickedCountry);
 
                                         Country &country = Game::getAllCountries().find("China")->second;
                                         country.setOwnerIndex(2);
@@ -232,6 +238,39 @@ void MapManager::start(string mapPath) {
                                         country.setTextColor(Game::getPlayers().at(2).getTextColor());
 
                                         updateMapViewPort();
+                                    }
+                                    break;
+                            }
+                        case SDL_MOUSEBUTTONUP:
+                            switch (e.button.button) {
+                                case SDL_BUTTON_LEFT:
+                                    if (!isMouseLeftDonw) {
+                                        dragEndPoint = {e.motion.x, e.motion.y};
+
+                                        isMouseLeftDonw = false;
+
+                                        string fromCountryName = getCountryNameFromCoordinates(dragStartPoint.x, dragStartPoint.y);
+                                        if(!fromCountryName.empty()){
+                                            fromCountry = &Game::getAllCountries().find(fromCountryName)->second;
+                                        }else{
+                                            fromCountry = nullptr;
+                                        }
+                                        string toCountryName = getCountryNameFromCoordinates(dragEndPoint.x, dragEndPoint.y);
+                                        if(!toCountryName.empty()){
+                                            toCountry = &Game::getAllCountries().find(toCountryName)->second;
+                                        }else{
+                                            toCountry = nullptr;
+                                        }
+
+                                        if(fromCountry != nullptr && toCountry != nullptr && fromCountryName != toCountryName){
+                                            ss.str("");
+                                            ss.clear();
+                                            ss << "From <" << fromCountryName << "> to <" << toCountryName << ">";
+                                            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT, "Drag",
+                                                                     ss.str().c_str(), NULL);
+                                        }
+
+                                        //FIXME attack,deployment state
                                     }
                                     break;
                             }
@@ -248,12 +287,12 @@ void MapManager::start(string mapPath) {
 void MapManager::drawCountryInfoOnTextViewport(Country *pickedCountry) {
     vector<string> messages;
     stringstream ss;
-    ss <<"Country:  " << pickedCountry->getCountryName();
+    ss << "Country:  " << pickedCountry->getCountryName();
 
     messages.push_back(ss.str());
     Player &player = Game::getPlayers().at(pickedCountry->getOwnerIndex());
     ss.str("");
-    ss<< "Player:  " << player.getPlayerName();
+    ss << "Player:  " << player.getPlayerName();
     messages.push_back(ss.str());
 
     ss.str("");

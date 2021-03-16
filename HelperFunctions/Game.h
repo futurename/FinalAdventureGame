@@ -2,6 +2,8 @@
 #include "../Player.h"
 #include "../Continent.h"
 
+enum GameState{DEPLOYMENT, ATTACK, MOVE, EXCHANGE_CARDS};
+
 class Game {
 private:
     static vector<Player> players;
