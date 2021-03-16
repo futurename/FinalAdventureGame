@@ -25,14 +25,6 @@ void Country::setCountryColour(tuple<int, int, int, int> inCountryColour) {
     countryColour = inCountryColour;
 }
 
-string Country::getOwnerName() {
-    return ownerName;
-}
-
-void Country::setCountryOwner(string inOwnerName) {
-    ownerName = inOwnerName;
-}
-
 Country::Country(string name, int x, int y, vector<string> &countries) {
     this->countryName = name;
     this->coordinateX = x;
@@ -67,4 +59,16 @@ int Country::getCountryArmy() {
 
 tuple<int, int, int, int> Country::getTextColor() {
     return textColor;
+}
+
+void Country::loseOneArmy() {
+    --numOfArmy;
+}
+
+int Country::getOwnerIndex() {
+    return ownerIndex;
+}
+
+void Country::setOwnerIndex(int index) {
+    ownerIndex = index;
 }

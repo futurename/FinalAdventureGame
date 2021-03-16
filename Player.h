@@ -5,7 +5,7 @@ class Country;
 
 class Player {
 public:
-    Player();
+    Player(int index);
 
     // Accessors and mutators for private attributes
     void SetPlayerName(string inPlayerName);
@@ -20,11 +20,17 @@ public:
 
     vector<Card> getCards();
 
+    void addContinentBonus(int bonus);
+
+    void removeContinentBonus(int bonus);
+
 private:
     string playerName;
     vector<Card> cards;
     vector<Country> capturedCountries;
     tuple<int, int, int, int> bgColour;
     tuple<int, int, int, int> textColour;
-
+    int continentBonus;
+    int cardExchangeTime;
+    int playerIndex;
 };

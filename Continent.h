@@ -24,4 +24,8 @@ public:
     vector<string> &getCountryNames();
 
     void setCountryNames(vector<string>& countryNames);
+
+    void setOwnerIndex(int index);
+
+    const static int NO_CONTINENT_OWNER = -1;
 };

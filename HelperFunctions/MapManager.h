@@ -52,7 +52,7 @@ private:
 
     bool static SDLInit();
 
-    bool static SDLLoadMedia(const string mapPath = DEFAULT_MAP);
+    bool static SDLLoadMedia(string mapPath = DEFAULT_MAP);
 
     void static SDLClose();
 
@@ -61,7 +61,7 @@ private:
 public:
     static void initWorldMarks();
 
-    static void start(string mapPath);
+    static void start(string mapPath = DEFAULT_MAP);
 
     static void renderMapViewPort();
 

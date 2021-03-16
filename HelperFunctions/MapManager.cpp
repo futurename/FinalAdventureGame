@@ -165,10 +165,13 @@ void MapManager::start(string mapPath) {
             //Main loop flag
             bool quit = false;
 
+
             SDL_RenderClear(gRenderer);
 
             //get raw image width/height vs display ratio
             detectImageWidthHeightRatio(mapPath);
+
+
 
             //*******************************************
             //Rendering map vew port

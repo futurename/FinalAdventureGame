@@ -33,12 +33,20 @@ public:
 
     tuple<int,int,int,int> getTextColor();
 
+    void loseOneArmy();
+
+    void deployArmy(int numOfArmy);
+
+    int getOwnerIndex();
+
+    void setOwnerIndex(int index);
+
 private:
     string countryName;
     string continentName;
     tuple<int, int, int, int> countryColour;
     tuple<int,int,int,int> textColor;
-    string ownerName;
+    int ownerIndex;
     int coordinateX;
     int coordinateY;
     vector<string> adjacentCountries;

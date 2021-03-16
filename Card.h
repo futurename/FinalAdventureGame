@@ -14,4 +14,6 @@ public:
     CardType getCard();
 
     void setCard(CardType newCardType);
+
+    static const int CARD_EXCHANGE_BASE = 5;
 };
