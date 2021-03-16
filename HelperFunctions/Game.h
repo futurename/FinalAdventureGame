@@ -7,7 +7,7 @@ private:
     static vector<Player> players;
     static map<string, Country> allCountries;
     static map<string, Continent> allContinents;
-    const static int DEFAULT_PLAYERS = 3;
+    const static int DEFAULT_PLAYERS = 4;
 
 public:
     static vector<Player> getPlayers();

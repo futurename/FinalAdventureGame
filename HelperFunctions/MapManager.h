@@ -10,36 +10,45 @@ class MapManager {
 private:
     const static int SCREEN_WIDTH = 1800;
     const static int SCREEN_HEIGHT = 900;
+
     const static int MAP_VIEW_PORT_WIDTH = 1500;
     const static int MAP_VIEW_PORT_HEIGHT = SCREEN_HEIGHT;
-    const static int TEXT_VIEW_PORT_WIDTH = SCREEN_WIDTH - MAP_VIEW_PORT_WIDTH;
-    const static int TEXT_VIEW_PORT_HEIGHT = 600;
-    const static int PLAYER_VIEW_PORT_WIDTH = TEXT_VIEW_PORT_WIDTH;
-    const static int PLAYER_VIEW_PORT_HEIGHT = SCREEN_HEIGHT - TEXT_VIEW_PORT_HEIGHT;
+
+    const static int PLAYER_VIEWPORT_HEIGHT = 180;
+    const static int PLAYER_VIEWPORT_WIDTH = SCREEN_WIDTH - MAP_VIEW_PORT_WIDTH;
+    const static int PLAYER_INFO_X = 90;
+    const static int PLAYER_INFO_Y = 40;
+    const static int PLAYER_INFO_SPACE = 100;
+    const static int PLAYER_INFO_GAP = 25;
+    const static int PLAYER_INFO_RECT_WIDTH = 15;
+    const static int PLAYER_INFO_FONT_SIZE = 18;
+
+    const static int TEXT_VIEW_PORT_WIDTH = PLAYER_VIEWPORT_WIDTH;
+    const static int TEXT_VIEW_PORT_HEIGHT = SCREEN_HEIGHT - PLAYER_VIEWPORT_HEIGHT;
+    const static int TEXT_VIEWPORT_CENTER_X = TEXT_VIEW_PORT_WIDTH / 2;
+    const static int TEXT_VIEWPORT_START_Y = 15;
+    const static int TEXT_VIEWPORT_GAP = 30;
+    const static int TEXT_VIEW_FONT_SIZE = 20;
+
     const static int COUNTRY_MARK_WIDTH = 74;
     const static int COUNTRY_MARK_HEIGHT = 55;
     const static int COUNTRY_TEXT_HEIGHT_SHIFT = 18;
+
     const static tuple<int, int, int, int> DEFAULT_BACKGROUND_COLOR;
     const static string DEFAULT_MAP;
     const static string DEFAULT_MAP_CONFIG;
     const static string TERRITORIES_TITLE;
     const static string CONTINENT_TITLE;
+
     const static int COUNTRY_NAME_INDEX = 0;
     const static int COUNTRY_COORDINATE_X = 1;
     const static int COUNTRY_COORDINATE_Y = 2;
     const static int ARYM_NUMBER_INDEX = 3;
     const static int CONTINENT_NAME_INDEX = 4;
     const static int ADJACENT_COUNTRIES_STARTS = 5;
-    const static int DEFAULT_TEXT_FONT_SIZE = 18;
-    const static int DEFAULT_PLAYER_INFO_FONT_SIZE = 14;
-    const static int TEXT_VIEWPORT_CENTER_X =  TEXT_VIEW_PORT_WIDTH/ 2;
-    const static int PLAYER_INFO_HEIGHT = 200;
-    const static int PLAYER_INFO_X = 100;
-    const static int PLAYER_INFO_Y = 20;
-    const static int PLAYER_INFO_SPACE = 100;
-    const static int PLAYER_INFO_GAP = 20;
-    const static int PLAYER_INFO_RECT_WIDTH = 15;
+
     const static char *DEFAULT_FONT_PATH;
+    const static char *DEFAULT_TEXT_FONT_PATH;
     static double IMAGE_WIDTH_RATIO;
     static double IMAGE_HEIGHT_RATIO;
     static SDL_Rect textViewPort;
@@ -58,9 +67,6 @@ private:
     //Current displayed texture
     static SDL_Texture *gMapTexture;
 
-    //The surface contained by the window
-    static SDL_Surface *gScreenSurface;
-
     //Font used for display
     static TTF_Font *gFont;
 
@@ -69,8 +75,6 @@ private:
     bool static SDLLoadMedia(string mapPath = DEFAULT_MAP);
 
     void static SDLClose();
-
-    static map<string, SDL_Texture *> countryTextures;
 
 public:
     static void initWorldMarks();
@@ -94,15 +98,17 @@ public:
 
     static void renderCountryMark(int x, int y, Country &country, const int fontSize);
 
-    static void updateTextViewPort(vector<string> &messages);
+    static void updateTextViewPort(vector<string> &messages, tuple<int, int, int, int> color);
 
     const static int DEFAULT_MAP_FONT_SIZE = 14;
-
-    static void resetTextViewPortBackground();
 
     static void updateMapViewPort();
 
     static void resetToDefaultColor();
 
     static void renderPlayerInfo();
+
+    static void drawCountryInfoOnTextViewport(Country *pickedCountry);
+
+    static void clearTextViewport();
 };
