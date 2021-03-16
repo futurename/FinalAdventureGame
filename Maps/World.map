@@ -49,9 +49,9 @@ Ural,613,136,Asia,Siberia,China,Afghanistan,Ukraine
 Afghanistan,585,192,Asia,Ural,China,India,M-East,Ukraine
 India,612,249,Asia,China,Siam,Afghanistan,M-East
 Siberia,666,110,Asia,Yatusk,Irkutsk,Mongolia,China,Ural
-China,662,217,Asia,Ural,Siberia,Mongolia,Siam,India,Afghanistan
+China,658,215,Asia,Ural,Siberia,Mongolia,Siam,India,Afghanistan
 Siam,671,270,Asia,China,India,Indonesia
-Mongolia,707,188,Asia,Siberia,Irkutsk,Japan,China,Kamchatka
+Mongolia,710,186,Asia,Siberia,Irkutsk,Japan,China,Kamchatka
 Irkutsk,698,152,Asia,Siberia,Yatusk,Kamchatka,Mongolia
 Yatusk,738,118,Asia,Siberia,Irkutsk,Kamchatka
 Kamchatka,806,125,Asia,Yatusk,Irkutsk,Japan,Alaska,Mongolia

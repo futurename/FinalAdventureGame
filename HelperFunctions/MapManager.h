@@ -14,9 +14,9 @@ private:
     const static int MAP_VIEW_PORT_HEIGHT = SCREEN_HEIGHT;
     const static int TEXT_VIEW_PORT_WIDTH = SCREEN_WIDTH - MAP_VIEW_PORT_WIDTH;
     const static int TEXT_VIEW_PORT_HEIGHT = SCREEN_HEIGHT;
-    const static int COUNTRY_MARK_WIDTH = 70;
-    const static int COUNTRY_MARK_HEIGHT = 50;
-    const static int COUNTRY_TEXT_HEIGHT_SHIFT = 16;
+    const static int COUNTRY_MARK_WIDTH = 74;
+    const static int COUNTRY_MARK_HEIGHT = 55;
+    const static int COUNTRY_TEXT_HEIGHT_SHIFT = 18;
     const static tuple<int, int, int, int> DEFAULT_BACKGROUND_COLOR;
     const static string DEFAULT_MAP;
     const static string DEFAULT_MAP_CONFIG;

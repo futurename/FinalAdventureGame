@@ -38,7 +38,7 @@ void MapManager::initWorldMarks() {
 
     map<string, Country> allCountries = Game::getAllCountries();
 
-    for (auto & item : allCountries) {
+    for (auto &item : allCountries) {
         Country &country = item.second;
         int x = country.getX();
         int y = country.getY();
@@ -166,13 +166,10 @@ void MapManager::start(string mapPath) {
             //Main loop flag
             bool quit = false;
 
-
-            SDL_RenderClear(gRenderer);
-
             //get raw image width/height vs display ratio
             detectImageWidthHeightRatio(mapPath);
 
-
+            SDL_RenderClear(gRenderer);
 
             //*******************************************
             //Rendering map vew port
@@ -220,9 +217,9 @@ void MapManager::start(string mapPath) {
                             if (!getCountryNameFromCoordinates(e.motion.x, e.motion.y).empty()) {
                                 message = getCountryNameFromCoordinates(e.motion.x, e.motion.y);
                                 pickedCountry = &Game::getAllCountries().find(message.c_str())->second;
-                                clearTextViewPort();
-                                renderMapViewPort(*pickedCountry);
-                                renderCountryMark(pickedCountry->getX(), pickedCountry->getY(), *pickedCountry, 22);
+                                //clearTextViewPort();
+                                // renderMapViewPort(*pickedCountry);
+                                //renderCountryMark(pickedCountry->getX(), pickedCountry->getY(), *pickedCountry, 22);
                             }
                             SDL_SetWindowTitle(gWindow, message.c_str());
                             break;
@@ -231,6 +228,9 @@ void MapManager::start(string mapPath) {
                                 case SDL_BUTTON_LEFT:
                                     message = getCountryNameFromCoordinates(e.motion.x, e.motion.y);
                                     SDL_ShowSimpleMessageBox(0, "check range", message.c_str(), gWindow);
+
+                                    //renderMapViewPort(*pickedCountry);
+                                    clearTextViewPort();
                                     break;
                             }
 
@@ -294,10 +294,49 @@ void MapManager::renderTextViewPort() {
 }
 
 void MapManager::renderMapViewPort(Country &country) {
-    SDL_Rect textVeiewPort{MAP_VIEW_PORT_WIDTH, 0, SCREEN_WIDTH - MAP_VIEW_PORT_WIDTH, SCREEN_HEIGHT / 2};
+    SDL_Texture *textTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING,
+                                                 SCREEN_WIDTH - MAP_VIEW_PORT_WIDTH, SCREEN_HEIGHT);
 
-    SDL_RenderSetViewport(gRenderer, &textVeiewPort);
+    SDL_SetRenderDrawColor(gRenderer, get<0>(ColorList::LIGHTER_YELLOW), get<1>(ColorList::LIGHTER_YELLOW),
+                           get<2>(ColorList::LIGHTER_YELLOW), get<3>(ColorList::LIGHTER_YELLOW));
+    SDL_Rect dst;
+    dst.x = MAP_VIEW_PORT_WIDTH;
+    dst.y = 0;
+    dst.w = SCREEN_WIDTH - MAP_VIEW_PORT_WIDTH;
+    dst.h = SCREEN_HEIGHT;
 
+    SDL_RenderSetViewport(gRenderer, &dst);
+
+    // SDL_RenderFillRect(gRenderer, nullptr);
+
+    /*SDL_SetRenderDrawColor(gRenderer, get<0>(ColorList::BLACK), get<1>(ColorList::BLACK),
+                           get<2>(ColorList::BLACK), get<3>(ColorList::BLACK));
+
+    SDL_RenderDrawRect(gRenderer, nullptr);*/
+
+    string textureText = "rendering text";
+    SDL_Color textColor = {255, 255, 0, 0};
+    SDL_SetRenderTarget(gRenderer, textTexture);
+    SDL_Surface *textSurface = TTF_RenderText_Solid(gFont, textureText.c_str(), textColor);
+
+    SDL_Texture *mTexture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
+
+    //Get rid of old surface
+    // SDL_FreeSurface(textSurface);
+
+    //SDL_RenderClear( gRenderer );
+    SDL_RenderCopyEx(gRenderer, mTexture, NULL, &dst, 0, NULL, SDL_FLIP_HORIZONTAL);
+
+    SDL_SetRenderTarget(gRenderer, NULL);
+
+    SDL_RenderPresent(gRenderer);
+
+
+    SDL_DestroyTexture(textTexture);
+    //SDL_FreeSurface(textSurface);
+
+    //SDL_RenderSetViewport(gRenderer, &textVeiewPort);
+/*
     tuple<int, int, int, int> bgColor = ColorList::LIGHTER_YELLOW;
     SDL_SetRenderDrawColor(gRenderer, get<0>(bgColor), get<1>(bgColor), get<2>(bgColor), get<3>(bgColor));
 
@@ -314,18 +353,17 @@ void MapManager::renderMapViewPort(Country &country) {
     renderMessage(50, 50, country.getCountryName().c_str(), ColorList::RED, 18);
     renderMessage(50, 80, to_string(country.getCountryArmy()).c_str(), ColorList::RED, 18);
 
-    SDL_RenderCopy(gRenderer, gMapTexture, NULL, NULL);
+    SDL_RenderCopy(gRenderer, gMapTexture, NULL, NULL);*/
 }
 
 void MapManager::renderMessage(int x, int y, const char *message, tuple<int, int, int, int> color, int fontSize,
                                const char *fontPath) {
-    SDL_Surface *textSurface;
     gFont = TTF_OpenFont(fontPath, fontSize);
 
     SDL_Color textColor = {(Uint8) get<0>(color), (Uint8) get<1>(color),
                            (Uint8) get<2>(color)};
 
-    textSurface = TTF_RenderText_Solid(gFont, message, textColor);
+    SDL_Surface *textSurface = TTF_RenderText_Solid(gFont, message, textColor);
     if (!textSurface) {
         cout << "Failed to render textSurface: " << TTF_GetError() << endl;
     }
@@ -419,20 +457,22 @@ void MapManager::detectImageWidthHeightRatio(string &mapPath) {
 }
 
 string MapManager::getCountryNameFromCoordinates(int x, int y) {
-    for (auto itr = Game::getAllCountries().begin(); itr != Game::getAllCountries().end(); itr++) {
-        int coorX = itr->second.getX();
-        int coorY = itr->second.getY();
+    for (auto &itr : Game::getAllCountries()) {
+        int coorX = itr.second.getX();
+        int coorY = itr.second.getY();
         int widthDia = COUNTRY_MARK_WIDTH / 2;
         int heightDia = COUNTRY_MARK_HEIGHT / 2;
         if (x <= coorX + widthDia && x >= coorX - widthDia && y >= coorY - heightDia && y <= coorY + heightDia) {
-            return itr->first;
+            return itr.first;
         }
     }
     return "";
 }
 
 void MapManager::renderCountryMark(int x, int y, Country &country, const int fontSize) {
-    renderMessage(x, y - COUNTRY_TEXT_HEIGHT_SHIFT,to_string(country.getOwnerIndex()).c_str() , ColorList::RED,
+    stringstream ss;
+    ss << "P_" << to_string(country.getOwnerIndex() + 1).c_str();
+    renderMessage(x, y - COUNTRY_TEXT_HEIGHT_SHIFT, ss.str().c_str(), ColorList::RED,
                   fontSize);
     renderMessage(x, y, country.getCountryName().c_str(), ColorList::RED, fontSize);
     renderMessage(x, y + COUNTRY_TEXT_HEIGHT_SHIFT, to_string(country.getCountryArmy()).c_str(), ColorList::RED,
@@ -442,10 +482,30 @@ void MapManager::renderCountryMark(int x, int y, Country &country, const int fon
 void MapManager::clearTextViewPort() {
 
     SDL_Texture *textTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
-                                                 SCREEN_WIDTH - MAP_VIEW_PORT_WIDTH, SCREEN_HEIGHT);
+                                                 400,600);
+
+    //SDL_SetRenderTarget( gRenderer, textTexture );
+
+    SDL_Rect textRect{MAP_VIEW_PORT_WIDTH, 0, SCREEN_WIDTH - MAP_VIEW_PORT_WIDTH, SCREEN_HEIGHT};
+
+    SDL_Rect srcRect{200, 200, 300, 400};
+
+    SDL_SetRenderDrawColor(gRenderer, 255,255,255,255);
+    SDL_RenderClear(gRenderer);
+
+    //SDL_RenderFillRect(gRenderer, &textRect);
+
+    //SDL_SetRenderTarget(gRenderer, textTexture);
 
 
-    SDL_RenderCopy(gRenderer, textTexture, NULL, NULL);
+    SDL_RenderCopy(gRenderer, textTexture,&textRect, NULL );
+
+    SDL_SetRenderTarget( gRenderer, NULL );
+
+    SDL_RenderCopy(gRenderer,textTexture, NULL, NULL);
+    //SDL_RenderSetViewport(gRenderer, &srcRect);
+
+   SDL_RenderPresent(gRenderer);
 
 }
 
