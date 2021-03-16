@@ -230,7 +230,7 @@ void MapManager::start(string mapPath) {
                                     SDL_ShowSimpleMessageBox(0, "check range", message.c_str(), gWindow);
 
                                     //renderMapViewPort(*pickedCountry);
-                                    clearTextViewPort();
+                                    //clearTextViewPort();
                                     break;
                             }
 
