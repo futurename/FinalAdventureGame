@@ -41,6 +41,9 @@ public:
 
     void setOwnerIndex(int index);
 
+    void setTextColor(tuple<int,int,int,int> color);
+
+
 private:
     string countryName;
     string continentName;

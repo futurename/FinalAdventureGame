@@ -17,7 +17,7 @@ void Player::SetPlayerName(string inPlayerName) {
     playerName = inPlayerName;
 }
 
-string Player::GetPlayerName() {
+string Player::getPlayerName() {
     return playerName;
 }
 
@@ -39,5 +39,21 @@ void Player::addContinentBonus(int bonus) {
 
 void Player::removeContinentBonus(int bonus) {
     continentBonus -= bonus;
+}
+
+void Player::setBgColor(tuple<int, int, int, int> color) {
+    this->bgColour = color;
+}
+
+void Player::setTextColor(tuple<int, int, int, int> color) {
+    this->textColour = color;
+}
+
+tuple<int, int, int, int> Player::getBgColor() {
+    return bgColour;
+}
+
+tuple<int, int, int, int> Player::getTextColor() {
+    return textColour;
 }
 

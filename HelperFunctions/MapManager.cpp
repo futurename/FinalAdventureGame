@@ -271,11 +271,12 @@ void MapManager::setOwnerColorMark(int centerX, int centerY, tuple<int, int, int
     sdlRect.h = COUNTRY_MARK_HEIGHT;
 
     SDL_RenderFillRect(gRenderer, &sdlRect);
-
+/*
+    //set color to the default color
     SDL_SetRenderDrawColor(gRenderer, get<0>(DEFAULT_BACKGROUND_COLOR),
                            get<1>(DEFAULT_BACKGROUND_COLOR),
                            get<2>(DEFAULT_BACKGROUND_COLOR),
-                           get<3>(DEFAULT_BACKGROUND_COLOR));
+                           get<3>(DEFAULT_BACKGROUND_COLOR));*/
 }
 
 void MapManager::initTextViewPort() {
@@ -361,7 +362,6 @@ void MapManager::readMapConfigFromFile(string filePath) {
                         int coordinateY = stoi(countryTokens.at(COUNTRY_COORDINATE_Y)) * IMAGE_HEIGHT_RATIO;
                         string continentName = countryTokens.at(CONTINENT_NAME_INDEX);
                         int numOfArmy = stoi(countryTokens.at(ARYM_NUMBER_INDEX));
-
                         Game::getAllContinents().find(continentName)->second.addCountryName(countryName);
 
                         vector<string> adjacentCountries;
@@ -399,12 +399,14 @@ string MapManager::getCountryNameFromCoordinates(int x, int y) {
 }
 
 void MapManager::renderCountryMark(int x, int y, Country &country, const int fontSize) {
-    int playerIndex = country.getOwnerIndex();
-    string playerName = Game::getPlayers().at(playerIndex).GetPlayerName();
-    renderMessage(x, y - COUNTRY_TEXT_HEIGHT_SHIFT, playerName.c_str(), ColorList::RED,
+
+    int ownerIndex = country.getOwnerIndex();
+    Player& player = Game::getPlayers().at(ownerIndex);
+
+    renderMessage(x, y - COUNTRY_TEXT_HEIGHT_SHIFT, player.getPlayerName().c_str(), country.getTextColor(),
                   fontSize);
-    renderMessage(x, y, country.getCountryName().c_str(), ColorList::RED, fontSize);
-    renderMessage(x, y + COUNTRY_TEXT_HEIGHT_SHIFT, to_string(country.getCountryArmy()).c_str(), ColorList::RED,
+    renderMessage(x, y, country.getCountryName().c_str(), country.getTextColor(), fontSize);
+    renderMessage(x, y + COUNTRY_TEXT_HEIGHT_SHIFT, to_string(country.getCountryArmy()).c_str(), country.getTextColor(),
                   fontSize);
 }
 

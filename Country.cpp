@@ -30,7 +30,7 @@ Country::Country(string name, int x, int y, vector<string> &countries, int numOf
     this->countryName = name;
     this->coordinateX = x;
     this->coordinateY = y;
-    this->countryColour = ColorList::GREEN;
+    this->countryColour = ColorList::WHITE;
     this->numOfArmy = numOfArmy;
     this->ownerIndex = NO_COUNTRY_OWNER;
     vector<string> adjacentCountries;
@@ -73,4 +73,8 @@ int Country::getOwnerIndex() {
 
 void Country::setOwnerIndex(int index) {
     ownerIndex = index;
+}
+
+void Country::setTextColor(tuple<int,int,int,int> color) {
+    this->textColor = color;
 }

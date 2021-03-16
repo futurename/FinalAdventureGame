@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "../Random.h"
 #include "MapManager.h"
+#include "ColorList.h"
 
 map<string, Country> Game::allCountries{map<string, Country>()};
 
@@ -44,6 +45,9 @@ void Game::initPlayersAndCountries() {
 void Game::initPlayers() {
     for (int i = 0; i < DEFAULT_PLAYERS; i++) {
         Player player(i);
+        pair<tuple<int, int, int, int>, tuple<int, int, int, int>> color = ColorList::getPlayerColorPairs().at(i);
+        player.setBgColor(color.first);
+        player.setTextColor(color.second);
         players.push_back(player);
     }
 }
@@ -108,6 +112,8 @@ void Game::attackFrom(Country attacker, Country defender) {
 
         if (defender.getCountryArmy() == 0) {
             defender.setOwnerIndex(attacker.getOwnerIndex());
+            defender.setCountryColour(attacker.getCountryColour());
+            defender.setTextColor(attacker.getTextColor());
         }
 
         Continent &continent = allContinents.at(defender.getContinentName());
@@ -121,6 +127,7 @@ void Game::attackFrom(Country attacker, Country defender) {
             players.at(attacker.getOwnerIndex())
                     .addContinentBonus(continent.getBonus());
         }
+        //FIXME whether the world is conquered by the attacker.
     }
 }
 
@@ -159,6 +166,8 @@ void Game::assignCountriesToPlayers() {
         }
         playerCounter.at(rand)--;
         country.second.setOwnerIndex(rand);
+        country.second.setCountryColour(players.at(rand).getBgColor());
+        country.second.setTextColor(players.at(rand).getTextColor());
     }
 }
 

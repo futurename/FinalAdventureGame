@@ -10,7 +10,7 @@ public:
     // Accessors and mutators for private attributes
     void SetPlayerName(string inPlayerName);
 
-    string GetPlayerName();
+    string getPlayerName();
 
     void GetPlayerCaptures();
 
@@ -23,6 +23,14 @@ public:
     void addContinentBonus(int bonus);
 
     void removeContinentBonus(int bonus);
+
+    void setBgColor(tuple<int,int,int,int> color);
+
+    void setTextColor(tuple<int,int,int,int> color);
+
+    tuple<int,int,int,int> getBgColor();
+
+    tuple<int,int,int,int> getTextColor();
 
 private:
     string playerName;
