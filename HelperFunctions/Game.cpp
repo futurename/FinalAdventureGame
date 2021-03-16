@@ -44,7 +44,6 @@ void Game::initPlayersAndCountries() {
 void Game::initPlayers() {
     for (int i = 0; i < DEFAULT_PLAYERS; i++) {
         Player player(i);
-
         players.push_back(player);
     }
 }

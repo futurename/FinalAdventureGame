@@ -14,50 +14,50 @@ Asia=7
 Australia=2
 
 [Territories]
-Alaska,70,125,North America,N-Territory,Alberta,Kamchatka
-N-Territory,148,125,North America,Alaska,Alberta,Ontario,Greenland
-Alberta,142,164,North America,Alaska,N-Territory,Ontario,W-USA
-Greenland,324,76,North America,N-Territory,Ontario,Quebec,Iceland
-Ontario,202,164,North America,N-Territory,Alberta,Greenland,Quebec,W-USA,E-USA
-Quebec,260,164,North America,Greenland,Ontario,E-USA
-W-USA,159,204,North America,Alberta,Ontario,E-USA,C-America
-E-USA,219,216,North America,Ontario,Quebec,W-USA,C-America
-C-America,183,262,North America,W-USA,E-USA,Venezuala
+Alaska,70,125,1,North America,N-Territory,Alberta,Kamchatka
+N-Territory,148,125,3,North America,Alaska,Alberta,Ontario,Greenland
+Alberta,142,164,2,North America,Alaska,N-Territory,Ontario,W-USA
+Greenland,324,76,2,North America,N-Territory,Ontario,Quebec,Iceland
+Ontario,202,164,3,North America,N-Territory,Alberta,Greenland,Quebec,W-USA,E-USA
+Quebec,260,164,3,North America,Greenland,Ontario,E-USA
+W-USA,159,204,2,North America,Alberta,Ontario,E-USA,C-America
+E-USA,219,216,3,North America,Ontario,Quebec,W-USA,C-America
+C-America,183,262,2,North America,W-USA,E-USA,Venezuala
 
-Venezuala,259,303,South America,C-America,Peru,Brazil
-Peru,262,349,South America,Venezuala,Brazil,Argentina
-Argentina,263,407,South America,Peru,Brazil
-Brazil,314,337,South America,Venezuala,Peru,Argentina,N-Africa
+Venezuala,259,303,2,South America,C-America,Peru,Brazil
+Peru,262,349,2,South America,Venezuala,Brazil,Argentina
+Argentina,263,407,3,South America,Peru,Brazil
+Brazil,314,337,2,South America,Venezuala,Peru,Argentina,N-Africa
 
-N-Africa,422,264,Africa,Brazil,W-Europe,S-Europe,Egypt,E-Africa,Congo
-Congo,470,318,Africa,N-Africa,E-Africa,South Africa
-S-Africa,483,371,Africa,Congo,E-Africa,Madagascar
-Madagascar,540,361,Africa,E-Africa,South Africa
-E-Africa,524,295,Africa,Egypt,M-East,Congo,N-Africa,S-Africa,Madagascar
-Egypt,480,249,Africa,S-Europe,N-Africa,M-East,E-Africa
+N-Africa,422,264,2,Africa,Brazil,W-Europe,S-Europe,Egypt,E-Africa,Congo
+Congo,470,318,2,Africa,N-Africa,E-Africa,South Africa
+S-Africa,483,371,2,Africa,Congo,E-Africa,Madagascar
+Madagascar,540,361,3,Africa,E-Africa,South Africa
+E-Africa,524,295,2,Africa,Egypt,M-East,Congo,N-Africa,S-Africa,Madagascar
+Egypt,480,249,3,Africa,S-Europe,N-Africa,M-East,E-Africa
 
-Iceland,380,126,Europe,Greenland,Britain,Scandinavia
-Britain,415,169,Europe,Iceland,Scandinavia,W-Europe,N-Europe
-W-Europe,420,202,Europe,Britain,N-Europe,S-Europe,N-Africa
-Scandinavia,463,127,Europe,Iceland,Britain,N-Europe,Ukraine
-N-Europe,467,168,Europe,Britain,Scandinavia,Ukraine,S-Europe,W-Europe
-S-Europe,473,204,Europe,N-Europe,Ukraine,M-East,Egypt,N-Africa,W-Europe
-Ukraine,524,157,Europe,Ural,Afghanistan,M-East,S-Europe,N-Europe,Scandinavia
+Iceland,380,126,2,Europe,Greenland,Britain,Scandinavia
+Britain,415,169,3,Europe,Iceland,Scandinavia,W-Europe,N-Europe
+W-Europe,420,202,4,Europe,Britain,N-Europe,S-Europe,N-Africa
+Scandinavia,463,127,2,Europe,Iceland,Britain,N-Europe,Ukraine
+N-Europe,467,168,3,Europe,Britain,Scandinavia,Ukraine,S-Europe,W-Europe
+S-Europe,473,204,3,Europe,N-Europe,Ukraine,M-East,Egypt,N-Africa,W-Europe
+Ukraine,524,157,1,Europe,Ural,Afghanistan,M-East,S-Europe,N-Europe,Scandinavia
 
-M-East,530,234,Asia,Ukraine,Afghanistan,India,S-Europe,Egypt,E-Africa
-Ural,613,136,Asia,Siberia,China,Afghanistan,Ukraine
-Afghanistan,585,192,Asia,Ural,China,India,M-East,Ukraine
-India,612,249,Asia,China,Siam,Afghanistan,M-East
-Siberia,666,110,Asia,Yatusk,Irkutsk,Mongolia,China,Ural
-China,658,215,Asia,Ural,Siberia,Mongolia,Siam,India,Afghanistan
-Siam,671,270,Asia,China,India,Indonesia
-Mongolia,710,186,Asia,Siberia,Irkutsk,Japan,China,Kamchatka
-Irkutsk,698,152,Asia,Siberia,Yatusk,Kamchatka,Mongolia
-Yatusk,738,118,Asia,Siberia,Irkutsk,Kamchatka
-Kamchatka,806,125,Asia,Yatusk,Irkutsk,Japan,Alaska,Mongolia
-Japan,759,220,Asia,Kamchatka,Mongolia
+M-East,530,234,2,Asia,Ukraine,Afghanistan,India,S-Europe,Egypt,E-Africa
+Ural,613,136,1,Asia,Siberia,China,Afghanistan,Ukraine
+Afghanistan,585,192,2,Asia,Ural,China,India,M-East,Ukraine
+India,612,249,3,Asia,China,Siam,Afghanistan,M-East
+Siberia,666,110,1,Asia,Yatusk,Irkutsk,Mongolia,China,Ural
+China,658,215,3,Asia,Ural,Siberia,Mongolia,Siam,India,Afghanistan
+Siam,671,270,2,Asia,China,India,Indonesia
+Mongolia,710,186,1,Asia,Siberia,Irkutsk,Japan,China,Kamchatka
+Irkutsk,698,152,2,Asia,Siberia,Yatusk,Kamchatka,Mongolia
+Yatusk,738,118,1,Asia,Siberia,Irkutsk,Kamchatka
+Kamchatka,806,125,2,Asia,Yatusk,Irkutsk,Japan,Alaska,Mongolia
+Japan,759,220,2,Asia,Kamchatka,Mongolia
 
-Indonesia,698,314,Australia,Siam,N-Guinea,W-Australia
-N-Guinea,768,325,Australia,Indonesia,W-Australia,E-Australia
-W-Australia,726,373,Australia,Indonesia,N-Guinea,E-Australia
-E-Australia,780,381,Australia,W-Australia,N-Guinea
+Indonesia,698,314,2,Australia,Siam,N-Guinea,W-Australia
+N-Guinea,768,325,3,Australia,Indonesia,W-Australia,E-Australia
+W-Australia,726,373,2,Australia,Indonesia,N-Guinea,E-Australia
+E-Australia,780,381,1,Australia,W-Australia,N-Guinea

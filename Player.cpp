@@ -1,11 +1,15 @@
 #include "Player.h"
 #include "Country.h"
 
-Player::Player(int index) {
-    playerName = "P_" + to_string(index + 1);
+const vector<string> Player::DEFAULT_PLAYER_NAMES{vector<string>{"You", "Putin", "Trump", "Modi","Xi"}};
+
+Player::Player(int index, string name) {
     continentBonus = 0;
     cardExchangeTime = 0;
     playerIndex = index;
+    if(name.empty()){
+        this->playerName = DEFAULT_PLAYER_NAMES.at(index);
+    }
 }
 
 
