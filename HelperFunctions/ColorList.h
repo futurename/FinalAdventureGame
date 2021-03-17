@@ -14,6 +14,8 @@ public:
     const static tuple<int, int, int, int> LIGHTER_YELLOW;
     const static tuple<int, int, int, int> PURPLE;
     const static tuple<int, int, int, int> CYAN;
+    const static tuple<int, int, int, int> PUMPKIN;
+    const static tuple<int, int, int, int> INDIGO;
 
     void generateColorPairs(int numOfPlayers);
 
