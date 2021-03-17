@@ -396,7 +396,7 @@ void MapManager::setOwnerColorMark(int centerX, int centerY, tuple<int, int, int
 void MapManager::initTextViewPort() {
     renderPlayerInfoRect();
     resetToDefaultColor();
-    rendnerNumberListRect();
+    renderNumberListRect();
     renderCardsListRect();
     renderButtonsRect();
 }
@@ -627,7 +627,7 @@ void MapManager::clearCountryInfoRect() {
     SDL_DestroyTexture(textBgTexture);
 }
 
-void MapManager::rendnerNumberListRect() {
+void MapManager::renderNumberListRect() {
     SDL_Texture *numberTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
                                                    NUMBER_LIST_WIDTH, NUMBER_LIST_HEIGHT);
     SDL_SetRenderTarget(gRenderer, numberTexture);
@@ -683,7 +683,6 @@ void MapManager::rendnerNumberListRect() {
         startX += NUMBER_LIST_SPACE;
     }
 
-
     SDL_SetRenderTarget(gRenderer, NULL);
     SDL_RenderCopy(gRenderer, numberTexture, NULL, &numberListRect);
     SDL_RenderPresent(gRenderer);
@@ -716,7 +715,7 @@ bool MapManager::isDragToOwnCountry(SDL_Point point, int playerIndex) {
 void MapManager::updateWholeScreen() {
     renderPlayerInfoRect();
     updateMapRect();
-    rendnerNumberListRect();
+    renderNumberListRect();
     renderCardsListRect();
     renderButtonsRect();
 }

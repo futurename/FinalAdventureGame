@@ -166,7 +166,7 @@ public:
 
     static void updateWholeScreen();
 
-    static void rendnerNumberListRect();
+    static void renderNumberListRect();
 
     static bool isDragFromNumber(SDL_Point point);
 
