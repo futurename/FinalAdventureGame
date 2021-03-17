@@ -44,7 +44,6 @@ public:
 
     static void checkInitContinentsOwner();
 
-
     static int deployArmy(Country &country, Player player, int numOfDeployed);
 
     static void conquerTheCountry(Country &attackCountry, Country &defendCountry);

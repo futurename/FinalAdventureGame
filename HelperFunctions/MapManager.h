@@ -29,23 +29,26 @@ private:
     const static int COUNTRY_INFO_START_Y = 15;
     const static int COUNTRY_INFO_GAP = 30;
     const static int COUNTRY_INFO_FONT_SIZE = 20;
+    const static int COUNTRY_MARK_WIDTH = 74;
+    const static int COUNTRY_MARK_HEIGHT = 55;
+    const static int COUNTRY_TEXT_HEIGHT_SHIFT = 18;
 
     const static int NUMBER_LIST_WIDTH = PLAYER_INFO_WIDTH;
     const static int NUMBER_LIST_HEIGHT = 100;
     const static int NUMBER_LIST_X = 35;
-    const static int NUMBER_LIST_Y = 10;
+    const static int NUMBER_LIST_Y = 0;
+    const static int NUMBER_LIST_GAP = 30;
     const static int NUMBER_LIST_ABSOLUTE_Y = PLAYER_INFO_HEIGHT + COUNTRY_INFO_HEIGHT;
     const static int NUMBER_LIST_SPACE = 50;
     const static int NUMBER_LIST_FONT_SIZE = 18;
     const static int NUMBER_LIST_MARK_WIDTH = 35;
+    const static int NUMBER_LIST_UNDEPLOY_FONT_SIZE = 22;
     const static vector<string> NUMBER_STRING_VECTOR;
     const static tuple<int,int,int,int> NUMBER_BACKGROUND_COLOR;
     const static tuple<int,int,int,int> NUMBER_TEXT_COLOR;
     static vector<SDL_Point> numberMarkCoordinates;
 
-    const static int COUNTRY_MARK_WIDTH = 74;
-    const static int COUNTRY_MARK_HEIGHT = 55;
-    const static int COUNTRY_TEXT_HEIGHT_SHIFT = 18;
+
 
     const static tuple<int, int, int, int> DEFAULT_BACKGROUND_COLOR;
     const static string DEFAULT_MAP;
@@ -112,7 +115,7 @@ public:
 
     static string getCountryNameFromCoordinates(int x, int y);
 
-    static void renderCountryMark(int x, int y, Country &country, const int fontSize);
+    static void renderCountryMark(int x, int y, Country &country, int fontSize);
 
     static void updateCountryInfoRect(vector<string> &messages, tuple<int, int, int, int> color);
 
@@ -128,7 +131,7 @@ public:
 
     static void updateWholeScreen();
 
-    static void rednerNumberListRect(bool isDeployArmy, int numOfArmy);
+    static void rednerNumberListRect();
 
     static bool isDragFromNumber(SDL_Point point);
 

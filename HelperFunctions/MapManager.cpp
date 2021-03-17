@@ -284,15 +284,16 @@ void MapManager::start(string mapPath) {
                                     }
 
                                     //deploy numbers
-                                    if (isDragFromNumber(dragStartPoint) && isDragToOwnCountry(dragEndPoint, curPlayer.getPlayerIndex())) {
+                                    if (isDragFromNumber(dragStartPoint) &&
+                                        isDragToOwnCountry(dragEndPoint, curPlayer.getPlayerIndex())) {
                                         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT, "Drag",
                                                                  "Own country", NULL);
 
-                                        if(Game::getGameStage() == DEPLOYMENT){
+                                        if (Game::getGameStage() == DEPLOYMENT) {
                                             //FIXME
                                         }
 
-                                        if(Game::getGameStage() == MOVE){
+                                        if (Game::getGameStage() == MOVE) {
                                             //FIXME
                                         }
                                     }
@@ -360,7 +361,7 @@ void MapManager::setOwnerColorMark(int centerX, int centerY, tuple<int, int, int
 void MapManager::initTextViewPort() {
     renderPlayerInfoRect();
     resetToDefaultColor();
-    rednerNumberListRect(true, 7);
+    rednerNumberListRect();
 }
 
 void MapManager::renderMessage(int x, int y, const char *message, tuple<int, int, int, int> color, int fontSize,
@@ -512,9 +513,7 @@ void MapManager::updateMapRect() {
     SDL_Texture *mapViewTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
                                                     MAP_VIEW_PORT_WIDTH, MAP_VIEW_PORT_HEIGHT);
     SDL_SetRenderTarget(gRenderer, mapViewTexture);
-
     SDL_RenderClear(gRenderer);
-
     SDL_RenderCopy(gRenderer, gMapTexture, NULL, &worldMapRect);
 
     map<string, Country> allCountries = Game::getAllCountries();
@@ -591,35 +590,62 @@ void MapManager::clearCountryInfoRect() {
     SDL_DestroyTexture(textBgTexture);
 }
 
-void MapManager::rednerNumberListRect(bool isDeployArmy, int numOfArmy) {
+void MapManager::rednerNumberListRect() {
     SDL_Texture *numberTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
                                                    NUMBER_LIST_WIDTH, NUMBER_LIST_HEIGHT);
     SDL_SetRenderTarget(gRenderer, numberTexture);
     SDL_RenderClear(gRenderer);
 
     int startX = NUMBER_LIST_X;
+    int startY = NUMBER_LIST_HEIGHT / 4;
     numberMarkCoordinates.clear();
+    Player &curPlayer = Game::getAllPlayers().at(Game::getCurPlayerIndex());
+    stringstream ss;
 
-    if(isDeployArmy){
-
+    if (Game::getGameStage() == GameStage::DEPLOYMENT) {
+        ss << "Undeploy Army:   " << curPlayer.getUndeployArmyNumber();
+        renderMessage(NUMBER_LIST_WIDTH / 2, startY, ss.str().c_str(), curPlayer.getTextColor(),
+                      NUMBER_LIST_UNDEPLOY_FONT_SIZE);
     }
 
+    if (Game::getGameStage() == GameStage::MOVE) {
+        ss << "Stage: Move Army";
+        renderMessage(NUMBER_LIST_WIDTH / 2, startY, ss.str().c_str(), curPlayer.getTextColor(),
+                      NUMBER_LIST_UNDEPLOY_FONT_SIZE);
+    }
+
+    if (Game::getGameStage() == GameStage::ATTACK) {
+        ss << "Stage: Attack Country";
+        renderMessage(NUMBER_LIST_WIDTH / 2, startY, ss.str().c_str(), curPlayer.getTextColor(),
+                      NUMBER_LIST_UNDEPLOY_FONT_SIZE);
+    }
+
+    if (Game::getGameStage() == GameStage::EXCHANGE_CARDS) {
+        ss << "Stage: Exchange-Cards";
+        renderMessage(NUMBER_LIST_WIDTH / 2, startY, ss.str().c_str(), curPlayer.getTextColor(),
+                      NUMBER_LIST_UNDEPLOY_FONT_SIZE);
+    }
+
+    startY += NUMBER_LIST_GAP;
+
     for (string numStr : NUMBER_STRING_VECTOR) {
-        SDL_Rect rect{startX, NUMBER_LIST_Y, NUMBER_LIST_MARK_WIDTH, NUMBER_LIST_MARK_WIDTH};
+        SDL_Rect rect{startX, startY, NUMBER_LIST_MARK_WIDTH, NUMBER_LIST_MARK_WIDTH};
         SDL_SetRenderDrawColor(gRenderer, get<0>(NUMBER_BACKGROUND_COLOR), get<1>(NUMBER_BACKGROUND_COLOR),
                                get<2>(NUMBER_BACKGROUND_COLOR), get<3>(NUMBER_BACKGROUND_COLOR));
         SDL_RenderFillRect(gRenderer, &rect);
 
         int centerX = startX + NUMBER_LIST_MARK_WIDTH / 2;
-        int centerY = NUMBER_LIST_Y + NUMBER_LIST_MARK_WIDTH / 2;
+        int centerY = startY + NUMBER_LIST_MARK_WIDTH / 2;
 
         renderMessage(centerX, centerY, numStr.c_str(),
                       NUMBER_TEXT_COLOR, NUMBER_LIST_FONT_SIZE);
 
-        numberMarkCoordinates.push_back({centerX + MAP_VIEW_PORT_WIDTH, centerY + PLAYER_INFO_HEIGHT + COUNTRY_INFO_HEIGHT});
+        numberMarkCoordinates.push_back(
+                {centerX + MAP_VIEW_PORT_WIDTH, centerY + PLAYER_INFO_HEIGHT + COUNTRY_INFO_HEIGHT});
 
         startX += NUMBER_LIST_SPACE;
     }
+
 
     SDL_SetRenderTarget(gRenderer, NULL);
     SDL_RenderCopy(gRenderer, numberTexture, NULL, &numberListRect);
@@ -631,7 +657,7 @@ void MapManager::rednerNumberListRect(bool isDeployArmy, int numOfArmy) {
 bool MapManager::isDragFromNumber(SDL_Point point) {
     for (SDL_Point &p: numberMarkCoordinates) {
         if (point.x <= p.x + NUMBER_LIST_MARK_WIDTH / 2 && point.x >= p.x - NUMBER_LIST_MARK_WIDTH / 2
-            && point.y >= p.y - NUMBER_LIST_MARK_WIDTH / 2 && point.y <= p.y + NUMBER_LIST_MARK_WIDTH / 2){
+            && point.y >= p.y - NUMBER_LIST_MARK_WIDTH / 2 && point.y <= p.y + NUMBER_LIST_MARK_WIDTH / 2) {
             return true;
         }
     }
@@ -640,11 +666,11 @@ bool MapManager::isDragFromNumber(SDL_Point point) {
 
 bool MapManager::isDragToOwnCountry(SDL_Point point, int playerIndex) {
     string countryName = getCountryNameFromCoordinates(point.x, point.y);
-    if(countryName.empty()){
+    if (countryName.empty()) {
         return false;
     }
-    Country& country = Game::getAllCountries().at(countryName);
-    if(country.getOwnerIndex() != playerIndex){
+    Country &country = Game::getAllCountries().at(countryName);
+    if (country.getOwnerIndex() != playerIndex) {
         return false;
     }
     return true;
@@ -653,6 +679,7 @@ bool MapManager::isDragToOwnCountry(SDL_Point point, int playerIndex) {
 void MapManager::updateWholeScreen() {
     renderPlayerInfoRect();
     updateMapRect();
+    rednerNumberListRect();
 }
 
 

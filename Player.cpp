@@ -66,3 +66,8 @@ int Player::getPlayerIndex() {
     return playerIndex;
 }
 
+int Player::getUndeployArmyNumber() {
+    //FIXME
+    return 12;
+}
+

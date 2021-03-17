@@ -36,7 +36,7 @@ public:
 
     int getPlayerIndex();
 
-    int getUndeployedArmyNumber();
+    int getUndeployArmyNumber();
 
 private:
     string playerName;
