@@ -10,9 +10,10 @@ private:
     static map<string, Country> allCountries;
     static map<string, Continent> allContinents;
     const static int DEFAULT_PLAYERS = 4;
+    static int curPlayerIndex;
 
 public:
-    static vector<Player> getPlayers();
+    static vector<Player> getAllPlayers();
 
     static void initPlayersAndCountries();
 
@@ -39,4 +40,8 @@ public:
     static void checkInitContinentsOwner();
 
     static void conquerTheCountry(Country &attackCountry, Country &defendCountry);
+
+    static void setCurPlayerIndex(int index);
+
+    static int getCurPlayerIndex();
 };

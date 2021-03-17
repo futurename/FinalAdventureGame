@@ -10,7 +10,7 @@ const tuple<int, int, int, int> ColorList::WHITE{255, 255, 255, 1};
 const tuple<int, int, int, int> ColorList::BLACK{0, 0, 0, 1};
 const tuple<int, int, int, int> ColorList::LIGHTER_YELLOW{255, 255, 240, 1};
 const tuple<int, int, int, int> ColorList::PURPLE{237, 74, 246, 1};
-const tuple<int, int, int, int> ColorList::CYAN{74, 246, 237, 1};
+const tuple<int, int, int, int> ColorList::CYAN{74, 246, 247, 1};
 const tuple<int, int, int, int> ColorList::PUMPKIN{211, 84, 0, 1};
 const tuple<int, int, int, int> ColorList::INDIGO{75, 0, 130, 1};
 

@@ -9,7 +9,9 @@ map<string, Continent> Game::allContinents{map<string, Continent>()};
 
 vector<Player> Game::players{vector<Player>()};
 
-vector<Player> Game::getPlayers() {
+int Game::curPlayerIndex = 0;
+
+vector<Player> Game::getAllPlayers() {
     return players;
 }
 
@@ -28,18 +30,8 @@ void Game::initPlayersAndCountries() {
     //check whether a continent is owned by a player
     checkInitContinentsOwner();
 
-    //render country marks
-    /*for (auto &item : allCountries) {
-        Country &country = item.second;
-        int x = country.getX();
-        int y = country.getY();
-
-        MapManager::setOwnerColorMark(x, y, country.getCountryColour());
-
-        MapManager::renderCountryMark(x, y, country, MapManager::DEFAULT_MAP_FONT_SIZE);
-    }*/
-
-
+    //init current player to 0
+    curPlayerIndex = 0;
 }
 
 void Game::initPlayers() {
@@ -206,5 +198,13 @@ void Game::conquerTheCountry(Country &attackCountry, Country &defendCountry) {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_COLOR_TEXT, "GAME OVER", (attacker.getPlayerName() + " WIN!").c_str(),
                                  NULL);
     }
+}
+
+void Game::setCurPlayerIndex(int index) {
+    curPlayerIndex = index;
+}
+
+int Game::getCurPlayerIndex() {
+    return curPlayerIndex;
 }
 

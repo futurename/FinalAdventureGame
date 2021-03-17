@@ -32,15 +32,16 @@ private:
 
     const static int NUMBER_LIST_WIDTH = PLAYER_INFO_WIDTH;
     const static int NUMBER_LIST_HEIGHT = 100;
-    const static int NUMBER_LIST_X = 30;
+    const static int NUMBER_LIST_X = 35;
     const static int NUMBER_LIST_Y = 10;
     const static int NUMBER_LIST_ABSOLUTE_Y = PLAYER_INFO_HEIGHT + COUNTRY_INFO_HEIGHT;
     const static int NUMBER_LIST_SPACE = 50;
-    const static int NUMBER_LIST_FONT_SIZE = 16;
+    const static int NUMBER_LIST_FONT_SIZE = 18;
     const static int NUMBER_LIST_MARK_WIDTH = 35;
     const static vector<string> NUMBER_STRING_VECTOR;
     const static tuple<int,int,int,int> NUMBER_BACKGROUND_COLOR;
     const static tuple<int,int,int,int> NUMBER_TEXT_COLOR;
+    static vector<SDL_Point> numberMarkCoordinates;
 
     const static int COUNTRY_MARK_WIDTH = 74;
     const static int COUNTRY_MARK_HEIGHT = 55;
@@ -128,4 +129,8 @@ public:
     static void updateWholeScreen();
 
     static void rednerNumberList();
+
+    static bool isDragFromNumber(SDL_Point point);
+
+    static bool isDragToOwnCountry(SDL_Point point, int index);
 };
