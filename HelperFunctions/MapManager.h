@@ -128,7 +128,7 @@ public:
 
     static void updateWholeScreen();
 
-    static void rednerNumberList();
+    static void rednerNumberList(bool isDeployArmy, int numOfArmy);
 
     static bool isDragFromNumber(SDL_Point point);
 

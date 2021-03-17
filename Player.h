@@ -12,7 +12,7 @@ public:
 
     string getPlayerName();
 
-    void GetPlayerCaptures();
+    void getPlayerCaptures();
 
     void addCard(Card card);
 
@@ -32,9 +32,7 @@ public:
 
     tuple<int,int,int,int> getTextColor();
 
-
     int getNumOfCapturedCountries();
-
 
     int getPlayerIndex();
 

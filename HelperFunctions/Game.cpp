@@ -12,6 +12,8 @@ vector<Player> Game::players{vector<Player>()};
 
 int Game::curPlayerIndex = 0;
 
+const int Game::DEFAULT_NUM_UNDEPLOYED = 3;
+
 vector<Player> Game::getAllPlayers() {
     return players;
 }
@@ -88,7 +90,6 @@ void Game::printAllContinents() {
 //Check whether all countries of a continent are conquered by the player. If so, the player is given an amount of
 //armies that corresponding to the continent's control value.
 void Game::attackFrom(Country attacker, Country defender) {
-
     for (int i = 0; i < attacker.getCountryArmy(); i++) {
         pair<int, int> attackerDice = Random::RollDie(attacker.getCountryArmy());
         pair<int, int> defenderDice = Random::RollDie(defender.getCountryArmy());
@@ -110,23 +111,12 @@ void Game::attackFrom(Country attacker, Country defender) {
             conquerTheCountry(attacker, defender);
         }
 
+        Continent& continent = allContinents.at(defender.getContinentName());
+
         if (isContinentConquered(attacker.getOwnerIndex(), continent.getContinentName())) {
             continent.setOwnerIndex(attacker.getOwnerIndex());
             players.at(attacker.getOwnerIndex())
                     .addContinentBonus(continent.getBonus());
-        }
-        //FIXME whether the world is conquered by the attacker.
-
-        bool worldIsConquered = true;
-        int attackerIdx = attacker.getOwnerIndex();
-        for (const auto & [continentName, continent] : allContinents){
-            if (continent.getOwnerIndex() != attackerIdx){
-                worldIsConquered = false;
-            }
-        }
-        //game terminates once a player owns all the countries in the map
-        if (worldIsConquered){
-            SDL_ShowSimpleMessageBox(0, "Game Over", "One player has conquered the whole world!", NULL);
         }
     }
 }
@@ -188,12 +178,11 @@ void Game::checkInitContinentsOwner() {
   3. the function is called repeatedly until there is no more undeployed army.
 */
 int Game::deployArmy(Country& country, Player player, int numOfDeployed){
-
     int totalUndeployed = max(DEFAULT_NUM_UNDEPLOYED, player.getNumOfCapturedCountries() / 3);
 
-    for (const auto & [continentName, continent] : allContinents){
-        if (continent.getOwnerIndex() != player.getPlayerIndex()){
-            totalUndeployed += continent.getBonus();
+    for (const auto & item: allContinents){
+        if (item.second.getOwnerIndex() != player.getPlayerIndex()){
+            totalUndeployed += item.second.getBonus();
         }
     }
 

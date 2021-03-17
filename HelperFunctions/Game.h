@@ -2,7 +2,9 @@
 #include "../Player.h"
 #include "../Continent.h"
 
-enum GameState{DEPLOYMENT, ATTACK, MOVE, EXCHANGE_CARDS};
+enum GameState {
+    DEPLOYMENT, ATTACK, MOVE, EXCHANGE_CARDS
+};
 
 class Game {
 private:
@@ -10,12 +12,8 @@ private:
 
     static map<string, Country> allCountries;      //<countryName, countryObject>
     static map<string, Continent> allContinents;   //<continentName, continentObject>
-    const static int DEFAULT_PLAYERS = 3;
-    const static int DEFAULT_NUM_UNDEPLOYED = 3;   //defaul num of undeployed armies
-
-    static map<string, Country> allCountries;
-    static map<string, Continent> allContinents;
     const static int DEFAULT_PLAYERS = 4;
+    const static int DEFAULT_NUM_UNDEPLOYED;   //defaul num of undeployed armies
     static int curPlayerIndex;
 
 
@@ -38,7 +36,7 @@ public:
 
     static void attackFrom(Country attacker, Country defender);
 
-    static bool isContinentConquered(int index, const string& continentName);
+    static bool isContinentConquered(int index, const string &continentName);
 
     static void initPlayers();
 
@@ -47,7 +45,7 @@ public:
     static void checkInitContinentsOwner();
 
 
-    static int deployArmy(Country& country, Player player, int numOfDeployed);
+    static int deployArmy(Country &country, Player player, int numOfDeployed);
 
     static void conquerTheCountry(Country &attackCountry, Country &defendCountry);
 

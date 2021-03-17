@@ -7,6 +7,7 @@ class Card {
 
 private:
     CardType cardType;
+    const static int CARDS_EXCHANGE_VALUE = 5;
 public:
 
     Card(CardType card);

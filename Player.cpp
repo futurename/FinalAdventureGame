@@ -62,10 +62,7 @@ int Player::getNumOfCapturedCountries(){
     return capturedCountries.size();
 }
 
-int Player::getPlayerIndex(){
-
 int Player::getPlayerIndex() {
-
     return playerIndex;
 }
 

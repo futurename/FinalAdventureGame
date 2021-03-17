@@ -354,7 +354,7 @@ void MapManager::setOwnerColorMark(int centerX, int centerY, tuple<int, int, int
 void MapManager::initTextViewPort() {
     renderPlayerInfo();
     resetToDefaultColor();
-    rednerNumberList();
+    rednerNumberList(true, 7);
 }
 
 void MapManager::renderMessage(int x, int y, const char *message, tuple<int, int, int, int> color, int fontSize,
@@ -595,12 +595,7 @@ void MapManager::clearCountryInfo() {
     SDL_DestroyTexture(textBgTexture);
 }
 
-void MapManager::updateWholeScreen() {
-    renderPlayerInfo();
-    updateWorldMap();
-}
-
-void MapManager::rednerNumberList() {
+void MapManager::rednerNumberList(bool isDeployArmy, int numOfArmy) {
     SDL_Texture *numberTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
                                                    NUMBER_LIST_WIDTH, NUMBER_LIST_HEIGHT);
     SDL_SetRenderTarget(gRenderer, numberTexture);
@@ -608,6 +603,10 @@ void MapManager::rednerNumberList() {
 
     int startX = NUMBER_LIST_X;
     numberMarkCoordinates.clear();
+
+    if(isDeployArmy){
+
+    }
 
     for (string numStr : NUMBER_STRING_VECTOR) {
         SDL_Rect rect{startX, NUMBER_LIST_Y, NUMBER_LIST_MARK_WIDTH, NUMBER_LIST_MARK_WIDTH};
@@ -655,6 +654,9 @@ bool MapManager::isDragToOwnCountry(SDL_Point point, int playerIndex) {
     return true;
 }
 
-
+void MapManager::updateWholeScreen() {
+    renderPlayerInfo();
+    updateWorldMap();
+}
 
 
