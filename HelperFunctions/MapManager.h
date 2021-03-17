@@ -14,8 +14,8 @@ private:
     const static int MAP_VIEW_PORT_WIDTH = 1500;
     const static int MAP_VIEW_PORT_HEIGHT = SCREEN_HEIGHT;
 
-    const static int PLAYER_VIEWPORT_HEIGHT = 180;
-    const static int PLAYER_VIEWPORT_WIDTH = SCREEN_WIDTH - MAP_VIEW_PORT_WIDTH;
+    const static int PLAYER_INFO_HEIGHT = 180;
+    const static int PLAYER_INFO_WIDTH = SCREEN_WIDTH - MAP_VIEW_PORT_WIDTH;
     const static int PLAYER_INFO_X = 60;
     const static int PLAYER_INFO_Y = 40;
     const static int PLAYER_INFO_SPACE = 120;
@@ -23,12 +23,24 @@ private:
     const static int PLAYER_INFO_RECT_WIDTH = 15;
     const static int PLAYER_INFO_FONT_SIZE = 18;
 
-    const static int COUNTRY_INFO_WIDTH = PLAYER_VIEWPORT_WIDTH;
-    const static int COUNTRY_INFO_HEIGHT = SCREEN_HEIGHT - PLAYER_VIEWPORT_HEIGHT;
+    const static int COUNTRY_INFO_WIDTH = PLAYER_INFO_WIDTH;
+    const static int COUNTRY_INFO_HEIGHT = 160;
     const static int COUNTRY_INFO_CENTER_X = COUNTRY_INFO_WIDTH / 2;
     const static int COUNTRY_INFO_START_Y = 15;
     const static int COUNTRY_INFO_GAP = 30;
     const static int COUNTRY_INFO_FONT_SIZE = 20;
+
+    const static int NUMBER_LIST_WIDTH = PLAYER_INFO_WIDTH;
+    const static int NUMBER_LIST_HEIGHT = 100;
+    const static int NUMBER_LIST_X = 30;
+    const static int NUMBER_LIST_Y = 10;
+    const static int NUMBER_LIST_ABSOLUTE_Y = PLAYER_INFO_HEIGHT + COUNTRY_INFO_HEIGHT;
+    const static int NUMBER_LIST_SPACE = 50;
+    const static int NUMBER_LIST_FONT_SIZE = 16;
+    const static int NUMBER_LIST_MARK_WIDTH = 35;
+    const static vector<string> NUMBER_STRING_VECTOR;
+    const static tuple<int,int,int,int> NUMBER_BACKGROUND_COLOR;
+    const static tuple<int,int,int,int> NUMBER_TEXT_COLOR;
 
     const static int COUNTRY_MARK_WIDTH = 74;
     const static int COUNTRY_MARK_HEIGHT = 55;
@@ -53,9 +65,10 @@ private:
     const static char *DEFAULT_TEXT_FONT_PATH;
     static double IMAGE_WIDTH_RATIO;
     static double IMAGE_HEIGHT_RATIO;
-    static SDL_Rect textViewPort;
-    static SDL_Rect mapViewPort;
-    static SDL_Rect playerViewPort;
+    static SDL_Rect countryInfoRect;
+    static SDL_Rect worldMapRect;
+    static SDL_Rect playerInfoRect;
+    static SDL_Rect numberListRect;
 
     //Loads individual image as texture
     static SDL_Texture *loadTexture(std::string path);
@@ -113,4 +126,6 @@ public:
     static void clearCountryInfo();
 
     static void updateWholeScreen();
+
+    static void rednerNumberList();
 };
