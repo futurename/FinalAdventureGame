@@ -32,7 +32,9 @@ public:
 
     tuple<int,int,int,int> getTextColor();
 
+
     int getNumOfCapturedCountries();
+
 
     int getPlayerIndex();
 

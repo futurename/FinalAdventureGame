@@ -10,7 +10,9 @@ map<string, Continent> Game::allContinents{map<string, Continent>()};
 
 vector<Player> Game::players{vector<Player>()};
 
-vector<Player> Game::getPlayers() {
+int Game::curPlayerIndex = 0;
+
+vector<Player> Game::getAllPlayers() {
     return players;
 }
 
@@ -29,18 +31,8 @@ void Game::initPlayersAndCountries() {
     //check whether a continent is owned by a player
     checkInitContinentsOwner();
 
-    //render country marks
-    /*for (auto &item : allCountries) {
-        Country &country = item.second;
-        int x = country.getX();
-        int y = country.getY();
-
-        MapManager::setOwnerColorMark(x, y, country.getCountryColour());
-
-        MapManager::renderCountryMark(x, y, country, MapManager::COUNTRY_NAME_FONT_SIZE);
-    }*/
-
-
+    //init current player to 0
+    curPlayerIndex = 0;
 }
 
 void Game::initPlayers() {
@@ -115,15 +107,7 @@ void Game::attackFrom(Country attacker, Country defender) {
         }
 
         if (defender.getCountryArmy() == 0) {
-            defender.setOwnerIndex(attacker.getOwnerIndex());
-            defender.setCountryColour(attacker.getCountryColour());
-            defender.setTextColor(attacker.getTextColor());
-        }
-
-        Continent &continent = allContinents.at(defender.getContinentName());
-
-        if (continent.getOwnerIndex() == defender.getOwnerIndex()) {
-            continent.setOwnerIndex(Continent::NO_CONTINENT_OWNER);
+            conquerTheCountry(attacker, defender);
         }
 
         if (isContinentConquered(attacker.getOwnerIndex(), continent.getContinentName())) {
@@ -144,16 +128,14 @@ void Game::attackFrom(Country attacker, Country defender) {
         if (worldIsConquered){
             SDL_ShowSimpleMessageBox(0, "Game Over", "One player has conquered the whole world!", NULL);
         }
-
     }
-
 }
 
 bool Game::isContinentConquered(int index, const string &continentName) {
     vector<string> &countryNames = allContinents.find(continentName)->second.getCountryNames();
     bool result = true;
     for (const string &countryName: countryNames) {
-        if (allCountries.find(countryName) == allCountries.end()) {
+        if (allCountries.find(countryName)->second.getOwnerIndex() != index) {
             result = false;
             break;
         }
@@ -199,6 +181,7 @@ void Game::checkInitContinentsOwner() {
     }
 }
 
+
 /*
   1. init undeployed army numbers: 3 by default + bonus from the player attr.
   2. after the player selects a country and a certain number, add the army num to the country and subtract this from the total undeployed army number.
@@ -225,5 +208,56 @@ int Game::deployArmy(Country& country, Player player, int numOfDeployed){
     return totalUndeployed;
 
 
-
 }
+
+void Game::conquerTheCountry(Country &attackCountry, Country &defendCountry) {
+    Player &attacker = players.at(attackCountry.getOwnerIndex());
+    Player &defender = players.at(defendCountry.getOwnerIndex());
+
+    stringstream ss;
+
+    defendCountry.setOwnerIndex(attacker.getPlayerIndex());
+    defendCountry.setTextColor(attacker.getTextColor());
+    defendCountry.setCountryColour(attacker.getBgColor());
+
+    Continent &continent = allContinents.at(defendCountry.getContinentName());
+
+    if (continent.getOwnerIndex() == defender.getPlayerIndex()) {
+        continent.setOwnerIndex(Continent::NO_CONTINENT_OWNER);
+        defender.removeContinentBonus(continent.getBonus());
+    }
+
+    if (isContinentConquered(attackCountry.getOwnerIndex(), continent.getContinentName())) {
+        ss << "Conquer " << continent.getContinentName() << "!";
+        string title = ss.str();
+        ss.str("");
+        ss << attacker.getPlayerName() << " gets bonus <" << continent.getBonus() << ">";
+        string body = ss.str();
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, title.c_str(), body.c_str(), NULL);
+        continent.setOwnerIndex(attackCountry.getOwnerIndex());
+        attacker.addContinentBonus(continent.getBonus());
+    }
+
+    bool gameOver = true;
+    for (auto &c: allContinents) {
+        if (c.second.getOwnerIndex() != attacker.getPlayerIndex()) {
+            gameOver = false;
+            break;
+        }
+    }
+
+    if (gameOver) {
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_COLOR_TEXT, "GAME OVER", (attacker.getPlayerName() + " WIN!").c_str(),
+                                 NULL);
+    }
+}
+
+void Game::setCurPlayerIndex(int index) {
+    curPlayerIndex = index;
+}
+
+int Game::getCurPlayerIndex() {
+    return curPlayerIndex;
+}
+
+

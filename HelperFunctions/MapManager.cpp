@@ -1,15 +1,12 @@
 #include "MapManager.h"
 #include "Game.h"
 #include "ColorList.h"
-#include "../Continent.h"
 
 SDL_Window *MapManager::gWindow = NULL;
 
 SDL_Renderer *MapManager::gRenderer = NULL;
 
 SDL_Texture *MapManager::gMapTexture = NULL;
-
-SDL_Surface *MapManager::gScreenSurface = NULL;
 
 TTF_Font *MapManager::gFont = NULL;
 
@@ -23,13 +20,30 @@ const string MapManager::CONTINENT_TITLE = "Continents";
 
 const char *MapManager::DEFAULT_FONT_PATH = "../Fonts/FiraSans-Regular.ttf";
 
+const char *MapManager::DEFAULT_TEXT_FONT_PATH = "../Fonts/NotoSansTC-Bold.otf";
+
 const tuple<int, int, int, int> MapManager::DEFAULT_BACKGROUND_COLOR = ColorList::WHITE;
 
-map<string, SDL_Texture *> MapManager::countryTextures{map<string, SDL_Texture *>()};
+const vector<string> MapManager::NUMBER_STRING_VECTOR{"1", "2", "5", "10", "ALL"};
+
+const tuple<int, int, int, int> MapManager::NUMBER_BACKGROUND_COLOR{ColorList::BLACK};
+
+const tuple<int, int, int, int> MapManager::NUMBER_TEXT_COLOR{ColorList::WHITE};
 
 double MapManager::IMAGE_WIDTH_RATIO = 1.0;
 
 double MapManager::IMAGE_HEIGHT_RATIO = 1.0;
+
+SDL_Rect MapManager::countryInfoRect{MAP_VIEW_PORT_WIDTH, PLAYER_INFO_HEIGHT, COUNTRY_INFO_WIDTH,
+                                     COUNTRY_INFO_HEIGHT};
+
+SDL_Rect MapManager::worldMapRect{0, 0, MAP_VIEW_PORT_WIDTH, MAP_VIEW_PORT_HEIGHT};
+
+SDL_Rect MapManager::playerInfoRect{MAP_VIEW_PORT_WIDTH, 0, PLAYER_INFO_WIDTH, PLAYER_INFO_HEIGHT};
+
+SDL_Rect MapManager::numberListRect{MAP_VIEW_PORT_WIDTH, NUMBER_LIST_ABSOLUTE_Y, NUMBER_LIST_WIDTH, NUMBER_LIST_HEIGHT};
+
+vector<SDL_Point> MapManager::numberMarkCoordinates{vector<SDL_Point>()};
 
 void MapManager::initWorldMarks() {
     readMapConfigFromFile();
@@ -45,8 +59,9 @@ void MapManager::initWorldMarks() {
 
         setOwnerColorMark(x, y, country.getCountryColour());
 
-        renderCountryMark(x, y, country, COUNTRY_NAME_FONT_SIZE);
+        renderCountryMark(x, y, country, DEFAULT_MAP_FONT_SIZE);
     }
+    resetToDefaultColor();
 }
 
 bool MapManager::SDLInit() {
@@ -173,29 +188,16 @@ void MapManager::start(string mapPath) {
 
             //*******************************************
             //Rendering map vew port
-            renderMapViewPort();
+            renderWorldMap();
 
             initWorldMarks();
-
-            /*tuple<int, int, int, int> paintColor = ColorList::BLUE;
-            setOwnerColorMark(300, 400, paintColor);*/
-
-
 
             //*******************************************
             //rendering text view port
             initTextViewPort();
 
-
-
-            //******************************************
-            //render font
-
-
             //Update screen
             SDL_RenderPresent(gRenderer);
-
-
 
             //Event handler
             SDL_Event e;
@@ -206,38 +208,97 @@ void MapManager::start(string mapPath) {
                 while (SDL_PollEvent(&e) != 0) {
                     //User requests quit
                     string message;
-                    Country *pickedCountry;
+                    Country *clickedCountry;
+                    SDL_Point dragStartPoint, dragEndPoint;
+                    stringstream ss;
+                    Country *fromCountry, *toCountry;
+
+                    Player &curPlayer = Game::getAllPlayers().at(Game::getCurPlayerIndex());
 
                     switch (e.type) {
                         case SDL_QUIT:
                             quit = true;
                             break;
+
                         case SDL_MOUSEMOTION:
                             message = to_string(e.motion.x) + ":" + to_string(e.motion.y);
                             if (!getCountryNameFromCoordinates(e.motion.x, e.motion.y).empty()) {
                                 message = getCountryNameFromCoordinates(e.motion.x, e.motion.y);
-                                pickedCountry = &Game::getAllCountries().find(message.c_str())->second;
-                                //updateTextViewPort();
-                                // renderMapViewPort(*pickedCountry);
-                                //renderCountryMark(pickedCountry->getX(), pickedCountry->getY(), *pickedCountry, 22);
+                                clickedCountry = &Game::getAllCountries().find(message)->second;
+                                renderCountryInfo(clickedCountry);
+                            } else {
+                                clickedCountry = nullptr;
+                                clearCountryInfo();
                             }
                             SDL_SetWindowTitle(gWindow, message.c_str());
+
                             break;
+
                         case SDL_MOUSEBUTTONDOWN:
                             switch (e.button.button) {
                                 case SDL_BUTTON_LEFT:
-                                    message = getCountryNameFromCoordinates(e.motion.x, e.motion.y);
-                                    SDL_ShowSimpleMessageBox(0, "check range", message.c_str(), gWindow);
+                                    dragStartPoint = {e.motion.x, e.motion.y};
+                                    if (clickedCountry != nullptr) {
+                                        renderCountryInfo(clickedCountry);
 
-                                    vector<string> messages;
-                                    messages.push_back(pickedCountry->getCountryName());
-                                    messages.push_back(to_string(pickedCountry->getOwnerIndex()));
-                                    messages.push_back(pickedCountry->getContinentName());
-                                    messages.push_back(to_string(pickedCountry->getCountryArmy()));
-                                    updateTextViewPort(messages);
+                                        updateWholeScreen();
+                                    }
                                     break;
                             }
+                        case SDL_MOUSEBUTTONUP:
+                            switch (e.button.button) {
+                                case SDL_BUTTON_LEFT:
+                                    dragEndPoint = {e.motion.x, e.motion.y};
 
+                                    string fromCountryName = getCountryNameFromCoordinates(dragStartPoint.x,
+                                                                                           dragStartPoint.y);
+                                    if (!fromCountryName.empty()) {
+                                        fromCountry = &Game::getAllCountries().find(fromCountryName)->second;
+                                    } else {
+                                        fromCountry = nullptr;
+                                    }
+                                    string toCountryName = getCountryNameFromCoordinates(dragEndPoint.x,
+                                                                                         dragEndPoint.y);
+                                    if (!toCountryName.empty()) {
+                                        toCountry = &Game::getAllCountries().find(toCountryName)->second;
+                                    } else {
+                                        toCountry = nullptr;
+                                    }
+
+                                    if (fromCountry != nullptr && toCountry != nullptr &&
+                                        fromCountryName != toCountryName) {
+
+                                        //CHEATING mode for testing attack function.
+                                        if (fromCountry->getOwnerIndex() != toCountry->getOwnerIndex()) {
+                                            /*  ss.str("");
+                                              ss.clear();
+                                              ss << "From <" << fromCountryName << "> to <" << toCountryName << ">";
+                                              SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT, "Drag",
+                                                                       ss.str().c_str(), NULL);*/
+                                            Game::conquerTheCountry(*fromCountry, *toCountry);
+
+                                            updateWholeScreen();
+                                            // updateWorldMap();
+/*
+                                            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT, "Result",
+                                                                     to_string(toCountry->getOwnerIndex()).c_str(), NULL);*/
+                                        }
+                                    }
+
+                                    //deploy numbers
+                                    if (isDragFromNumber(dragStartPoint) && isDragToOwnCountry(dragEndPoint, curPlayer.getPlayerIndex())) {
+                                        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT, "Drag",
+                                                                 "Own country", NULL);
+                                    }
+
+
+
+
+
+                                    //FIXME attack state
+
+                                    break;
+                            }
                     }
                 }
             }
@@ -248,17 +309,34 @@ void MapManager::start(string mapPath) {
     SDLClose();
 }
 
-void MapManager::renderMapViewPort() {
-    SDL_Rect mapViewPort;
-    mapViewPort.x = 0;
-    mapViewPort.y = 0;
-    mapViewPort.w = MAP_VIEW_PORT_WIDTH;
-    mapViewPort.h = SCREEN_HEIGHT;
-    SDL_RenderSetViewport(gRenderer, &mapViewPort);
+void MapManager::renderCountryInfo(Country *pickedCountry) {
+    vector<string> messages;
+    stringstream ss;
+    ss << "Country:  " << pickedCountry->getCountryName();
 
-    SDL_RenderCopy(gRenderer, gMapTexture, NULL, NULL);
+    messages.push_back(ss.str());
+    Player &player = Game::getAllPlayers().at(pickedCountry->getOwnerIndex());
+    ss.str("");
+    ss << "Player:  " << player.getPlayerName();
+    messages.push_back(ss.str());
 
-    renderMessage(0, 10, "Hello world", ColorList::RED, 18);
+    ss.str("");
+    ss << "Continent:  " << pickedCountry->getContinentName();
+    messages.push_back(ss.str());
+
+    ss.str("");
+    ss << "Army:  " << to_string(pickedCountry->getCountryArmy());
+    messages.push_back(ss.str());
+
+    ss.str("");
+    updateTextViewPort(messages, player.getTextColor());
+}
+
+void MapManager::renderWorldMap() {
+    //SDL_RenderSetViewport(gRenderer, &worldMapRect);
+    SDL_RenderCopy(gRenderer, gMapTexture, NULL, &worldMapRect);
+    SDL_RenderPresent(gRenderer);
+    resetToDefaultColor();
 }
 
 void MapManager::setOwnerColorMark(int centerX, int centerY, tuple<int, int, int, int> color) {
@@ -271,18 +349,12 @@ void MapManager::setOwnerColorMark(int centerX, int centerY, tuple<int, int, int
     sdlRect.h = COUNTRY_MARK_HEIGHT;
 
     SDL_RenderFillRect(gRenderer, &sdlRect);
-/*
-    //set color to the default color
-    SDL_SetRenderDrawColor(gRenderer, get<0>(DEFAULT_BACKGROUND_COLOR),
-                           get<1>(DEFAULT_BACKGROUND_COLOR),
-                           get<2>(DEFAULT_BACKGROUND_COLOR),
-                           get<3>(DEFAULT_BACKGROUND_COLOR));*/
 }
 
 void MapManager::initTextViewPort() {
-    SDL_Rect textVeiewPort{MAP_VIEW_PORT_WIDTH, 0, SCREEN_WIDTH - MAP_VIEW_PORT_WIDTH, SCREEN_HEIGHT};
-    SDL_RenderSetViewport(gRenderer, &textVeiewPort);
-    resetTextViewPortBackground();
+    renderPlayerInfo();
+    resetToDefaultColor();
+    rednerNumberList();
 }
 
 void MapManager::renderMessage(int x, int y, const char *message, tuple<int, int, int, int> color, int fontSize,
@@ -311,6 +383,7 @@ void MapManager::renderMessage(int x, int y, const char *message, tuple<int, int
 
     SDL_DestroyTexture(textTexture);
     SDL_FreeSurface(textSurface);
+    resetToDefaultColor();
 }
 
 void MapManager::readMapConfigFromFile(string filePath) {
@@ -399,54 +472,189 @@ string MapManager::getCountryNameFromCoordinates(int x, int y) {
 }
 
 void MapManager::renderCountryMark(int x, int y, Country &country, const int fontSize) {
-
     int ownerIndex = country.getOwnerIndex();
-    Player& player = Game::getPlayers().at(ownerIndex);
+    Player player = Game::getAllPlayers().at(ownerIndex);
 
     renderMessage(x, y - COUNTRY_TEXT_HEIGHT_SHIFT, player.getPlayerName().c_str(), country.getTextColor(),
                   fontSize);
     renderMessage(x, y, country.getCountryName().c_str(), country.getTextColor(), fontSize);
-    renderMessage(x, y + COUNTRY_TEXT_HEIGHT_SHIFT, to_string(country.getCountryArmy()).c_str(), country.getTextColor(),
+    renderMessage(x, y + COUNTRY_TEXT_HEIGHT_SHIFT, to_string(country.getCountryArmy()).c_str(),
+                  country.getTextColor(),
                   fontSize);
 }
 
-void MapManager::updateTextViewPort(vector<string> &messages) {
 
-    SDL_Rect textViewPort{MAP_VIEW_PORT_WIDTH, 0, SCREEN_WIDTH - MAP_VIEW_PORT_WIDTH, SCREEN_HEIGHT};
-
+void MapManager::updateTextViewPort(vector<string> &messages, tuple<int, int, int, int> color) {
     SDL_Texture *textBgTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
-                                                   TEXT_VIEW_PORT_WIDTH, TEXT_VIEW_PORT_HEIGHT);
+                                                   COUNTRY_INFO_WIDTH, COUNTRY_INFO_HEIGHT);
     SDL_SetRenderTarget(gRenderer, textBgTexture);
-    // SDL_RenderSetViewport(gRenderer,&textViewPort);
 
     SDL_RenderClear(gRenderer);
 
-    resetTextViewPortBackground();
-
-
-    int y = 50;
-    int gap = 30;
-
+    int y = COUNTRY_INFO_START_Y;
     for (string &msg: messages) {
-        renderMessage(TEXT_VIEWPORT_CENTER_X, y, msg.c_str(), ColorList::RED, 16);
-        y += 30;
+        renderMessage(COUNTRY_INFO_CENTER_X, y, msg.c_str(), color, COUNTRY_INFO_FONT_SIZE, DEFAULT_TEXT_FONT_PATH);
+        y += COUNTRY_INFO_GAP;
     }
 
     SDL_SetRenderTarget(gRenderer, NULL);
 
-    SDL_RenderCopy(gRenderer, textBgTexture, NULL, NULL);
+    SDL_RenderCopy(gRenderer, textBgTexture, NULL, &countryInfoRect);
 
     SDL_RenderPresent(gRenderer);
+    SDL_DestroyTexture(textBgTexture);
 }
 
-void MapManager::resetTextViewPortBackground() {
-    tuple<int, int, int, int> bgColor = ColorList::LIGHTER_YELLOW;
-    SDL_SetRenderDrawColor(gRenderer, get<0>(bgColor), get<1>(bgColor), get<2>(bgColor), get<3>(bgColor));
-    SDL_RenderFillRect(gRenderer, nullptr);
+void MapManager::updateWorldMap() {
+    //SDL_RenderSetViewport(gRenderer,&worldMapRect);
+    SDL_Texture *mapViewTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+                                                    MAP_VIEW_PORT_WIDTH, MAP_VIEW_PORT_HEIGHT);
+    SDL_SetRenderTarget(gRenderer, mapViewTexture);
 
-    tuple<int, int, int, int> borderColor = ColorList::BLACK;
-    SDL_SetRenderDrawColor(gRenderer, get<0>(borderColor), get<1>(borderColor), get<2>(borderColor),
-                           get<3>(borderColor));
-    SDL_RenderDrawRect(gRenderer, nullptr);
+    SDL_RenderClear(gRenderer);
+
+    SDL_RenderCopy(gRenderer, gMapTexture, NULL, &worldMapRect);
+
+    map<string, Country> allCountries = Game::getAllCountries();
+    for (auto &item : allCountries) {
+        Country &country = item.second;
+        int x = country.getX();
+        int y = country.getY();
+
+        setOwnerColorMark(x, y, country.getCountryColour());
+
+        renderCountryMark(x, y, country, DEFAULT_MAP_FONT_SIZE);
+    }
+
+    SDL_SetRenderTarget(gRenderer, NULL);
+    //SDL_RenderSetClipRect(gRenderer, &worldMapRect);
+    SDL_RenderCopy(gRenderer, mapViewTexture, NULL, &worldMapRect);
+
+
+    SDL_RenderPresent(gRenderer);
+    //SDL_DestroyTexture(mapViewTexture);
+
+    //renderPlayerInfo();
 }
+
+void MapManager::resetToDefaultColor() {
+    SDL_SetRenderDrawColor(gRenderer, get<0>(DEFAULT_BACKGROUND_COLOR), get<1>(DEFAULT_BACKGROUND_COLOR),
+                           get<2>(DEFAULT_BACKGROUND_COLOR),
+                           get<3>(DEFAULT_BACKGROUND_COLOR));
+}
+
+void MapManager::renderPlayerInfo() {
+    SDL_Texture *playerTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+                                                   COUNTRY_INFO_WIDTH, PLAYER_INFO_HEIGHT);
+    SDL_SetRenderTarget(gRenderer, playerTexture);
+    SDL_RenderClear(gRenderer);
+    vector<Player> players = Game::getAllPlayers();
+    int startY = PLAYER_INFO_Y;
+    for (Player &player: players) {
+        SDL_Rect rect{PLAYER_INFO_X, startY - PLAYER_INFO_RECT_WIDTH / 2, PLAYER_INFO_RECT_WIDTH,
+                      PLAYER_INFO_RECT_WIDTH};
+        SDL_SetRenderDrawColor(gRenderer, get<0>(player.getBgColor()), get<1>(player.getBgColor()),
+                               get<2>(player.getBgColor()), get<3>(player.getBgColor()));
+        SDL_RenderFillRect(gRenderer, &rect);
+
+        auto allCountries = Game::getAllCountries();
+
+        int counter = 0;
+
+        for (auto &item: Game::getAllCountries()) {
+            if (item.second.getOwnerIndex() == player.getPlayerIndex()) {
+                counter++;
+            }
+        }
+
+        string playerInfoStr = player.getPlayerName() + "  <" + to_string(counter) + ">";
+
+        renderMessage(PLAYER_INFO_X + PLAYER_INFO_SPACE, startY, playerInfoStr.c_str(), player.getTextColor(),
+                      PLAYER_INFO_FONT_SIZE, DEFAULT_TEXT_FONT_PATH);
+        startY += PLAYER_INFO_GAP;
+    }
+
+    SDL_SetRenderTarget(gRenderer, NULL);
+    SDL_RenderCopy(gRenderer, playerTexture, NULL, &playerInfoRect);
+    SDL_RenderPresent(gRenderer);
+    SDL_DestroyTexture(playerTexture);
+}
+
+void MapManager::clearCountryInfo() {
+    SDL_Texture *textBgTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+                                                   COUNTRY_INFO_WIDTH, COUNTRY_INFO_HEIGHT);
+    SDL_SetRenderTarget(gRenderer, textBgTexture);
+
+    SDL_RenderClear(gRenderer);
+
+    SDL_SetRenderTarget(gRenderer, NULL);
+
+    SDL_RenderCopy(gRenderer, textBgTexture, NULL, &countryInfoRect);
+
+    SDL_RenderPresent(gRenderer);
+    SDL_DestroyTexture(textBgTexture);
+}
+
+void MapManager::updateWholeScreen() {
+    renderPlayerInfo();
+    updateWorldMap();
+}
+
+void MapManager::rednerNumberList() {
+    SDL_Texture *numberTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+                                                   NUMBER_LIST_WIDTH, NUMBER_LIST_HEIGHT);
+    SDL_SetRenderTarget(gRenderer, numberTexture);
+    SDL_RenderClear(gRenderer);
+
+    int startX = NUMBER_LIST_X;
+    numberMarkCoordinates.clear();
+
+    for (string numStr : NUMBER_STRING_VECTOR) {
+        SDL_Rect rect{startX, NUMBER_LIST_Y, NUMBER_LIST_MARK_WIDTH, NUMBER_LIST_MARK_WIDTH};
+        SDL_SetRenderDrawColor(gRenderer, get<0>(NUMBER_BACKGROUND_COLOR), get<1>(NUMBER_BACKGROUND_COLOR),
+                               get<2>(NUMBER_BACKGROUND_COLOR), get<3>(NUMBER_BACKGROUND_COLOR));
+        SDL_RenderFillRect(gRenderer, &rect);
+
+        int centerX = startX + NUMBER_LIST_MARK_WIDTH / 2;
+        int centerY = NUMBER_LIST_Y + NUMBER_LIST_MARK_WIDTH / 2;
+
+        renderMessage(centerX, centerY, numStr.c_str(),
+                      NUMBER_TEXT_COLOR, NUMBER_LIST_FONT_SIZE);
+
+        numberMarkCoordinates.push_back({centerX + MAP_VIEW_PORT_WIDTH, centerY + PLAYER_INFO_HEIGHT + COUNTRY_INFO_HEIGHT});
+
+        startX += NUMBER_LIST_SPACE;
+    }
+
+    SDL_SetRenderTarget(gRenderer, NULL);
+    SDL_RenderCopy(gRenderer, numberTexture, NULL, &numberListRect);
+    SDL_RenderPresent(gRenderer);
+    SDL_DestroyTexture(numberTexture);
+    resetToDefaultColor();
+}
+
+bool MapManager::isDragFromNumber(SDL_Point point) {
+    for (SDL_Point &p: numberMarkCoordinates) {
+        if (point.x <= p.x + NUMBER_LIST_MARK_WIDTH / 2 && point.x >= p.x - NUMBER_LIST_MARK_WIDTH / 2
+            && point.y >= p.y - NUMBER_LIST_MARK_WIDTH / 2 && point.y <= p.y + NUMBER_LIST_MARK_WIDTH / 2){
+            return true;
+        }
+    }
+    return false;
+}
+
+bool MapManager::isDragToOwnCountry(SDL_Point point, int playerIndex) {
+    string countryName = getCountryNameFromCoordinates(point.x, point.y);
+    if(countryName.empty()){
+        return false;
+    }
+    Country& country = Game::getAllCountries().at(countryName);
+    if(country.getOwnerIndex() != playerIndex){
+        return false;
+    }
+    return true;
+}
+
+
+
 

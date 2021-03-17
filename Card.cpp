@@ -1,7 +1,6 @@
 
 #include "Card.h"
 
-
 Card::Card(CardType cardType){
     this->cardType = cardType;
 }

@@ -1,13 +1,13 @@
 #include "Player.h"
 #include "Country.h"
 
-const vector<string> Player::DEFAULT_PLAYER_NAMES{vector<string>{"You", "Putin", "Trump", "Modi","Xi"}};
+const vector<string> Player::DEFAULT_PLAYER_NAMES{vector<string>{"You", "Napoleon", "Trump", "Putin", "Modi"}};
 
 Player::Player(int index, string name) {
     continentBonus = 0;
     cardExchangeTime = 0;
     playerIndex = index;
-    if(name.empty()){
+    if (name.empty()) {
         this->playerName = DEFAULT_PLAYER_NAMES.at(index);
     }
 }
@@ -57,11 +57,15 @@ tuple<int, int, int, int> Player::getTextColor() {
     return textColour;
 }
 
+
 int Player::getNumOfCapturedCountries(){
     return capturedCountries.size();
 }
 
 int Player::getPlayerIndex(){
+
+int Player::getPlayerIndex() {
+
     return playerIndex;
 }
 

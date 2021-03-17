@@ -2,18 +2,23 @@
 
 using namespace std;
 
-const tuple<int, int, int, int> ColorList::RED{255, 0, 0, 1};
-const tuple<int, int, int, int> ColorList::GREEN{0, 255, 0, 1};
-const tuple<int, int, int, int> ColorList::BLUE{0, 0, 255, 1};
+const tuple<int, int, int, int> ColorList::RED{225, 50, 0, 1};
+const tuple<int, int, int, int> ColorList::GREEN{50, 225, 0, 1};
+const tuple<int, int, int, int> ColorList::BLUE{50, 50, 225, 1};
 const tuple<int, int, int, int> ColorList::YELLOW{255, 255, 0, 1};
 const tuple<int, int, int, int> ColorList::WHITE{255, 255, 255, 1};
 const tuple<int, int, int, int> ColorList::BLACK{0, 0, 0, 1};
 const tuple<int, int, int, int> ColorList::LIGHTER_YELLOW{255, 255, 240, 1};
+const tuple<int, int, int, int> ColorList::PURPLE{237, 74, 246, 1};
+const tuple<int, int, int, int> ColorList::CYAN{74, 246, 247, 1};
+const tuple<int, int, int, int> ColorList::PUMPKIN{211, 84, 0, 1};
+const tuple<int, int, int, int> ColorList::INDIGO{75, 0, 130, 1};
 
-vector<pair<tuple<int, int, int, int>, tuple<int, int, int, int>>> ColorList::colorPairs{{ColorList::RED,   ColorList::WHITE},
-                                                                                         {ColorList::GREEN, ColorList::RED},
-                                                                                         {ColorList::BLUE, ColorList::YELLOW},
-                                                                                         {ColorList::YELLOW, ColorList::BLUE}};
+vector<pair<tuple<int, int, int, int>, tuple<int, int, int, int>>> ColorList::colorPairs{{ColorList::RED,    ColorList::BLUE},
+                                                                                         {ColorList::GREEN,  ColorList::PUMPKIN},
+                                                                                         {ColorList::PURPLE,   ColorList::CYAN},
+                                                                                         {ColorList::YELLOW, ColorList::INDIGO},
+                                                                                         {ColorList::PURPLE, ColorList::GREEN}};
 
 
 vector<tuple<int, int, int, int>> playerColors = {ColorList::RED,
