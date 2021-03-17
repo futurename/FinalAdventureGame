@@ -46,6 +46,26 @@ SDL_Rect MapManager::buttonsRect{MAP_VIEW_PORT_WIDTH, BUTTONS_ABSOLUTE_Y, BUTTON
 vector<SDL_Point> MapManager::numberMarkCoordinates{vector<SDL_Point>()};
 map<ButtonType, SDL_Point> MapManager::buttonCoordinates{map<ButtonType, SDL_Point>()};
 
+const SDL_MessageBoxButtonData MESSAGE_BOX_BUTTONS[2] = {
+        {SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT, 0, "No"},
+        {SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, 1, "Yes"},
+};
+
+const SDL_MessageBoxColorScheme MapManager::MESSAGE_BOX_COLOR_SCHEME{
+        { /* .colors (.r, .g, .b) */
+                /* [SDL_MESSAGEBOX_COLOR_BACKGROUND] */
+                {255, 0, 0},
+                /* [SDL_MESSAGEBOX_COLOR_TEXT] */
+                {0, 255, 0},
+                /* [SDL_MESSAGEBOX_COLOR_BUTTON_BORDER] */
+                {255, 255, 0},
+                /* [SDL_MESSAGEBOX_COLOR_BUTTON_BACKGROUND] */
+                {0, 0, 255},
+                /* [SDL_MESSAGEBOX_COLOR_BUTTON_SELECTED] */
+                {255, 0, 255}
+        }
+};
+
 void MapManager::initCountryMarks() {
     map<string, Country> allCountries = Game::getAllCountries();
 
@@ -215,6 +235,17 @@ void MapManager::start(string mapPath) {
 
                     Player &curPlayer = Game::getAllPlayers().at(Game::getCurPlayerIndex());
 
+                    int buttonId;
+                    const SDL_MessageBoxData resetMsgBoxData = {
+                            SDL_MESSAGEBOX_INFORMATION, /* .flags */
+                            NULL, /* .window */
+                            "example message box", /* .title */
+                            "Danger: you are resetting the game!", /* .message */
+                            SDL_arraysize(MESSAGE_BOX_BUTTONS), /* .numbuttons */
+                            MESSAGE_BOX_BUTTONS, /* .buttons */
+                            &MESSAGE_BOX_COLOR_SCHEME /* .colorScheme */
+                    };
+
                     switch (e.type) {
                         case SDL_QUIT:
                             quit = true;
@@ -260,16 +291,18 @@ void MapManager::start(string mapPath) {
                                                 saveGameToFile();
                                                 break;
                                             case RESET:
-                                                //FIXME
-                                                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT, "RESET",
-                                                                         "GAME RESET!", NULL);
-                                                resetGame();
+                                                if (SDL_ShowMessageBox(&resetMsgBoxData, &buttonId) < 0) {
+                                                    SDL_Log("error displaying message box");
+                                                }
+                                                if (buttonId == 1) {
+                                                    resetGame();
+                                                }
                                                 break;
                                             case NEXT:
                                                 //FIXME check stage is ATTACK
                                                 SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT, "NEXT",
                                                                          "NEXT", NULL);
-                                                finishAttack();
+                                                nextStage();
                                                 break;
                                         }
                                     }
@@ -767,7 +800,7 @@ void MapManager::renderButtonsRect() {
     int startY = BUTTONS_UPPER_Y;
     buttonCoordinates.clear();
 
-    //two lines of buttons
+    //two lines of MESSAGE_BOX_BUTTONS
     for (int i = 0; i < 2; i++) {
         SDL_Rect buttonRect1{startX, startY, BUTTONS_RECT_WIDTH, BUTTONS_RECT_HEIGHT};
         SDL_SetRenderDrawColor(gRenderer, get<0>(BUTTONS_BACKGROUND_COLOR), get<1>(BUTTONS_BACKGROUND_COLOR),
@@ -846,9 +879,21 @@ void MapManager::resetGame() {
     SDL_RenderPresent(gRenderer);
 }
 
-//FIXME
-void MapManager::finishAttack() {
 
+void MapManager::nextStage() {
+    GameStage curStage = Game::getGameStage();
+    if (curStage == ATTACK) {
+        Game::setGameStage(MOVE);
+    }
+    if (curStage == MOVE) {
+        int curPlayerIndex = Game::getCurPlayerIndex();
+        Game::setCurPlayerIndex((++curPlayerIndex) % (Game::getAllPlayers().size()));
+        Game::setGameStage(DEPLOYMENT);
+    }
+    if (curStage == DEPLOYMENT) {
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Deploy Stage", "Please deploy armies!", NULL);
+    }
+    updateWholeScreen();
 }
 
 ButtonType MapManager::getButtonTypeFromStr(string buttonName) {
@@ -866,5 +911,7 @@ ButtonType MapManager::getButtonTypeFromStr(string buttonName) {
     }
     return NONE;
 }
+
+
 
 

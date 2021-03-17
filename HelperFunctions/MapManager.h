@@ -109,6 +109,8 @@ private:
     static SDL_Rect cardsListRect;
     static SDL_Rect buttonsRect;
 
+    const static SDL_MessageBoxColorScheme MESSAGE_BOX_COLOR_SCHEME;
+
     //Loads individual image as texture
     static SDL_Texture *loadTexture(std::string path);
 
@@ -184,7 +186,7 @@ public:
 
     static void resetGame();
 
-    static void finishAttack();
+    static void nextStage();
 
     static ButtonType getButtonTypeFromStr(string buttonName);
 };

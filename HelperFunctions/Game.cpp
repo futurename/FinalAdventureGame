@@ -14,7 +14,7 @@ int Game::curPlayerIndex = 0;
 
 const int Game::DEFAULT_NUM_UNDEPLOYED = 3;
 
-GameStage Game::curGameStage{EXCHANGE_CARDS};
+GameStage Game::curGameStage{ATTACK};
 
 vector<Player>& Game::getAllPlayers() {
     return players;
