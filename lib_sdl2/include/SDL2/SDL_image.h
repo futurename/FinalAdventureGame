@@ -19,7 +19,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-/* A simple library to load images of various formats as SDL surfaces */
+/* A simple library to load Images of various formats as SDL surfaces */
 
 #ifndef SDL_IMAGE_H_
 #define SDL_IMAGE_H_

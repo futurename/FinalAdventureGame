@@ -3,47 +3,48 @@
 #include "ColorList.h"
 
 SDL_Window *MapManager::gWindow = NULL;
-
 SDL_Renderer *MapManager::gRenderer = NULL;
-
 SDL_Texture *MapManager::gMapTexture = NULL;
-
 TTF_Font *MapManager::gFont = NULL;
 
 const string MapManager::DEFAULT_MAP = "../Maps/World.bmp";
-
 const string MapManager::DEFAULT_MAP_CONFIG = "../Maps/World.map";
-
 const string MapManager::TERRITORIES_TITLE = "Territories";
-
 const string MapManager::CONTINENT_TITLE = "Continents";
 
 const char *MapManager::DEFAULT_FONT_PATH = "../Fonts/FiraSans-Regular.ttf";
-
 const char *MapManager::DEFAULT_TEXT_FONT_PATH = "../Fonts/NotoSansTC-Bold.otf";
+const char *MapManager::BUTTONS_FONT_PATH = "../Fonts/FredokaOne-Regular.ttf";
+
+vector<const char *> MapManager::CRAD_IMAGE_PATH_LIST = {"../Images/Artillery.jpg", "../Images/Cavalry.jpg",
+                                                         "../Images/Infantry.jpg"};
+vector<string> MapManager::CARDS_TYPE_LIST{"Infantry", "Cavalry", "Artillery"};
 
 const tuple<int, int, int, int> MapManager::DEFAULT_BACKGROUND_COLOR = ColorList::WHITE;
-
 const vector<string> MapManager::NUMBER_STRING_VECTOR{"1", "2", "5", "10", "ALL"};
-
 const tuple<int, int, int, int> MapManager::NUMBER_BACKGROUND_COLOR{ColorList::BLACK};
-
 const tuple<int, int, int, int> MapManager::NUMBER_TEXT_COLOR{ColorList::WHITE};
+tuple<int, int, int, int> MapManager::CARDS_IMAGE_BORDER_COLOR{ColorList::BLACK};
+tuple<int, int, int, int> MapManager::BUTTONS_BACKGROUND_COLOR{ColorList::LIGHTER_YELLOW};
+tuple<int, int, int, int> MapManager::BUTTONS_BORDER_COLOR{ColorList::BLACK};
+tuple<int, int, int, int> MapManager::BUTTONS_TEXT_COLOR{ColorList::BLACK};
+
+vector<string> MapManager::buttonNames{"LOAD", "SAVE", "RESET", "NEXT"};
 
 double MapManager::IMAGE_WIDTH_RATIO = 1.0;
-
 double MapManager::IMAGE_HEIGHT_RATIO = 1.0;
 
 SDL_Rect MapManager::countryInfoRect{MAP_VIEW_PORT_WIDTH, PLAYER_INFO_HEIGHT, COUNTRY_INFO_WIDTH,
                                      COUNTRY_INFO_HEIGHT};
-
 SDL_Rect MapManager::worldMapRect{0, 0, MAP_VIEW_PORT_WIDTH, MAP_VIEW_PORT_HEIGHT};
-
 SDL_Rect MapManager::playerInfoRect{MAP_VIEW_PORT_WIDTH, 0, PLAYER_INFO_WIDTH, PLAYER_INFO_HEIGHT};
-
 SDL_Rect MapManager::numberListRect{MAP_VIEW_PORT_WIDTH, NUMBER_LIST_ABSOLUTE_Y, NUMBER_LIST_WIDTH, NUMBER_LIST_HEIGHT};
+SDL_Rect MapManager::cardsListRect{MAP_VIEW_PORT_WIDTH, CARDS_LIST_ABSOLUTE_Y, CARDS_LIST_WIDTH,
+                                   CARDS_LIST_HEIGHT};
+SDL_Rect MapManager::buttonsRect{MAP_VIEW_PORT_WIDTH, BUTTONS_ABSOLUTE_Y, BUTTONS_WIDTH, BUTTONS_HEIGHT};
 
 vector<SDL_Point> MapManager::numberMarkCoordinates{vector<SDL_Point>()};
+map<ButtonType, SDL_Point> MapManager::buttonCoordinates{map<ButtonType, SDL_Point>()};
 
 void MapManager::initCountryMarks() {
     map<string, Country> allCountries = Game::getAllCountries();
@@ -195,6 +196,10 @@ void MapManager::start(string mapPath) {
             //rendering text view port
             initTextViewPort();
 
+
+
+
+
             //Update screen
             SDL_RenderPresent(gRenderer);
 
@@ -242,6 +247,36 @@ void MapManager::start(string mapPath) {
 
                                         updateWholeScreen();
                                     }
+                                    ButtonType buttonType = clickButtonType(e.motion.x, e.motion.y);
+                                    if (buttonType != NONE) {
+                                        switch (buttonType) {
+                                            case LOAD:
+                                                //FIXEME
+                                                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT, "LOAD",
+                                                                         "Click LOAD", NULL);
+
+                                                loadGameFromFile();
+                                                break;
+                                            case SAVE:
+                                                //FIXME
+                                                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT, "SAVE",
+                                                                         "Click SAVE", NULL);
+                                                saveGameToFile();
+                                                break;
+                                            case RESET:
+                                                //FIXME
+                                                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT, "RESET",
+                                                                         "Click RESET", NULL);
+                                                resetGame();
+                                                break;
+                                            case NEXT:
+                                                //FIXME check stage is ATTACK
+                                                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT, "NEXT",
+                                                                         "NEXT", NULL);
+                                                finishAttack();
+                                                break;
+                                        }
+                                    }
                                     break;
                             }
                         case SDL_MOUSEBUTTONUP:
@@ -284,15 +319,16 @@ void MapManager::start(string mapPath) {
                                     }
 
                                     //deploy numbers
-                                    if (isDragFromNumber(dragStartPoint) && isDragToOwnCountry(dragEndPoint, curPlayer.getPlayerIndex())) {
+                                    if (isDragFromNumber(dragStartPoint) &&
+                                        isDragToOwnCountry(dragEndPoint, curPlayer.getPlayerIndex())) {
                                         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT, "Drag",
                                                                  "Own country", NULL);
 
-                                        if(Game::getGameStage() == DEPLOYMENT){
+                                        if (Game::getGameStage() == DEPLOYMENT) {
                                             //FIXME
                                         }
 
-                                        if(Game::getGameStage() == MOVE){
+                                        if (Game::getGameStage() == MOVE) {
                                             //FIXME
                                         }
                                     }
@@ -360,7 +396,9 @@ void MapManager::setOwnerColorMark(int centerX, int centerY, tuple<int, int, int
 void MapManager::initTextViewPort() {
     renderPlayerInfoRect();
     resetToDefaultColor();
-    rednerNumberListRect(true, 7);
+    rendnerNumberListRect();
+    renderCardsListRect();
+    renderButtonsRect();
 }
 
 void MapManager::renderMessage(int x, int y, const char *message, tuple<int, int, int, int> color, int fontSize,
@@ -440,7 +478,7 @@ void MapManager::readMapConfigFromFile(string filePath) {
                         int coordinateX = stoi(countryTokens.at(COUNTRY_COORDINATE_X)) * IMAGE_WIDTH_RATIO;
                         int coordinateY = stoi(countryTokens.at(COUNTRY_COORDINATE_Y)) * IMAGE_HEIGHT_RATIO;
                         string continentName = countryTokens.at(CONTINENT_NAME_INDEX);
-                        int numOfArmy = stoi(countryTokens.at(ARYM_NUMBER_INDEX));
+                        int numOfArmy = stoi(countryTokens.at(ARMY_NUMBER_INDEX));
                         Game::getAllContinents().find(continentName)->second.addCountryName(countryName);
 
                         vector<string> adjacentCountries;
@@ -512,9 +550,7 @@ void MapManager::updateMapRect() {
     SDL_Texture *mapViewTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
                                                     MAP_VIEW_PORT_WIDTH, MAP_VIEW_PORT_HEIGHT);
     SDL_SetRenderTarget(gRenderer, mapViewTexture);
-
     SDL_RenderClear(gRenderer);
-
     SDL_RenderCopy(gRenderer, gMapTexture, NULL, &worldMapRect);
 
     map<string, Country> allCountries = Game::getAllCountries();
@@ -591,35 +627,62 @@ void MapManager::clearCountryInfoRect() {
     SDL_DestroyTexture(textBgTexture);
 }
 
-void MapManager::rednerNumberListRect(bool isDeployArmy, int numOfArmy) {
+void MapManager::rendnerNumberListRect() {
     SDL_Texture *numberTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
                                                    NUMBER_LIST_WIDTH, NUMBER_LIST_HEIGHT);
     SDL_SetRenderTarget(gRenderer, numberTexture);
     SDL_RenderClear(gRenderer);
 
     int startX = NUMBER_LIST_X;
+    int startY = NUMBER_LIST_HEIGHT / 4;
     numberMarkCoordinates.clear();
+    Player &curPlayer = Game::getAllPlayers().at(Game::getCurPlayerIndex());
+    stringstream ss;
 
-    if(isDeployArmy){
-
+    if (Game::getGameStage() == GameStage::DEPLOYMENT) {
+        ss << "Undeploy Army:   " << curPlayer.getUndeployArmyNumber();
+        renderMessage(NUMBER_LIST_WIDTH / 2, startY, ss.str().c_str(), curPlayer.getTextColor(),
+                      NUMBER_LIST_UNDEPLOY_FONT_SIZE);
     }
 
+    if (Game::getGameStage() == GameStage::MOVE) {
+        ss << "Stage: Move Army";
+        renderMessage(NUMBER_LIST_WIDTH / 2, startY, ss.str().c_str(), curPlayer.getTextColor(),
+                      NUMBER_LIST_UNDEPLOY_FONT_SIZE);
+    }
+
+    if (Game::getGameStage() == GameStage::ATTACK) {
+        ss << "Stage: Attack Country";
+        renderMessage(NUMBER_LIST_WIDTH / 2, startY, ss.str().c_str(), curPlayer.getTextColor(),
+                      NUMBER_LIST_UNDEPLOY_FONT_SIZE);
+    }
+
+    if (Game::getGameStage() == GameStage::EXCHANGE_CARDS) {
+        ss << "Stage: Exchange-Cards";
+        renderMessage(NUMBER_LIST_WIDTH / 2, startY, ss.str().c_str(), curPlayer.getTextColor(),
+                      NUMBER_LIST_UNDEPLOY_FONT_SIZE);
+    }
+
+    startY += NUMBER_LIST_GAP;
+
     for (string numStr : NUMBER_STRING_VECTOR) {
-        SDL_Rect rect{startX, NUMBER_LIST_Y, NUMBER_LIST_MARK_WIDTH, NUMBER_LIST_MARK_WIDTH};
+        SDL_Rect rect{startX, startY, NUMBER_LIST_MARK_WIDTH, NUMBER_LIST_MARK_WIDTH};
         SDL_SetRenderDrawColor(gRenderer, get<0>(NUMBER_BACKGROUND_COLOR), get<1>(NUMBER_BACKGROUND_COLOR),
                                get<2>(NUMBER_BACKGROUND_COLOR), get<3>(NUMBER_BACKGROUND_COLOR));
         SDL_RenderFillRect(gRenderer, &rect);
 
         int centerX = startX + NUMBER_LIST_MARK_WIDTH / 2;
-        int centerY = NUMBER_LIST_Y + NUMBER_LIST_MARK_WIDTH / 2;
+        int centerY = startY + NUMBER_LIST_MARK_WIDTH / 2;
 
         renderMessage(centerX, centerY, numStr.c_str(),
                       NUMBER_TEXT_COLOR, NUMBER_LIST_FONT_SIZE);
 
-        numberMarkCoordinates.push_back({centerX + MAP_VIEW_PORT_WIDTH, centerY + PLAYER_INFO_HEIGHT + COUNTRY_INFO_HEIGHT});
+        numberMarkCoordinates.push_back(
+                {centerX + MAP_VIEW_PORT_WIDTH, centerY + PLAYER_INFO_HEIGHT + COUNTRY_INFO_HEIGHT});
 
         startX += NUMBER_LIST_SPACE;
     }
+
 
     SDL_SetRenderTarget(gRenderer, NULL);
     SDL_RenderCopy(gRenderer, numberTexture, NULL, &numberListRect);
@@ -631,7 +694,7 @@ void MapManager::rednerNumberListRect(bool isDeployArmy, int numOfArmy) {
 bool MapManager::isDragFromNumber(SDL_Point point) {
     for (SDL_Point &p: numberMarkCoordinates) {
         if (point.x <= p.x + NUMBER_LIST_MARK_WIDTH / 2 && point.x >= p.x - NUMBER_LIST_MARK_WIDTH / 2
-            && point.y >= p.y - NUMBER_LIST_MARK_WIDTH / 2 && point.y <= p.y + NUMBER_LIST_MARK_WIDTH / 2){
+            && point.y >= p.y - NUMBER_LIST_MARK_WIDTH / 2 && point.y <= p.y + NUMBER_LIST_MARK_WIDTH / 2) {
             return true;
         }
     }
@@ -640,11 +703,11 @@ bool MapManager::isDragFromNumber(SDL_Point point) {
 
 bool MapManager::isDragToOwnCountry(SDL_Point point, int playerIndex) {
     string countryName = getCountryNameFromCoordinates(point.x, point.y);
-    if(countryName.empty()){
+    if (countryName.empty()) {
         return false;
     }
-    Country& country = Game::getAllCountries().at(countryName);
-    if(country.getOwnerIndex() != playerIndex){
+    Country &country = Game::getAllCountries().at(countryName);
+    if (country.getOwnerIndex() != playerIndex) {
         return false;
     }
     return true;
@@ -653,6 +716,152 @@ bool MapManager::isDragToOwnCountry(SDL_Point point, int playerIndex) {
 void MapManager::updateWholeScreen() {
     renderPlayerInfoRect();
     updateMapRect();
+    rendnerNumberListRect();
+    renderCardsListRect();
+    renderButtonsRect();
+}
+
+void MapManager::renderCardsListRect() {
+    SDL_Texture *cardsTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+                                                  CARDS_LIST_WIDTH, CARDS_LIST_HEIGHT);
+    SDL_SetRenderTarget(gRenderer, cardsTexture);
+    SDL_RenderClear(gRenderer);
+
+    int startX = CARDS_LIST_X;
+    int startY = CARDS_LIST_Y;
+
+    Player &curPlayer = Game::getAllPlayers().at(Game::getCurPlayerIndex());
+
+    SDL_Surface *cardImageSurface;
+    SDL_Texture *cardImageTexture;
+
+    //type of card is 3
+    for (int i = 0; i < CRAD_IMAGE_PATH_LIST.size(); i++) {
+        cardImageSurface = IMG_Load(CRAD_IMAGE_PATH_LIST.at(i));
+        if (cardImageSurface != nullptr) {
+            cardImageTexture = SDL_CreateTextureFromSurface(gRenderer, cardImageSurface);
+            SDL_Rect cardRect{startX, startY, CARDS_LIST_IMAGE_WIDTH, CARDS_LIST_IMAGE_HEIGHT};
+            SDL_Rect cardBorderRect{startX - 2, startY - 2, CARDS_LIST_IMAGE_WIDTH + 4, CARDS_LIST_IMAGE_HEIGHT + 4};
+            SDL_SetRenderDrawColor(gRenderer, get<0>(CARDS_IMAGE_BORDER_COLOR), get<1>(CARDS_IMAGE_BORDER_COLOR),
+                                   get<2>(CARDS_IMAGE_BORDER_COLOR), get<3>(CARDS_IMAGE_BORDER_COLOR));
+            SDL_RenderDrawRect(gRenderer, &cardBorderRect);
+            SDL_RenderCopy(gRenderer, cardImageTexture, NULL, &cardRect);
+
+            renderMessage(startX + CARDS_LIST_SPACE, startY + CARDS_LIST_IMAGE_HEIGHT / 2 - CARDS_TEXT_GAP / 2,
+                          CARDS_TYPE_LIST.at(i).c_str(),
+                          curPlayer.getTextColor(), CARDS_LIST_FONT_SIZE);
+
+            //FIXME get cards from current player
+            renderMessage(startX + CARDS_LIST_SPACE, startY + CARDS_LIST_IMAGE_HEIGHT / 2 + CARDS_TEXT_GAP / 2, "33",
+                          curPlayer.getTextColor(), CARDS_LIST_FONT_SIZE);
+            startY += CARDS_LIST_IMAGE_HEIGHT + CARDS_LIST_GAP;
+        }
+    }
+
+    SDL_SetRenderTarget(gRenderer, NULL);
+    SDL_RenderCopy(gRenderer, cardsTexture, NULL, &cardsListRect);
+    SDL_RenderPresent(gRenderer);
+    SDL_DestroyTexture(cardsTexture);
+    resetToDefaultColor();
+}
+
+void MapManager::renderButtonsRect() {
+    SDL_Texture *buttonsTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+                                                    COUNTRY_INFO_WIDTH, COUNTRY_INFO_HEIGHT);
+    SDL_SetRenderTarget(gRenderer, buttonsTexture);
+    SDL_RenderClear(gRenderer);
+
+    int startX = BUTTONS_LEFT_X;
+    int startY = BUTTONS_UPPER_Y;
+    buttonCoordinates.clear();
+
+    //two lines of buttons
+    for (int i = 0; i < 2; i++) {
+        SDL_Rect buttonRect1{startX, startY, BUTTONS_RECT_WIDTH, BUTTONS_RECT_HEIGHT};
+        SDL_SetRenderDrawColor(gRenderer, get<0>(BUTTONS_BACKGROUND_COLOR), get<1>(BUTTONS_BACKGROUND_COLOR),
+                               get<2>(BUTTONS_BACKGROUND_COLOR), get<3>(BUTTONS_BACKGROUND_COLOR));
+        SDL_RenderFillRect(gRenderer, &buttonRect1);
+        SDL_SetRenderDrawColor(gRenderer, get<0>(BUTTONS_BORDER_COLOR), get<1>(BUTTONS_BORDER_COLOR),
+                               get<2>(BUTTONS_BORDER_COLOR), get<3>(BUTTONS_BORDER_COLOR));
+        SDL_RenderDrawRect(gRenderer, &buttonRect1);
+        string buttonName1 = buttonNames.at(i * 2);
+        renderMessage(startX + BUTTONS_RECT_WIDTH / 2, startY + BUTTONS_RECT_HEIGHT / 2, buttonName1.c_str(),
+                      BUTTONS_TEXT_COLOR, BUTTONS_TEXT_FONT_SIZE, BUTTONS_FONT_PATH);
+        SDL_Point buttonPoint1{MAP_VIEW_PORT_WIDTH + startX, BUTTONS_ABSOLUTE_Y + startY};
+        buttonCoordinates.insert({getButtonTypeFromStr(buttonName1), buttonPoint1});
+
+        startX += BUTTONS_RECT_WIDTH + BUTTONS_SPACE;
+
+        SDL_Rect buttonRect2{startX, startY, BUTTONS_RECT_WIDTH, BUTTONS_RECT_HEIGHT};
+        SDL_SetRenderDrawColor(gRenderer, get<0>(BUTTONS_BACKGROUND_COLOR), get<1>(BUTTONS_BACKGROUND_COLOR),
+                               get<2>(BUTTONS_BACKGROUND_COLOR), get<3>(BUTTONS_BACKGROUND_COLOR));
+        SDL_RenderFillRect(gRenderer, &buttonRect2);
+        SDL_SetRenderDrawColor(gRenderer, get<0>(BUTTONS_BORDER_COLOR), get<1>(BUTTONS_BORDER_COLOR),
+                               get<2>(BUTTONS_BORDER_COLOR), get<3>(BUTTONS_BORDER_COLOR));
+        SDL_RenderDrawRect(gRenderer, &buttonRect2);
+        string buttonName2 = buttonNames.at(i * 2 + 1);
+        renderMessage(startX + BUTTONS_RECT_WIDTH / 2, startY + BUTTONS_RECT_HEIGHT / 2,
+                      buttonName2.c_str(),
+                      BUTTONS_TEXT_COLOR, BUTTONS_TEXT_FONT_SIZE, BUTTONS_FONT_PATH);
+
+        SDL_Point buttonPoint2{MAP_VIEW_PORT_WIDTH + startX, BUTTONS_ABSOLUTE_Y + startY};
+        buttonCoordinates.insert({getButtonTypeFromStr(buttonName2), buttonPoint2});
+
+        startX = BUTTONS_LEFT_X;
+        startY += BUTTONS_RECT_HEIGHT + BUTTONS_GAP;
+    }
+
+    SDL_SetRenderTarget(gRenderer, NULL);
+    SDL_RenderCopy(gRenderer, buttonsTexture, NULL, &buttonsRect);
+    SDL_RenderPresent(gRenderer);
+    SDL_DestroyTexture(buttonsTexture);
+    resetToDefaultColor();
+}
+
+//FIXME
+void MapManager::loadGameFromFile() {
+
+}
+
+ButtonType MapManager::clickButtonType(int x, int y) {
+    for (auto& item: buttonCoordinates) {
+        SDL_Point& point = item.second;
+        if (x >= point.x && x <= point.x + BUTTONS_RECT_WIDTH && y >= point.y && y <= point.y + BUTTONS_RECT_HEIGHT) {
+            return item.first;
+        }
+    }
+    return NONE;
+}
+
+//FIXME
+void MapManager::saveGameToFile() {
+
+}
+
+//FIXME
+void MapManager::resetGame() {
+
+}
+
+//FIXME
+void MapManager::finishAttack() {
+
+}
+
+ButtonType MapManager::getButtonTypeFromStr(string buttonName) {
+    if (buttonName == buttonNames.at(0)) {
+        return LOAD;
+    }
+    if (buttonName == buttonNames.at(1)) {
+        return SAVE;
+    }
+    if (buttonName == buttonNames.at(2)) {
+        return RESET;
+    }
+    if (buttonName == buttonNames.at(3)) {
+        return NEXT;
+    }
+    return NONE;
 }
 
 
