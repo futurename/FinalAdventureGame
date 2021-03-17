@@ -29,7 +29,7 @@
 
 /*
 
- Defines some images for tests.
+ Defines some Images for tests.
 
 */
 
@@ -45,7 +45,7 @@ extern "C" {
 #endif
 
 /**
- *Type for test images.
+ *Type for test Images.
  */
 typedef struct SDLTest_SurfaceImage_s {
   int width;
@@ -54,7 +54,7 @@ typedef struct SDLTest_SurfaceImage_s {
   const char *pixel_data;
 } SDLTest_SurfaceImage_t;
 
-/* Test images */
+/* Test Images */
 SDL_Surface *SDLTest_ImageBlit(void);
 SDL_Surface *SDLTest_ImageBlitColor(void);
 SDL_Surface *SDLTest_ImageBlitAlpha(void);

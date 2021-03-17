@@ -28,11 +28,11 @@
  *      * single pixel points
  *      * single pixel lines
  *      * filled rectangles
- *      * texture images
+ *      * texture Images
  *
  *  The primitives may be drawn in opaque, blended, or additive modes.
  *
- *  The texture images may be drawn in opaque, blended, or additive modes.
+ *  The texture Images may be drawn in opaque, blended, or additive modes.
  *  They can have an additional color tint or alpha modulation applied to
  *  them, and may also be stretched with linear interpolation.
  *

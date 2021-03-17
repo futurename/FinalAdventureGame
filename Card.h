@@ -1,6 +1,6 @@
 
 enum CardType {
-    INFANTRY, CALVARY, ARTILLERY
+    INFANTRY, CAVALRY, ARTILLERY
 };
 
 class Card {

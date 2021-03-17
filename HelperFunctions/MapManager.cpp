@@ -3,45 +3,38 @@
 #include "ColorList.h"
 
 SDL_Window *MapManager::gWindow = NULL;
-
 SDL_Renderer *MapManager::gRenderer = NULL;
-
 SDL_Texture *MapManager::gMapTexture = NULL;
-
 TTF_Font *MapManager::gFont = NULL;
 
 const string MapManager::DEFAULT_MAP = "../Maps/World.bmp";
-
 const string MapManager::DEFAULT_MAP_CONFIG = "../Maps/World.map";
-
 const string MapManager::TERRITORIES_TITLE = "Territories";
-
 const string MapManager::CONTINENT_TITLE = "Continents";
 
 const char *MapManager::DEFAULT_FONT_PATH = "../Fonts/FiraSans-Regular.ttf";
-
 const char *MapManager::DEFAULT_TEXT_FONT_PATH = "../Fonts/NotoSansTC-Bold.otf";
 
+vector<const char *> MapManager::CRAD_IMAGE_PATH_LIST = {"../Images/Artillery.jpg", "../Images/Cavalry.jpg",
+                                                         "../Images/Infantry.jpg"};
+vector<string> MapManager::CARDS_TYPE_LIST{"Infantry", "Cavalry", "Artillery"};
+
 const tuple<int, int, int, int> MapManager::DEFAULT_BACKGROUND_COLOR = ColorList::WHITE;
-
 const vector<string> MapManager::NUMBER_STRING_VECTOR{"1", "2", "5", "10", "ALL"};
-
 const tuple<int, int, int, int> MapManager::NUMBER_BACKGROUND_COLOR{ColorList::BLACK};
-
 const tuple<int, int, int, int> MapManager::NUMBER_TEXT_COLOR{ColorList::WHITE};
+tuple<int, int, int, int> MapManager::CARDS_IMAGE_BORDER_COLOR{ColorList::BLACK};
 
 double MapManager::IMAGE_WIDTH_RATIO = 1.0;
-
 double MapManager::IMAGE_HEIGHT_RATIO = 1.0;
 
 SDL_Rect MapManager::countryInfoRect{MAP_VIEW_PORT_WIDTH, PLAYER_INFO_HEIGHT, COUNTRY_INFO_WIDTH,
                                      COUNTRY_INFO_HEIGHT};
-
 SDL_Rect MapManager::worldMapRect{0, 0, MAP_VIEW_PORT_WIDTH, MAP_VIEW_PORT_HEIGHT};
-
 SDL_Rect MapManager::playerInfoRect{MAP_VIEW_PORT_WIDTH, 0, PLAYER_INFO_WIDTH, PLAYER_INFO_HEIGHT};
-
 SDL_Rect MapManager::numberListRect{MAP_VIEW_PORT_WIDTH, NUMBER_LIST_ABSOLUTE_Y, NUMBER_LIST_WIDTH, NUMBER_LIST_HEIGHT};
+SDL_Rect MapManager::cardsListRect{MAP_VIEW_PORT_WIDTH, CARDS_LIST_ABSOLUTE_Y, CARDS_LIST_WIDTH,
+                                   CARDS_LIST_HEIGHT};
 
 vector<SDL_Point> MapManager::numberMarkCoordinates{vector<SDL_Point>()};
 
@@ -194,6 +187,9 @@ void MapManager::start(string mapPath) {
             //*******************************************
             //rendering text view port
             initTextViewPort();
+
+            //display player card list
+            renderCardsListRect();
 
             //Update screen
             SDL_RenderPresent(gRenderer);
@@ -361,7 +357,7 @@ void MapManager::setOwnerColorMark(int centerX, int centerY, tuple<int, int, int
 void MapManager::initTextViewPort() {
     renderPlayerInfoRect();
     resetToDefaultColor();
-    rednerNumberListRect();
+    rendnerNumberListRect();
 }
 
 void MapManager::renderMessage(int x, int y, const char *message, tuple<int, int, int, int> color, int fontSize,
@@ -441,7 +437,7 @@ void MapManager::readMapConfigFromFile(string filePath) {
                         int coordinateX = stoi(countryTokens.at(COUNTRY_COORDINATE_X)) * IMAGE_WIDTH_RATIO;
                         int coordinateY = stoi(countryTokens.at(COUNTRY_COORDINATE_Y)) * IMAGE_HEIGHT_RATIO;
                         string continentName = countryTokens.at(CONTINENT_NAME_INDEX);
-                        int numOfArmy = stoi(countryTokens.at(ARYM_NUMBER_INDEX));
+                        int numOfArmy = stoi(countryTokens.at(ARMY_NUMBER_INDEX));
                         Game::getAllContinents().find(continentName)->second.addCountryName(countryName);
 
                         vector<string> adjacentCountries;
@@ -590,7 +586,7 @@ void MapManager::clearCountryInfoRect() {
     SDL_DestroyTexture(textBgTexture);
 }
 
-void MapManager::rednerNumberListRect() {
+void MapManager::rendnerNumberListRect() {
     SDL_Texture *numberTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
                                                    NUMBER_LIST_WIDTH, NUMBER_LIST_HEIGHT);
     SDL_SetRenderTarget(gRenderer, numberTexture);
@@ -679,7 +675,52 @@ bool MapManager::isDragToOwnCountry(SDL_Point point, int playerIndex) {
 void MapManager::updateWholeScreen() {
     renderPlayerInfoRect();
     updateMapRect();
-    rednerNumberListRect();
+    rendnerNumberListRect();
+    renderCardsListRect();
+}
+
+void MapManager::renderCardsListRect() {
+    SDL_Texture *cardsTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+                                                  CARDS_LIST_WIDTH, CARDS_LIST_HEIGHT);
+    SDL_SetRenderTarget(gRenderer, cardsTexture);
+    SDL_RenderClear(gRenderer);
+
+    int startX = CARDS_LIST_X;
+    int startY = CARDS_LIST_Y;
+
+    Player &curPlayer = Game::getAllPlayers().at(Game::getCurPlayerIndex());
+
+    SDL_Surface *cardImageSurface;
+    SDL_Texture *cardImageTexture;
+
+    //type of card is 3
+    for (int i = 0; i < CRAD_IMAGE_PATH_LIST.size(); i++) {
+        cardImageSurface = IMG_Load(CRAD_IMAGE_PATH_LIST.at(i));
+        if (cardImageSurface != nullptr) {
+            cardImageTexture = SDL_CreateTextureFromSurface(gRenderer, cardImageSurface);
+            SDL_Rect cardRect{startX, startY, CARDS_LIST_IMAGE_WIDTH, CARDS_LIST_IMAGE_HEIGHT};
+            SDL_Rect cardBorderRect{startX - 2, startY - 2, CARDS_LIST_IMAGE_WIDTH + 4, CARDS_LIST_IMAGE_HEIGHT + 4};
+            SDL_SetRenderDrawColor(gRenderer, get<0>(CARDS_IMAGE_BORDER_COLOR), get<1>(CARDS_IMAGE_BORDER_COLOR),
+                                   get<2>(CARDS_IMAGE_BORDER_COLOR), get<3>(CARDS_IMAGE_BORDER_COLOR));
+            SDL_RenderDrawRect(gRenderer, &cardBorderRect);
+            SDL_RenderCopy(gRenderer, cardImageTexture, NULL, &cardRect);
+
+            renderMessage(startX + CARDS_LIST_SPACE, startY + CARDS_LIST_IMAGE_HEIGHT / 2 - CARDS_TEXT_GAP / 2,
+                          CARDS_TYPE_LIST.at(i).c_str(),
+                          curPlayer.getTextColor(), CARDS_LIST_FONT_SIZE);
+
+            //FIXME get cards from current player
+            renderMessage(startX + CARDS_LIST_SPACE, startY + CARDS_LIST_IMAGE_HEIGHT / 2 + CARDS_TEXT_GAP / 2, "33",
+                          curPlayer.getTextColor(), CARDS_LIST_FONT_SIZE);
+            startY += CARDS_LIST_IMAGE_HEIGHT + CARDS_LIST_GAP;
+        }
+    }
+
+    SDL_SetRenderTarget(gRenderer, NULL);
+    SDL_RenderCopy(gRenderer, cardsTexture, NULL, &cardsListRect);
+    SDL_RenderPresent(gRenderer);
+    SDL_DestroyTexture(cardsTexture);
+    resetToDefaultColor();
 }
 
 
