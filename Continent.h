@@ -15,9 +15,9 @@ public:
 
     string getContinentName();
 
-    int getOwnerIndex();
+    int getOwnerIndex() const;
 
-    int getBonus();
+    int getBonus() const;
 
     void addCountryName(string &countryName);
 

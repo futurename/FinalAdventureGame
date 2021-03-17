@@ -35,13 +35,15 @@ public:
 
     void loseOneArmy();
 
-    void deployArmy(int numOfArmy);
-
     int getOwnerIndex();
 
     void setOwnerIndex(int index);
 
     void setTextColor(tuple<int,int,int,int> color);
+
+    int getNumOfArmy();
+
+    void setNumOfArmy(int newNumOfArmy);
 
 
 private:

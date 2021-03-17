@@ -78,3 +78,12 @@ void Country::setOwnerIndex(int index) {
 void Country::setTextColor(tuple<int,int,int,int> color) {
     this->textColor = color;
 }
+
+
+int Country::getNumOfArmy(){
+    return numOfArmy;
+}
+
+void Country::setNumOfArmy(int newNumOfArmy){
+    numOfArmy = newNumOfArmy;
+}
