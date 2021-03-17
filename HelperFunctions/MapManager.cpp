@@ -289,6 +289,14 @@ void MapManager::start(string mapPath) {
                                     if (isDragFromNumber(dragStartPoint) && isDragToOwnCountry(dragEndPoint, curPlayer.getPlayerIndex())) {
                                         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT, "Drag",
                                                                  "Own country", NULL);
+
+                                        if(Game::getGameStage() == DEPLOYMENT){
+                                            //FIXME
+                                        }
+
+                                        if(Game::getGameStage() == MOVE){
+                                            //FIXME
+                                        }
                                     }
 
 

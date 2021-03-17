@@ -14,6 +14,8 @@ int Game::curPlayerIndex = 0;
 
 const int Game::DEFAULT_NUM_UNDEPLOYED = 3;
 
+GameStage Game::curGameStage{DEPLOYMENT};
+
 vector<Player> Game::getAllPlayers() {
     return players;
 }
@@ -111,7 +113,7 @@ void Game::attackFrom(Country attacker, Country defender) {
             conquerTheCountry(attacker, defender);
         }
 
-        Continent& continent = allContinents.at(defender.getContinentName());
+        Continent &continent = allContinents.at(defender.getContinentName());
 
         if (isContinentConquered(attacker.getOwnerIndex(), continent.getContinentName())) {
             continent.setOwnerIndex(attacker.getOwnerIndex());
@@ -177,11 +179,11 @@ void Game::checkInitContinentsOwner() {
   2. after the player selects a country and a certain number, add the army num to the country and subtract this from the total undeployed army number.
   3. the function is called repeatedly until there is no more undeployed army.
 */
-int Game::deployArmy(Country& country, Player player, int numOfDeployed){
+int Game::deployArmy(Country &country, Player player, int numOfDeployed) {
     int totalUndeployed = max(DEFAULT_NUM_UNDEPLOYED, player.getNumOfCapturedCountries() / 3);
 
-    for (const auto & item: allContinents){
-        if (item.second.getOwnerIndex() != player.getPlayerIndex()){
+    for (const auto &item: allContinents) {
+        if (item.second.getOwnerIndex() != player.getPlayerIndex()) {
             totalUndeployed += item.second.getBonus();
         }
     }
@@ -247,6 +249,14 @@ void Game::setCurPlayerIndex(int index) {
 
 int Game::getCurPlayerIndex() {
     return curPlayerIndex;
+}
+
+void Game::setGameStage(GameStage stage) {
+    curGameStage = stage;
+}
+
+GameStage Game::getGameStage() {
+    return curGameStage;
 }
 
 

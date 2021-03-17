@@ -2,7 +2,7 @@
 #include "../Player.h"
 #include "../Continent.h"
 
-enum GameState {
+enum GameStage {
     DEPLOYMENT, ATTACK, MOVE, EXCHANGE_CARDS
 };
 
@@ -15,7 +15,7 @@ private:
     const static int DEFAULT_PLAYERS = 4;
     const static int DEFAULT_NUM_UNDEPLOYED;   //defaul num of undeployed armies
     static int curPlayerIndex;
-
+    static GameStage curGameStage;
 
 public:
     static vector<Player> getAllPlayers();
@@ -52,5 +52,9 @@ public:
     static void setCurPlayerIndex(int index);
 
     static int getCurPlayerIndex();
+
+    static void setGameStage(GameStage stage);
+
+    static GameStage getGameStage();
 
 };
