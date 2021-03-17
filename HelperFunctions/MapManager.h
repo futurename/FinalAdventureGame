@@ -4,6 +4,7 @@
 #include <string>
 #include <SDL_ttf.h>
 
+
 class Country;
 
 class MapManager {

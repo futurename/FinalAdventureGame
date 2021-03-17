@@ -36,7 +36,12 @@ public:
 
     int getPlayerIndex();
 
-    int getUndeployedArmyNumber();
+    int getUndeployArmyNumber();
+
+    void setUndeployArmyNumber(int newUndeployArmyNumber);
+
+    int getCalUndeployArmyNumber();
+
 
 private:
     string playerName;
@@ -48,4 +53,5 @@ private:
     int cardExchangeTime;
     int playerIndex;
     const static vector<string> DEFAULT_PLAYER_NAMES;
+    int undeployArmyNumber;
 };
