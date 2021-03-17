@@ -37,4 +37,6 @@ public:
     static void assignCountriesToPlayers();
 
     static void checkInitContinentsOwner();
+
+    static void conquerTheCountry(Country &attackCountry, Country &defendCountry);
 };

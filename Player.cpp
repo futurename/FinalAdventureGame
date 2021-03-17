@@ -57,3 +57,7 @@ tuple<int, int, int, int> Player::getTextColor() {
     return textColour;
 }
 
+int Player::getPlayerIndex() {
+    return playerIndex;
+}
+
