@@ -14,6 +14,7 @@ const string MapManager::CONTINENT_TITLE = "Continents";
 
 const char *MapManager::DEFAULT_FONT_PATH = "../Fonts/FiraSans-Regular.ttf";
 const char *MapManager::DEFAULT_TEXT_FONT_PATH = "../Fonts/NotoSansTC-Bold.otf";
+const char *MapManager::BUTTONS_FONT_PATH = "../Fonts/FredokaOne-Regular.ttf";
 
 vector<const char *> MapManager::CRAD_IMAGE_PATH_LIST = {"../Images/Artillery.jpg", "../Images/Cavalry.jpg",
                                                          "../Images/Infantry.jpg"};
@@ -24,6 +25,11 @@ const vector<string> MapManager::NUMBER_STRING_VECTOR{"1", "2", "5", "10", "ALL"
 const tuple<int, int, int, int> MapManager::NUMBER_BACKGROUND_COLOR{ColorList::BLACK};
 const tuple<int, int, int, int> MapManager::NUMBER_TEXT_COLOR{ColorList::WHITE};
 tuple<int, int, int, int> MapManager::CARDS_IMAGE_BORDER_COLOR{ColorList::BLACK};
+tuple<int, int, int, int> MapManager::BUTTONS_BACKGROUND_COLOR{ColorList::LIGHTER_YELLOW};
+tuple<int, int, int, int> MapManager::BUTTONS_BORDER_COLOR{ColorList::BLACK};
+tuple<int, int, int, int> MapManager::BUTTONS_TEXT_COLOR{ColorList::BLACK};
+
+vector<string> MapManager::buttonNames{"LOAD", "SAVE", "RESET", "NEXT"};
 
 double MapManager::IMAGE_WIDTH_RATIO = 1.0;
 double MapManager::IMAGE_HEIGHT_RATIO = 1.0;
@@ -35,8 +41,10 @@ SDL_Rect MapManager::playerInfoRect{MAP_VIEW_PORT_WIDTH, 0, PLAYER_INFO_WIDTH, P
 SDL_Rect MapManager::numberListRect{MAP_VIEW_PORT_WIDTH, NUMBER_LIST_ABSOLUTE_Y, NUMBER_LIST_WIDTH, NUMBER_LIST_HEIGHT};
 SDL_Rect MapManager::cardsListRect{MAP_VIEW_PORT_WIDTH, CARDS_LIST_ABSOLUTE_Y, CARDS_LIST_WIDTH,
                                    CARDS_LIST_HEIGHT};
+SDL_Rect MapManager::buttonsRect{MAP_VIEW_PORT_WIDTH, BUTTONS_ABSOLUTE_Y, BUTTONS_WIDTH, BUTTONS_HEIGHT};
 
 vector<SDL_Point> MapManager::numberMarkCoordinates{vector<SDL_Point>()};
+map<ButtonType, SDL_Point> MapManager::buttonCoordinates{map<ButtonType, SDL_Point>()};
 
 void MapManager::initCountryMarks() {
     map<string, Country> allCountries = Game::getAllCountries();
@@ -188,8 +196,9 @@ void MapManager::start(string mapPath) {
             //rendering text view port
             initTextViewPort();
 
-            //display player card list
-            renderCardsListRect();
+
+
+
 
             //Update screen
             SDL_RenderPresent(gRenderer);
@@ -237,6 +246,36 @@ void MapManager::start(string mapPath) {
                                         renderCountryInfoRect(clickedCountry);
 
                                         updateWholeScreen();
+                                    }
+                                    ButtonType buttonType = clickButtonType(e.motion.x, e.motion.y);
+                                    if (buttonType != NONE) {
+                                        switch (buttonType) {
+                                            case LOAD:
+                                                //FIXEME
+                                                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT, "LOAD",
+                                                                         "Click LOAD", NULL);
+
+                                                loadGameFromFile();
+                                                break;
+                                            case SAVE:
+                                                //FIXME
+                                                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT, "SAVE",
+                                                                         "Click SAVE", NULL);
+                                                saveGameToFile();
+                                                break;
+                                            case RESET:
+                                                //FIXME
+                                                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT, "RESET",
+                                                                         "Click RESET", NULL);
+                                                resetGame();
+                                                break;
+                                            case NEXT:
+                                                //FIXME check stage is ATTACK
+                                                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT, "NEXT",
+                                                                         "NEXT", NULL);
+                                                finishAttack();
+                                                break;
+                                        }
                                     }
                                     break;
                             }
@@ -358,6 +397,8 @@ void MapManager::initTextViewPort() {
     renderPlayerInfoRect();
     resetToDefaultColor();
     rendnerNumberListRect();
+    renderCardsListRect();
+    renderButtonsRect();
 }
 
 void MapManager::renderMessage(int x, int y, const char *message, tuple<int, int, int, int> color, int fontSize,
@@ -677,6 +718,7 @@ void MapManager::updateWholeScreen() {
     updateMapRect();
     rendnerNumberListRect();
     renderCardsListRect();
+    renderButtonsRect();
 }
 
 void MapManager::renderCardsListRect() {
@@ -721,6 +763,105 @@ void MapManager::renderCardsListRect() {
     SDL_RenderPresent(gRenderer);
     SDL_DestroyTexture(cardsTexture);
     resetToDefaultColor();
+}
+
+void MapManager::renderButtonsRect() {
+    SDL_Texture *buttonsTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+                                                    COUNTRY_INFO_WIDTH, COUNTRY_INFO_HEIGHT);
+    SDL_SetRenderTarget(gRenderer, buttonsTexture);
+    SDL_RenderClear(gRenderer);
+
+    int startX = BUTTONS_LEFT_X;
+    int startY = BUTTONS_UPPER_Y;
+    buttonCoordinates.clear();
+
+    //two lines of buttons
+    for (int i = 0; i < 2; i++) {
+        SDL_Rect buttonRect1{startX, startY, BUTTONS_RECT_WIDTH, BUTTONS_RECT_HEIGHT};
+        SDL_SetRenderDrawColor(gRenderer, get<0>(BUTTONS_BACKGROUND_COLOR), get<1>(BUTTONS_BACKGROUND_COLOR),
+                               get<2>(BUTTONS_BACKGROUND_COLOR), get<3>(BUTTONS_BACKGROUND_COLOR));
+        SDL_RenderFillRect(gRenderer, &buttonRect1);
+        SDL_SetRenderDrawColor(gRenderer, get<0>(BUTTONS_BORDER_COLOR), get<1>(BUTTONS_BORDER_COLOR),
+                               get<2>(BUTTONS_BORDER_COLOR), get<3>(BUTTONS_BORDER_COLOR));
+        SDL_RenderDrawRect(gRenderer, &buttonRect1);
+        string buttonName1 = buttonNames.at(i * 2);
+        renderMessage(startX + BUTTONS_RECT_WIDTH / 2, startY + BUTTONS_RECT_HEIGHT / 2, buttonName1.c_str(),
+                      BUTTONS_TEXT_COLOR, BUTTONS_TEXT_FONT_SIZE, BUTTONS_FONT_PATH);
+        SDL_Point buttonPoint1{MAP_VIEW_PORT_WIDTH + startX, BUTTONS_ABSOLUTE_Y + startY};
+        buttonCoordinates.insert({getButtonTypeFromStr(buttonName1), buttonPoint1});
+
+        startX += BUTTONS_RECT_WIDTH + BUTTONS_SPACE;
+
+        SDL_Rect buttonRect2{startX, startY, BUTTONS_RECT_WIDTH, BUTTONS_RECT_HEIGHT};
+        SDL_SetRenderDrawColor(gRenderer, get<0>(BUTTONS_BACKGROUND_COLOR), get<1>(BUTTONS_BACKGROUND_COLOR),
+                               get<2>(BUTTONS_BACKGROUND_COLOR), get<3>(BUTTONS_BACKGROUND_COLOR));
+        SDL_RenderFillRect(gRenderer, &buttonRect2);
+        SDL_SetRenderDrawColor(gRenderer, get<0>(BUTTONS_BORDER_COLOR), get<1>(BUTTONS_BORDER_COLOR),
+                               get<2>(BUTTONS_BORDER_COLOR), get<3>(BUTTONS_BORDER_COLOR));
+        SDL_RenderDrawRect(gRenderer, &buttonRect2);
+        string buttonName2 = buttonNames.at(i * 2 + 1);
+        renderMessage(startX + BUTTONS_RECT_WIDTH / 2, startY + BUTTONS_RECT_HEIGHT / 2,
+                      buttonName2.c_str(),
+                      BUTTONS_TEXT_COLOR, BUTTONS_TEXT_FONT_SIZE, BUTTONS_FONT_PATH);
+
+        SDL_Point buttonPoint2{MAP_VIEW_PORT_WIDTH + startX, BUTTONS_ABSOLUTE_Y + startY};
+        buttonCoordinates.insert({getButtonTypeFromStr(buttonName2), buttonPoint2});
+
+        startX = BUTTONS_LEFT_X;
+        startY += BUTTONS_RECT_HEIGHT + BUTTONS_GAP;
+    }
+
+    SDL_SetRenderTarget(gRenderer, NULL);
+    SDL_RenderCopy(gRenderer, buttonsTexture, NULL, &buttonsRect);
+    SDL_RenderPresent(gRenderer);
+    SDL_DestroyTexture(buttonsTexture);
+    resetToDefaultColor();
+}
+
+//FIXME
+void MapManager::loadGameFromFile() {
+
+}
+
+ButtonType MapManager::clickButtonType(int x, int y) {
+    for (auto& item: buttonCoordinates) {
+        SDL_Point& point = item.second;
+        if (x >= point.x && x <= point.x + BUTTONS_RECT_WIDTH && y >= point.y && y <= point.y + BUTTONS_RECT_HEIGHT) {
+            return item.first;
+        }
+    }
+    return NONE;
+}
+
+//FIXME
+void MapManager::saveGameToFile() {
+
+}
+
+//FIXME
+void MapManager::resetGame() {
+
+}
+
+//FIXME
+void MapManager::finishAttack() {
+
+}
+
+ButtonType MapManager::getButtonTypeFromStr(string buttonName) {
+    if (buttonName == buttonNames.at(0)) {
+        return LOAD;
+    }
+    if (buttonName == buttonNames.at(1)) {
+        return SAVE;
+    }
+    if (buttonName == buttonNames.at(2)) {
+        return RESET;
+    }
+    if (buttonName == buttonNames.at(3)) {
+        return NEXT;
+    }
+    return NONE;
 }
 
 
