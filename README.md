@@ -59,3 +59,5 @@ You will also turn in your code on GitHub classroom to be awarded thoughtful, he
 NOTES ON GRADING:  I'm looking for forethought, not features.  Your implementation of a Map should make it easy to design, load, and use more maps.  Your menagerie of monsters and characters should be organized into useful class hierarchies.  If you have a Werewolf monster and a Vampire monster already defined, it should be easy to make a Vampire Werewolf with practically no coding needed – and to place this new monster at practically any spot on the map without changing any of the gameplay logic.  User interactions (display and input) should be isolated from the rest of the code, so that if next week you learn how to use a fancy graphics framework, you can plug your existing gameplay logic right in with minimal changes.
 Credit for creative themes (Forest of the Pikachu?  Garage of the Haunted Volvos?), but spend your time wisely.  Design not details.
 Comments – even more than usual.  Discuss your design decisions; comment on how you applied the Design Principles we learned.
+
+![image](https://github.com/futurename/FinalGameDesign/blob/master/Images/20210317184009.jpg)
