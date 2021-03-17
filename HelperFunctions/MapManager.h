@@ -93,11 +93,11 @@ private:
     void static SDLClose();
 
 public:
-    static void initWorldMarks();
+    static void initCountryMarks();
 
     static void start(string mapPath = DEFAULT_MAP);
 
-    static void renderWorldMap();
+    static void initMapImage();
 
     static void setOwnerColorMark(int centerX, int centerY, tuple<int, int, int, int> color);
 
@@ -114,21 +114,21 @@ public:
 
     static void renderCountryMark(int x, int y, Country &country, const int fontSize);
 
-    static void updateTextViewPort(vector<string> &messages, tuple<int, int, int, int> color);
+    static void updateCountryInfoRect(vector<string> &messages, tuple<int, int, int, int> color);
 
-    static void updateWorldMap();
+    static void updateMapRect();
 
     static void resetToDefaultColor();
 
-    static void renderPlayerInfo();
+    static void renderPlayerInfoRect();
 
-    static void renderCountryInfo(Country *pickedCountry);
+    static void renderCountryInfoRect(Country *pickedCountry);
 
-    static void clearCountryInfo();
+    static void clearCountryInfoRect();
 
     static void updateWholeScreen();
 
-    static void rednerNumberList(bool isDeployArmy, int numOfArmy);
+    static void rednerNumberListRect(bool isDeployArmy, int numOfArmy);
 
     static bool isDragFromNumber(SDL_Point point);
 
