@@ -36,6 +36,8 @@ public:
 
     int getPlayerIndex();
 
+    int getUndeployedArmyNumber();
+
 private:
     string playerName;
     vector<Card> cards;
