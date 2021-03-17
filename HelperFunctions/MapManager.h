@@ -16,9 +16,9 @@ private:
 
     const static int PLAYER_VIEWPORT_HEIGHT = 180;
     const static int PLAYER_VIEWPORT_WIDTH = SCREEN_WIDTH - MAP_VIEW_PORT_WIDTH;
-    const static int PLAYER_INFO_X = 90;
+    const static int PLAYER_INFO_X = 60;
     const static int PLAYER_INFO_Y = 40;
-    const static int PLAYER_INFO_SPACE = 100;
+    const static int PLAYER_INFO_SPACE = 120;
     const static int PLAYER_INFO_GAP = 25;
     const static int PLAYER_INFO_RECT_WIDTH = 15;
     const static int PLAYER_INFO_FONT_SIZE = 18;
@@ -111,4 +111,6 @@ public:
     static void drawCountryInfoOnTextViewport(Country *pickedCountry);
 
     static void clearTextViewport();
+
+    static void updateWholeScreen();
 };

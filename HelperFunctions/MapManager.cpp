@@ -230,7 +230,7 @@ void MapManager::start(string mapPath) {
                                     if (clickedCountry != nullptr) {
                                         drawCountryInfoOnTextViewport(clickedCountry);
 
-                                        updateMapViewPort();
+                                        updateWholeScreen();
                                     }
                                     break;
                             }
@@ -266,7 +266,8 @@ void MapManager::start(string mapPath) {
                                                                      ss.str().c_str(), NULL);*/
                                             Game::conquerTheCountry(*fromCountry, *toCountry);
 
-                                            updateMapViewPort();
+                                            updateWholeScreen();
+                                           // updateMapViewPort();
 /*
                                             SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT, "Result",
                                                                      to_string(toCountry->getOwnerIndex()).c_str(), NULL);*/
@@ -482,7 +483,6 @@ void MapManager::updateTextViewPort(vector<string> &messages, tuple<int, int, in
 }
 
 void MapManager::updateMapViewPort() {
-
     //SDL_RenderSetViewport(gRenderer,&mapViewPort);
     SDL_Texture *mapViewTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
                                                     MAP_VIEW_PORT_WIDTH, MAP_VIEW_PORT_HEIGHT);
@@ -534,7 +534,19 @@ void MapManager::renderPlayerInfo() {
                                get<2>(player.getBgColor()), get<3>(player.getBgColor()));
         SDL_RenderFillRect(gRenderer, &rect);
 
-        renderMessage(PLAYER_INFO_X + PLAYER_INFO_SPACE, startY, player.getPlayerName().c_str(), player.getTextColor(),
+        auto allCountries = Game::getAllCountries();
+
+        int counter = 0;
+
+        for(auto& item: Game::getAllCountries()){
+            if(item.second.getOwnerIndex() == player.getPlayerIndex()){
+                counter++;
+            }
+        }
+
+        string playerInfoStr = player.getPlayerName() + "  <" + to_string(counter) + ">";
+
+        renderMessage(PLAYER_INFO_X + PLAYER_INFO_SPACE, startY, playerInfoStr.c_str(), player.getTextColor(),
                       PLAYER_INFO_FONT_SIZE, DEFAULT_TEXT_FONT_PATH);
         startY += PLAYER_INFO_GAP;
     }
@@ -559,6 +571,12 @@ void MapManager::clearTextViewport() {
     SDL_RenderPresent(gRenderer);
     SDL_DestroyTexture(textBgTexture);
 }
+
+void MapManager::updateWholeScreen() {
+    renderPlayerInfo();
+    updateMapViewPort();
+}
+
 
 
 
