@@ -12,11 +12,11 @@ string Continent::getContinentName(){
     return continentName;
 }
 
-int Continent::getOwnerIndex(){
+int Continent::getOwnerIndex() const {
     return ownerIndex;
 }
 
-int Continent::getBonus(){
+int Continent::getBonus() const {
     return bonus;
 }
 

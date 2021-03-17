@@ -5,9 +5,10 @@
 class Game {
 private:
     static vector<Player> players;
-    static map<string, Country> allCountries;
-    static map<string, Continent> allContinents;
+    static map<string, Country> allCountries;      //<countryName, countryObject>
+    static map<string, Continent> allContinents;   //<continentName, continentObject>
     const static int DEFAULT_PLAYERS = 3;
+    const static int DEFAULT_NUM_UNDEPLOYED = 3;   //defaul num of undeployed armies
 
 public:
     static vector<Player> getPlayers();
@@ -35,4 +36,6 @@ public:
     static void assignCountriesToPlayers();
 
     static void checkInitContinentsOwner();
+
+    static int deployArmy(Country& country, Player player, int numOfDeployed);
 };

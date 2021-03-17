@@ -57,3 +57,11 @@ tuple<int, int, int, int> Player::getTextColor() {
     return textColour;
 }
 
+int Player::getNumOfCapturedCountries(){
+    return capturedCountries.size();
+}
+
+int Player::getPlayerIndex(){
+    return playerIndex;
+}
+

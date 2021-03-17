@@ -32,6 +32,10 @@ public:
 
     tuple<int,int,int,int> getTextColor();
 
+    int getNumOfCapturedCountries();
+
+    int getPlayerIndex();
+
 private:
     string playerName;
     vector<Card> cards;
