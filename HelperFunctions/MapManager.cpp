@@ -196,10 +196,6 @@ void MapManager::start(string mapPath) {
             //rendering text view port
             initTextViewPort();
 
-
-
-
-
             //Update screen
             SDL_RenderPresent(gRenderer);
 
@@ -266,7 +262,7 @@ void MapManager::start(string mapPath) {
                                             case RESET:
                                                 //FIXME
                                                 SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT, "RESET",
-                                                                         "Click RESET", NULL);
+                                                                         "GAME RESET!", NULL);
                                                 resetGame();
                                                 break;
                                             case NEXT:
@@ -616,13 +612,10 @@ void MapManager::clearCountryInfoRect() {
     SDL_Texture *textBgTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
                                                    COUNTRY_INFO_WIDTH, COUNTRY_INFO_HEIGHT);
     SDL_SetRenderTarget(gRenderer, textBgTexture);
-
     SDL_RenderClear(gRenderer);
 
     SDL_SetRenderTarget(gRenderer, NULL);
-
     SDL_RenderCopy(gRenderer, textBgTexture, NULL, &countryInfoRect);
-
     SDL_RenderPresent(gRenderer);
     SDL_DestroyTexture(textBgTexture);
 }
@@ -823,8 +816,8 @@ void MapManager::loadGameFromFile() {
 }
 
 ButtonType MapManager::clickButtonType(int x, int y) {
-    for (auto& item: buttonCoordinates) {
-        SDL_Point& point = item.second;
+    for (auto &item: buttonCoordinates) {
+        SDL_Point &point = item.second;
         if (x >= point.x && x <= point.x + BUTTONS_RECT_WIDTH && y >= point.y && y <= point.y + BUTTONS_RECT_HEIGHT) {
             return item.first;
         }
@@ -837,9 +830,14 @@ void MapManager::saveGameToFile() {
 
 }
 
-//FIXME
 void MapManager::resetGame() {
-
+    SDL_RenderClear(gRenderer);
+    initMapImage();
+    readMapConfigFromFile();
+    Game::initPlayersAndCountries();
+    initCountryMarks();
+    initTextViewPort();
+    SDL_RenderPresent(gRenderer);
 }
 
 //FIXME
