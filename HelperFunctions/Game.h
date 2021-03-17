@@ -18,7 +18,7 @@ private:
     static GameStage curGameStage;
 
 public:
-    static vector<Player> getAllPlayers();
+    static vector<Player>& getAllPlayers();
 
     static void initPlayersAndCountries();
 

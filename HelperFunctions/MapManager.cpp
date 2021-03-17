@@ -831,6 +831,12 @@ void MapManager::saveGameToFile() {
 }
 
 void MapManager::resetGame() {
+    Game::setCurPlayerIndex(0);
+    Game::getAllPlayers().clear();
+    Game::setGameStage(DEPLOYMENT);
+    Game::getAllCountries().clear();
+    Game::getAllContinents().clear();
+
     SDL_RenderClear(gRenderer);
     initMapImage();
     readMapConfigFromFile();
