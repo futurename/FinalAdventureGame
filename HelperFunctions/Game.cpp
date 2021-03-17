@@ -179,7 +179,7 @@ void Game::conquerTheCountry(Country &attackCountry, Country &defendCountry) {
         ss << "Conquer " << continent.getContinentName() << "!";
         string title = ss.str();
         ss.str("");
-        ss << attacker.getPlayerName() << " get bonus <" << continent.getBonus() << ">";
+        ss << attacker.getPlayerName() << " gets bonus <" << continent.getBonus() << ">";
         string body = ss.str();
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, title.c_str(), body.c_str(), NULL);
         continent.setOwnerIndex(attackCountry.getOwnerIndex());
