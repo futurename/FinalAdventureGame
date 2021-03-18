@@ -45,6 +45,9 @@ public:
 
     void setNumOfArmy(int newNumOfArmy);
 
+    void reduceNumOfArmy(int numOfArmy);
+
+    void addNumOfArmy(int numOfArmy);
 
 private:
     string countryName;

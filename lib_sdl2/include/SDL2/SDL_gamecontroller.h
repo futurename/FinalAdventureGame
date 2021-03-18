@@ -356,7 +356,7 @@ extern DECLSPEC Sint16 SDLCALL
 SDL_GameControllerGetAxis(SDL_GameController *gamecontroller, SDL_GameControllerAxis axis);
 
 /**
- *  The list of buttons available from a controller
+ *  The list of MESSAGE_BOX_BUTTONS available from a controller
  */
 typedef enum
 {

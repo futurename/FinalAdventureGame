@@ -273,7 +273,7 @@ extern DECLSPEC void SDLCALL SDL_FreeCursor(SDL_Cursor * cursor);
 extern DECLSPEC int SDLCALL SDL_ShowCursor(int toggle);
 
 /**
- *  Used as a mask when testing buttons in buttonstate.
+ *  Used as a mask when testing MESSAGE_BOX_BUTTONS in buttonstate.
  *   - Button 1:  Left mouse button
  *   - Button 2:  Middle mouse button
  *   - Button 3:  Right mouse button

@@ -12,11 +12,11 @@ vector<Player> Game::players{vector<Player>()};
 
 int Game::curPlayerIndex = 0;
 
-const int Game::DEFAULT_NUM_UNDEPLOYED = 3;
+const int Game::DEFAULT_NUM_UNDEPLOY = 3;
 
-GameStage Game::curGameStage{EXCHANGE_CARDS};
+GameStage Game::curGameStage{DEPLOYMENT};
 
-vector<Player> Game::getAllPlayers() {
+vector<Player>& Game::getAllPlayers() {
     return players;
 }
 
@@ -25,11 +25,6 @@ static MapManager mapManager;
 void Game::initPlayersAndCountries() {
     //init all players
     initPlayers();
-
-    //load map file and world list
-    //MapManager::start();
-
-    //MapManager::readMapConfigFromFile();
 
     //randomly assign all countries to the players evenly
     assignCountriesToPlayers();
@@ -189,7 +184,10 @@ void Game::checkInitContinentsOwner() {
   2. after the player selects a country and a certain number, add the army num to the country and subtract this from the total undeployed army number.
   3. the function is called repeatedly until there is no more undeployed army.
 */
+
 bool Game::deployArmy(Country& country, Player& player, int numToDeploy) {
+    int totalUndeployed = max(DEFAULT_NUM_UNDEPLOY, player.getNumOfCapturedCountries() / 3);
+
 
     //Num of armies given depends on player's captured countries. Min is 3.
     int numOfArmyGiven = max(DEFAULT_NUM_UNDEPLOYED, player.getNumOfCapturedCountries() / 3);
