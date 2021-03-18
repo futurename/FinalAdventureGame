@@ -1,78 +1,58 @@
 
 #include "Card.h"
 
-Card::Card(CardType cardType){
+Card::Card(CardType cardType) {
     this->cardType = cardType;
 }
 
-CardType Card::getCard(){
+CardType Card::getCard() {
     return cardType;
 }
 
-void Card::setCard(CardType newCardType){
+void Card::setCard(CardType newCardType) {
     cardType = newCardType;
 }
 
-int Card::exchangeCards(vector<Card> cards) {
-    // a map to store the number of cards of each type
-    map<CardType, int> cardMap;
-    cardMap[INFANTRY] = 0;
-    cardMap[CAVALRY] = 0;
-    cardMap[ARTILLERY] = 0;
+int Card::exchangeCards(vector<CardType> &cards, int exchangeTimes) {
+    int result = 0;
 
-    for (size_t i = 0; i < cards.size(); i++) {
-        //get the card types from the player's cards
-        cardMap[cards.at(i).getCard()] += 1;
+    if (cards.size() <= 2) {
+        return result;
     }
 
-    bool hasThreeDifferentTypes = true;
+    sort(cards.begin(), cards.end());
 
-    for (auto it = cardMap.begin(); it != cardMap.end(); it++) {
-        // if having 3 same type of cards, must exchange for army
-        if (it->second >= 3) {
-            cardMap[it->first] -= 3;
-            undeployArmyNumber += cardExchangeTime * Card::CARD_EXCHANGE_BASE;
-            cardExchangeTime++;
-            //also remove from player's vector of cards
+    CardType preCardType = cards.at(cards.size() - 1);
+    int sameTypeCounter = 1;
+    int diffTypeCounter = 1;
+
+    for (int i = cards.size() - 2; i >= 0; i--) {
+        CardType curCardType = cards.at(i);
+        if (curCardType == preCardType) {
+            sameTypeCounter++;
+        } else {
+            preCardType = curCardType;
+            sameTypeCounter = 1;
+            diffTypeCounter++;
+        }
+        if (sameTypeCounter == CARD_EXCHANGE_THRESHOLD) {
+            cards.erase(cards.end() - i, cards.end() - i + sameTypeCounter);
+            result += CARD_EXCHANGE_BASE * exchangeTimes;
+            break;
         }
 
-        if (it->second == 0) {
-            hasThreeDifferentTypes = false;
-        }
-    }
-
-    //exchange for army with three different types of cards
-    if (hasThreeDifferentTypes) {
-        undeployArmyNumber += cardExchangeTime * Card::CARD_EXCHANGE_BASE;
-        cardExchangeTime++;
-        for (auto it = cardMap.begin(); it != cardMap.end(); it++) {
-            cardMap[it->first] -= 1;
-            if (it->second == 0) {
-                hasThreeDifferentTypes = false;
+        if (diffTypeCounter == CARD_EXCHANGE_THRESHOLD) {
+            cards.erase(cards.end() - 1);
+            cards.erase(cards.begin() + i);
+            for (int j = cards.size() - 2; j >= 0; j--) {
+                if (cards.at(j) == CAVALRY) {
+                    cards.erase(cards.begin() + j);
+                    break;
+                }
             }
+            result += CARD_EXCHANGE_BASE * exchangeTimes;
+            break;
         }
     }
-
-    //possible to still have three different types of cards
-    if (hasThreeDifferentTypes) {
-        undeployArmyNumber += cardExchangeTime * Card::CARD_EXCHANGE_BASE;
-        for (auto it = cardMap.begin(); it != cardMap.end(); it++) {
-            cardMap[it->first] -= 1;
-        }
-    }
-
-    //create new set of cards for the player then re-assign it.
-    vector<Card> newCards;
-
-    for (auto it = cardMap.begin(); it != cardMap.end(); it++) {
-        if (it->second > 0) {
-            for (size_t i = 0; i < it->second; i++) {
-                Card newCard{it->first};
-                newCards.push_back(newCard);
-            }
-        }
-    }
-
-    cards = newCards;
-    return 0;
+    return result;
 }

@@ -14,11 +14,11 @@ public:
 
     void getPlayerCaptures();
 
-    void addCard(Card card);
+    void addCard(CardType card);
 
-    void setCards(vector<Card> cards);
+    void setCards(vector<CardType>& cards);
 
-    vector<Card> getCards();
+    vector<CardType>& getCards();
 
     void addContinentBonus(int bonus);
 
@@ -47,13 +47,13 @@ public:
 
 private:
     string playerName;
-    vector<Card> cards;
+    vector<CardType> cards;
     vector<Country> capturedCountries;
     tuple<int, int, int, int> bgColour;
     tuple<int, int, int, int> textColour;
     int continentBonus;
-    int cardExchangeTime;
+    int exchangeTimes = 1;
     int playerIndex;
     const static vector<string> DEFAULT_PLAYER_NAMES;
-    int undeployArmyNumber;
+    int undeployArmyNumber = 0;
 };

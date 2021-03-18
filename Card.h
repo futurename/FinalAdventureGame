@@ -1,14 +1,15 @@
 #include "HelperFunctions/imports.h"
 
 enum CardType {
-    INFANTRY, CAVALRY, ARTILLERY
+    ARTILLERY, CAVALRY, INFANTRY
 };
 
 class Card {
 
 private:
     CardType cardType;
-    const static int CARDS_EXCHANGE_VALUE = 5;
+    static const int CARD_EXCHANGE_BASE = 5;
+    static const int CARD_EXCHANGE_THRESHOLD = 3;
 public:
 
     Card(CardType card);
@@ -17,7 +18,5 @@ public:
 
     void setCard(CardType newCardType);
 
-    static const int CARD_EXCHANGE_BASE = 5;
-
-    static int exchangeCards(vector<Card> cards);
+    static int exchangeCards(vector<CardType> &cards, int exchangeTimes);
 };

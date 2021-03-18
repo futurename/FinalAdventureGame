@@ -941,8 +941,9 @@ void MapManager::nextStage() {
     }
     if (curStage == DEPLOYMENT) {
         //FIXME get undeloy army number
-
-        if (0) {
+        Player& curPlayer = Game::getAllPlayers().at(Game::getCurPlayerIndex());
+        int undeployArmy = curPlayer.getUndeployArmyNumber();
+        if (undeployArmy > 0) {
             SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Deploy Stage", "Please deploy armies!", NULL);
         } else {
             Game::setGameStage(ATTACK);
