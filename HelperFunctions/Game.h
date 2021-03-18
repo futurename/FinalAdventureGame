@@ -23,7 +23,7 @@ private:
     const static string DEFAULT_MAP_CONFIG;
 
 public:
-    static vector<Player>& getAllPlayers();
+    static vector<Player> &getAllPlayers();
 
     static void initPlayersAndCountries();
 
@@ -48,7 +48,8 @@ public:
     static void assignCountriesToPlayers();
 
     static void checkInitContinentsOwner();
-    static bool deployArmy(Country &country, Player& player, int numOfDeployed);
+
+    static bool deployArmy(Country &country, Player &player, int numOfDeployed);
 
     static void conquerTheCountry(Country &attackCountry, Country &defendCountry);
 
