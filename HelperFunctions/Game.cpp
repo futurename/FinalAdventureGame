@@ -12,7 +12,7 @@ vector<Player> Game::players{vector<Player>()};
 
 int Game::curPlayerIndex = 0;
 
-const int Game::DEFAULT_NUM_UNDEPLOYED = 3;
+const int Game::DEFAULT_NUM_UNDEPLOY = 3;
 
 GameStage Game::curGameStage{ATTACK};
 
@@ -180,7 +180,7 @@ void Game::checkInitContinentsOwner() {
   3. the function is called repeatedly until there is no more undeployed army.
 */
 int Game::deployArmy(Country &country, Player player, int numOfDeployed) {
-    int totalUndeployed = max(DEFAULT_NUM_UNDEPLOYED, player.getNumOfCapturedCountries() / 3);
+    int totalUndeployed = max(DEFAULT_NUM_UNDEPLOY, player.getNumOfCapturedCountries() / 3);
 
     for (const auto &item: allContinents) {
         if (item.second.getOwnerIndex() != player.getPlayerIndex()) {

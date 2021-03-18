@@ -299,9 +299,6 @@ void MapManager::start(string mapPath) {
                                                 }
                                                 break;
                                             case NEXT:
-                                                //FIXME check stage is ATTACK
-                                                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT, "NEXT",
-                                                                         "NEXT", NULL);
                                                 nextStage();
                                                 break;
                                         }
@@ -879,7 +876,7 @@ void MapManager::resetGame() {
     SDL_RenderPresent(gRenderer);
 }
 
-
+//FIXME
 void MapManager::nextStage() {
     GameStage curStage = Game::getGameStage();
     if (curStage == ATTACK) {
@@ -891,7 +888,12 @@ void MapManager::nextStage() {
         Game::setGameStage(DEPLOYMENT);
     }
     if (curStage == DEPLOYMENT) {
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Deploy Stage", "Please deploy armies!", NULL);
+        //FIXME get undeloy army number
+        if (0) {
+            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Deploy Stage", "Please deploy armies!", NULL);
+        } else {
+            Game::setGameStage(ATTACK);
+        }
     }
     updateWholeScreen();
 }
