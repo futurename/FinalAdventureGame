@@ -1,5 +1,5 @@
 #include "HelperFunctions//imports.h"
-#include "Card.h"
+#include "HelperFunctions/Card.h"
 
 class Country;
 
@@ -34,15 +34,17 @@ public:
 
     int getNumOfCapturedCountries();
 
-    int getPlayerIndex();
+    int getPlayerIndex() const;
 
-    int getUndeployArmyNumber();
+    int getUndeployArmyNumber() const;
 
     void setUndeployArmyNumber(int newUndeployArmyNumber);
 
     void getCalUndeployArmyNumber();
 
     void removeUndeployArmy(int numOfArmy);
+
+    int getCardNumOfType(CardType type);
 
 
 private:

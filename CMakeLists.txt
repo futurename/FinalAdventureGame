@@ -3,7 +3,7 @@ project(FinalGameDesign)
 
 add_executable(FinalGameDesign main.cpp Continent.cpp Continent.h Country.cpp Country.h
         HelperFunctions/imports.h Player.cpp Player.h HelperFunctions/MapManager.cpp HelperFunctions/MapManager.h HelperFunctions/ColorList.h HelperFunctions/ColorList.cpp
-        HelperFunctions/Game.h HelperFunctions/Game.cpp Random.h Random.cpp Card.h Card.cpp)
+        HelperFunctions/Game.h HelperFunctions/Game.cpp Random.h Random.cpp HelperFunctions/Card.h Card.cpp)
 
 
 #[[

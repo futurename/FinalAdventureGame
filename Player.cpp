@@ -1,5 +1,5 @@
-#include <map>
 #include "HelperFunctions/Game.h"
+#include "Player.h"
 
 const vector<string> Player::DEFAULT_PLAYER_NAMES{vector<string>{"You", "Napoleon", "Trump", "Putin", "Modi"}};
 
@@ -61,12 +61,12 @@ int Player::getNumOfCapturedCountries() {
     return capturedCountries.size();
 }
 
-int Player::getPlayerIndex() {
+int Player::getPlayerIndex() const {
     return playerIndex;
 }
 
 
-int Player::getUndeployArmyNumber() {
+int Player::getUndeployArmyNumber() const {
     return undeployArmyNumber;
 }
 
@@ -87,4 +87,14 @@ void Player::getCalUndeployArmyNumber() {
 
 void Player::removeUndeployArmy(int numOfArmy) {
     undeployArmyNumber -= numOfArmy;
+}
+
+int Player::getCardNumOfType(CardType type) {
+    int result;
+    for(CardType c: cards){
+        if(c==type){
+            result++;
+        }
+    }
+    return result;
 }

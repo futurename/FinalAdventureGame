@@ -4,7 +4,6 @@
 #include <string>
 #include <SDL_ttf.h>
 
-
 class Country;
 
 enum ButtonType{LOAD, SAVE, RESET, NEXT, NONE};
@@ -134,6 +133,8 @@ private:
     bool static SDLLoadMedia(string mapPath = DEFAULT_MAP);
 
     void static SDLClose();
+
+    static CardType getCardTypeFromString(string& cardStr);
 
 public:
     static void initCountryMarks();

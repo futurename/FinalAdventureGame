@@ -2,7 +2,6 @@
 #include "../Random.h"
 #include "MapManager.h"
 #include "ColorList.h"
-#include <algorithm>
 
 map<string, Country> Game::allCountries{map<string, Country>()};
 

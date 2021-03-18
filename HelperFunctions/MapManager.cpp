@@ -18,7 +18,7 @@ const char *MapManager::BUTTONS_FONT_PATH = "../Fonts/FredokaOne-Regular.ttf";
 
 vector<const char *> MapManager::CRAD_IMAGE_PATH_LIST = {"../Images/Artillery.jpg", "../Images/Cavalry.jpg",
                                                          "../Images/Infantry.jpg"};
-vector<string> MapManager::CARDS_TYPE_LIST{"Infantry", "Cavalry", "Artillery"};
+vector<string> MapManager::CARDS_TYPE_LIST{"Artillery", "Cavalry", "Infantry"};
 
 const tuple<int, int, int, int> MapManager::DEFAULT_BACKGROUND_COLOR = ColorList::WHITE;
 vector<string> MapManager::NUMBER_STRING_VECTOR{"1", "2", "5", "10", "ALL"};
@@ -223,7 +223,7 @@ void MapManager::start(string mapPath) {
             SDL_RenderPresent(gRenderer);
 
             //curplayer cal undeploy army.
-            Player& curPlayer = Game::getAllPlayers().at(Game::getCurPlayerIndex());
+            Player &curPlayer = Game::getAllPlayers().at(Game::getCurPlayerIndex());
             curPlayer.getCalUndeployArmyNumber();
 
             //Event handler
@@ -349,15 +349,15 @@ void MapManager::start(string mapPath) {
                                         toCountry = nullptr;
                                     }
 
-                                  /*  if (fromCountry != nullptr && toCountry != nullptr &&
-                                        fromCountryName != toCountryName) {
+                                    /*  if (fromCountry != nullptr && toCountry != nullptr &&
+                                          fromCountryName != toCountryName) {
 
-                                        //CHEATING mode for testing attack function.
-                                        if (fromCountry->getOwnerIndex() != toCountry->getOwnerIndex()) {
-                                            Game::conquerTheCountry(*fromCountry, *toCountry);
-                                            updateWholeScreen();
-                                        }
-                                    }*/
+                                          //CHEATING mode for testing attack function.
+                                          if (fromCountry->getOwnerIndex() != toCountry->getOwnerIndex()) {
+                                              Game::conquerTheCountry(*fromCountry, *toCountry);
+                                              updateWholeScreen();
+                                          }
+                                      }*/
 
                                     if (fromCountry != nullptr && toCountry != nullptr &&
                                         fromCountryName != toCountryName) {
@@ -381,8 +381,9 @@ void MapManager::start(string mapPath) {
 
                                         if (Game::getGameStage() == DEPLOYMENT) {
                                             //FIXME
-                                            string countryName = getCountryNameFromCoordinates(dragEndPoint.x, dragEndPoint.y);
-                                            Country& deployCountry = Game::getAllCountries().at(countryName);
+                                            string countryName = getCountryNameFromCoordinates(dragEndPoint.x,
+                                                                                               dragEndPoint.y);
+                                            Country &deployCountry = Game::getAllCountries().at(countryName);
                                             int number = stoi(NUMBER_STRING_VECTOR.at(numberIndex));
 
                                             //FIXME curplayer remove number from undeploy army.
@@ -821,9 +822,10 @@ void MapManager::renderCardsListRect() {
                           CARDS_TYPE_LIST.at(i).c_str(),
                           curPlayer.getTextColor(), CARDS_LIST_FONT_SIZE);
 
-            //FIXME get cards from current player
-            renderMessage(startX + CARDS_LIST_SPACE, startY + CARDS_LIST_IMAGE_HEIGHT / 2 + CARDS_TEXT_GAP / 2, "33",
-                          curPlayer.getTextColor(), CARDS_LIST_FONT_SIZE);
+            CardType cardType = getCardTypeFromString(CARDS_TYPE_LIST.at(i));
+            int numOfCards = curPlayer.getCardNumOfType(cardType);
+            renderMessage(startX + CARDS_LIST_SPACE, startY + CARDS_LIST_IMAGE_HEIGHT / 2 + CARDS_TEXT_GAP / 2,
+                          to_string(numOfCards).c_str(), curPlayer.getTextColor(), CARDS_LIST_FONT_SIZE);
             startY += CARDS_LIST_IMAGE_HEIGHT + CARDS_LIST_GAP;
         }
     }
@@ -936,12 +938,12 @@ void MapManager::nextStage() {
         Game::setCurPlayerIndex((++curPlayerIndex) % (Game::getAllPlayers().size()));
         Game::setGameStage(DEPLOYMENT);
         //FIXME curPlayer calculate undeploy army
-        Player& player = Game::getAllPlayers().at(Game::getCurPlayerIndex());
+        Player &player = Game::getAllPlayers().at(Game::getCurPlayerIndex());
         player.getCalUndeployArmyNumber();
     }
     if (curStage == DEPLOYMENT) {
         //FIXME get undeloy army number
-        Player& curPlayer = Game::getAllPlayers().at(Game::getCurPlayerIndex());
+        Player &curPlayer = Game::getAllPlayers().at(Game::getCurPlayerIndex());
         int undeployArmy = curPlayer.getUndeployArmyNumber();
         if (undeployArmy > 0) {
             SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Deploy Stage", "Please deploy armies!", NULL);
@@ -968,6 +970,14 @@ ButtonType MapManager::getButtonTypeFromStr(string buttonName) {
     return NONE;
 }
 
-
-
-
+CardType MapManager::getCardTypeFromString(string &cardStr) {
+    if(cardStr == "Artillery"){
+        return ARTILLERY;
+    }
+    if(cardStr == "Cavalry"){
+        return CAVALRY;
+    }
+    if(cardStr == "Infantry"){
+        return INFANTRY;
+    }
+}

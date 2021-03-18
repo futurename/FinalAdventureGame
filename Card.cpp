@@ -1,17 +1,4 @@
-
-#include "Card.h"
-
-Card::Card(CardType cardType) {
-    this->cardType = cardType;
-}
-
-CardType Card::getCard() {
-    return cardType;
-}
-
-void Card::setCard(CardType newCardType) {
-    cardType = newCardType;
-}
+#include "HelperFunctions/Card.h"
 
 int Card::exchangeCards(vector<CardType> &cards, int exchangeTimes) {
     int result = 0;
