@@ -93,6 +93,13 @@ void Game::printAllContinents() {
 
 //Check whether all countries of a continent are conquered by the player. If so, the player is given an amount of
 //armies that corresponding to the continent's control value.
+
+//check whether the army num >1
+//check the defender country is adjacent of the attacking country.
+//check the owner of defending country is different from the attacking country.
+//call attackFrom()
+//updateWorldmap();
+
 void Game::attackFrom(Country attacker, Country defender) {
     for (int i = 0; i < attacker.getCountryArmy(); i++) {
         pair<int, int> attackerDice = Random::RollDie(attacker.getCountryArmy());
@@ -289,7 +296,18 @@ GameStage Game::getGameStage() {
 
 void Game::runGame(){
 
-    //call after deploy
+    // MOVE STAGE
+    // validate the player drag from one owned country to an adjacent owned country.
+    //how to display??
+    //A button to confirm finish move.
+
+
+    //ATTACK STAGE
+    //one successful attack in a round can get a card(random)
+    //vector for the player
+    //check cards at the end of the attack.
+
+    //call this after deploy
     MapManager::updateWholeScreen();
 }
 
