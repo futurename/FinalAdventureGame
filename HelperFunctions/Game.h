@@ -13,8 +13,6 @@ private:
     static map<string, Continent> allContinents;   //<continentName, continentObject>
     const static int DEFAULT_PLAYERS = 4;
 
-    const static int DEFAULT_NUM_UNDEPLOY;   //defaul num of undeployed armies
-
     static int curPlayerIndex;
     static GameStage curGameStage;
 
@@ -44,9 +42,7 @@ public:
     static void assignCountriesToPlayers();
 
     static void checkInitContinentsOwner();
-
-
-    static int deployArmy(Country &country, Player player, int numOfDeployed);
+    static bool deployArmy(Country &country, Player& player, int numOfDeployed);
 
     static void conquerTheCountry(Country &attackCountry, Country &defendCountry);
 
@@ -58,4 +54,7 @@ public:
 
     static GameStage getGameStage();
 
+    static void runGame();
+
+    const static int DEFAULT_NUM_UNDEPLOY;   //defaul num of undeployed armies
 };

@@ -1,3 +1,4 @@
+#include "HelperFunctions/imports.h"
 
 enum CardType {
     INFANTRY, CAVALRY, ARTILLERY
@@ -17,4 +18,6 @@ public:
     void setCard(CardType newCardType);
 
     static const int CARD_EXCHANGE_BASE = 5;
+
+    static int exchangeCards(vector<Card> cards);
 };

@@ -222,6 +222,10 @@ void MapManager::start(string mapPath) {
             //Update screen
             SDL_RenderPresent(gRenderer);
 
+            //curplayer cal undeploy army.
+            Player& curPlayer = Game::getAllPlayers().at(Game::getCurPlayerIndex());
+            curPlayer.getCalUndeployArmyNumber();
+
             //Event handler
             SDL_Event e;
 
@@ -270,6 +274,8 @@ void MapManager::start(string mapPath) {
                             switch (e.button.button) {
                                 case SDL_BUTTON_LEFT:
                                     dragStartPoint = {e.motion.x, e.motion.y};
+
+                                    //Move army if in Move stage and click a number button
                                     int numberIndex = getIndexOfDraggedNumber(dragStartPoint);
                                     if (numberIndex >= 0 && countriesDraggedForMove) {
                                         int number;
@@ -282,6 +288,12 @@ void MapManager::start(string mapPath) {
                                         toCountry->addNumOfArmy(number);
                                         countriesDraggedForMove = false;
                                         updateWholeScreen();
+
+                                        //end move stage, switch to next player
+                                        //FIXME check whether we miss something here.
+                                        nextStage();
+
+
                                     } else {
                                         ButtonType buttonType = clickButtonType(dragStartPoint);
                                         if (buttonType != NONE) {
@@ -337,7 +349,7 @@ void MapManager::start(string mapPath) {
                                         toCountry = nullptr;
                                     }
 
-                                    if (fromCountry != nullptr && toCountry != nullptr &&
+                                  /*  if (fromCountry != nullptr && toCountry != nullptr &&
                                         fromCountryName != toCountryName) {
 
                                         //CHEATING mode for testing attack function.
@@ -345,7 +357,7 @@ void MapManager::start(string mapPath) {
                                             Game::conquerTheCountry(*fromCountry, *toCountry);
                                             updateWholeScreen();
                                         }
-                                    }
+                                    }*/
 
                                     if (fromCountry != nullptr && toCountry != nullptr &&
                                         fromCountryName != toCountryName) {
@@ -374,7 +386,7 @@ void MapManager::start(string mapPath) {
                                             int number = stoi(NUMBER_STRING_VECTOR.at(numberIndex));
 
                                             //FIXME curplayer remove number from undeploy army.
-
+                                            curPlayer.removeUndeployArmy(number);
                                             deployCountry.addNumOfArmy(number);
                                             updateWholeScreen();
                                         }
@@ -726,7 +738,7 @@ void MapManager::renderNumberListRect() {
 
         if ((Game::getGameStage() == DEPLOYMENT ||
              (Game::getGameStage() == MOVE && fromCountry != nullptr
-              && toCountry != nullptr)) && (numOfArmy > 1) &&
+              && toCountry != nullptr)) && (numOfArmy >= 1) &&
             (i == NUMBER_STRING_VECTOR.size() - 1 || stoi(numStr) <= numOfArmy)) {
             renderMessage(centerX, centerY, numStr.c_str(),
                           curPlayer.getBgColor(), NUMBER_LIST_FONT_SIZE);
@@ -923,9 +935,13 @@ void MapManager::nextStage() {
         int curPlayerIndex = Game::getCurPlayerIndex();
         Game::setCurPlayerIndex((++curPlayerIndex) % (Game::getAllPlayers().size()));
         Game::setGameStage(DEPLOYMENT);
+        //FIXME curPlayer calculate undeploy army
+        Player& player = Game::getAllPlayers().at(Game::getCurPlayerIndex());
+        player.getCalUndeployArmyNumber();
     }
     if (curStage == DEPLOYMENT) {
         //FIXME get undeloy army number
+
         if (0) {
             SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Deploy Stage", "Please deploy armies!", NULL);
         } else {

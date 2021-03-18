@@ -12,3 +12,7 @@ CardType Card::getCard(){
 void Card::setCard(CardType newCardType){
     cardType = newCardType;
 }
+
+int Card::exchangeCards(vector<Card> cards) {
+    return 0;
+}

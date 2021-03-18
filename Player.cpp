@@ -1,8 +1,5 @@
-#include "Player.h"
-#include "Country.h"
 #include <map>
-#include "Card.h"
-using namespace std;
+#include "HelperFunctions/Game.h"
 
 const vector<string> Player::DEFAULT_PLAYER_NAMES{vector<string>{"You", "Napoleon", "Trump", "Putin", "Modi"}};
 int cardExchangeTime = 1;
@@ -15,7 +12,6 @@ Player::Player(int index, string name) {
         this->playerName = DEFAULT_PLAYER_NAMES.at(index);
     }
 }
-
 
 void Player::SetPlayerName(string inPlayerName) {
     playerName = inPlayerName;
@@ -62,7 +58,7 @@ tuple<int, int, int, int> Player::getTextColor() {
 }
 
 
-int Player::getNumOfCapturedCountries(){
+int Player::getNumOfCapturedCountries() {
     return capturedCountries.size();
 }
 
@@ -71,11 +67,11 @@ int Player::getPlayerIndex() {
 }
 
 
-int Player::getUndeployArmyNumber(){
+int Player::getUndeployArmyNumber() {
     return undeployArmyNumber;
 }
 
-void Player::setUndeployArmyNumber(int newUndeployArmyNumber){
+void Player::setUndeployArmyNumber(int newUndeployArmyNumber) {
     undeployArmyNumber = newUndeployArmyNumber;
 }
 
@@ -84,49 +80,49 @@ void Player::setUndeployArmyNumber(int newUndeployArmyNumber){
    if can exchange: do multiplication.
    return undeployed army number of the player
 */
-int Player::getCalUndeployArmyNumber(){
+void Player::getCalUndeployArmyNumber() {
 
     // a map to store the number of cards of each type
     map<CardType, int> cardMap;
     cardMap[INFANTRY] = 0;
-    cardMap[CALVARY] = 0;
+    cardMap[CAVALRY] = 0;
     cardMap[ARTILLERY] = 0;
 
-    for (size_t i = 0; i < cards.size(); i++){
+    for (size_t i = 0; i < cards.size(); i++) {
         //get the card types from the player's cards
         cardMap[cards.at(i).getCard()] += 1;
     }
 
     bool hasThreeDifferentTypes = true;
 
-    for (auto it = cardMap.begin(); it != cardMap.end(); it++){
+    for (auto it = cardMap.begin(); it != cardMap.end(); it++) {
         // if having 3 same type of cards, must exchange for army
-        if (it->second >= 3){
-            cardMap[it->first] -=3;
+        if (it->second >= 3) {
+            cardMap[it->first] -= 3;
             undeployArmyNumber += cardExchangeTime * Card::CARD_EXCHANGE_BASE;
             cardExchangeTime++;
             //also remove from player's vector of cards
         }
 
-        if (it->second == 0){
+        if (it->second == 0) {
             hasThreeDifferentTypes = false;
         }
     }
 
     //exchange for army with three different types of cards
-    if (hasThreeDifferentTypes){
+    if (hasThreeDifferentTypes) {
         undeployArmyNumber += cardExchangeTime * Card::CARD_EXCHANGE_BASE;
         cardExchangeTime++;
-        for (auto it = cardMap.begin(); it != cardMap.end(); it++){
+        for (auto it = cardMap.begin(); it != cardMap.end(); it++) {
             cardMap[it->first] -= 1;
-            if (it->second == 0){
+            if (it->second == 0) {
                 hasThreeDifferentTypes = false;
             }
         }
     }
 
     //possible to still have three different types of cards
-    if (hasThreeDifferentTypes){
+    if (hasThreeDifferentTypes) {
         undeployArmyNumber += cardExchangeTime * Card::CARD_EXCHANGE_BASE;
         for (auto it = cardMap.begin(); it != cardMap.end(); it++) {
             cardMap[it->first] -= 1;
@@ -136,10 +132,10 @@ int Player::getCalUndeployArmyNumber(){
     //create new set of cards for the player then re-assign it.
     vector<Card> newCards;
 
-    for (auto it = cardMap.begin(); it != cardMap.end(); it++){
-        if (it->second > 0){
-            for (size_t i = 0; i < it->second; i++){
-                Card newCard {it->first};
+    for (auto it = cardMap.begin(); it != cardMap.end(); it++) {
+        if (it->second > 0) {
+            for (size_t i = 0; i < it->second; i++) {
+                Card newCard{it->first};
                 newCards.push_back(newCard);
             }
         }
@@ -147,6 +143,11 @@ int Player::getCalUndeployArmyNumber(){
 
     cards = newCards;
 
-    return undeployArmyNumber;
+    //FIXME
+    this->undeployArmyNumber = 3+ continentBonus + Card::exchangeCards(newCards);
 
+}
+
+void Player::removeUndeployArmy(int numOfArmy) {
+    undeployArmyNumber -= numOfArmy;
 }

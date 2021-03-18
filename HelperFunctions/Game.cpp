@@ -16,7 +16,7 @@ const int Game::DEFAULT_NUM_UNDEPLOY = 3;
 
 GameStage Game::curGameStage{DEPLOYMENT};
 
-vector<Player>& Game::getAllPlayers() {
+vector<Player> &Game::getAllPlayers() {
     return players;
 }
 
@@ -185,15 +185,12 @@ void Game::checkInitContinentsOwner() {
   3. the function is called repeatedly until there is no more undeployed army.
 */
 
-bool Game::deployArmy(Country& country, Player& player, int numToDeploy) {
-    int totalUndeployed = max(DEFAULT_NUM_UNDEPLOY, player.getNumOfCapturedCountries() / 3);
-
-
+bool Game::deployArmy(Country &country, Player &player, int numToDeploy) {
     //Num of armies given depends on player's captured countries. Min is 3.
-    int numOfArmyGiven = max(DEFAULT_NUM_UNDEPLOYED, player.getNumOfCapturedCountries() / 3);
+    int numOfArmyGiven = max(DEFAULT_NUM_UNDEPLOY, player.getNumOfCapturedCountries() / 3);
 
     //inital undeployed armies is player's undeployed army number + num of armies given
-    int totalUndeployed = player.getCalUndeployArmyNumber() + numOfArmyGiven;
+    int totalUndeployed = player.getUndeployArmyNumber() + numOfArmyGiven;
 
     //bonus for conquering continent(s)
     for (const auto &item: allContinents) {
@@ -204,12 +201,11 @@ bool Game::deployArmy(Country& country, Player& player, int numToDeploy) {
 
     //add player's chosen army number to the country
     int newNumOfArmy = country.getNumOfArmy() + numToDeploy;;
-    if (numToDeploy <= totalUndeployed)
+    if (numToDeploy <= totalUndeployed) {
 
         country.setNumOfArmy(newNumOfArmy);
 
         //subtract from total undeployed army number and update player's undeployed
-        totalUndeployed ;
 
         player.setUndeployArmyNumber(totalUndeployed - newNumOfArmy);
     }
@@ -223,11 +219,9 @@ bool Game::deployArmy(Country& country, Player& player, int numToDeploy) {
 //    }
 
 
-    return (totalUndeployed <= 0);
-
-
-
+    return totalUndeployed <= 0;
 }
+
 
 void Game::conquerTheCountry(Country &attackCountry, Country &defendCountry) {
     Player &attacker = players.at(attackCountry.getOwnerIndex());
@@ -292,7 +286,7 @@ GameStage Game::getGameStage() {
 }
 
 
-void Game::runGame(){
+void Game::runGame() {
 
     // MOVE STAGE
     // validate the player drag from one owned country to an adjacent owned country.

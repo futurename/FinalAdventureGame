@@ -40,7 +40,9 @@ public:
 
     void setUndeployArmyNumber(int newUndeployArmyNumber);
 
-    int getCalUndeployArmyNumber();
+    void getCalUndeployArmyNumber();
+
+    void removeUndeployArmy(int numOfArmy);
 
 
 private:
