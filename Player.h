@@ -38,6 +38,11 @@ public:
 
     int getUndeployArmyNumber();
 
+    void setUndeployArmyNumber(int newUndeployArmyNumber);
+
+    int getCalUndeployArmyNumber();
+
+
 private:
     string playerName;
     vector<Card> cards;
@@ -48,4 +53,5 @@ private:
     int cardExchangeTime;
     int playerIndex;
     const static vector<string> DEFAULT_PLAYER_NAMES;
+    int undeployArmyNumber;
 };

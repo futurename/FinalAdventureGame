@@ -9,11 +9,12 @@ enum GameStage {
 class Game {
 private:
     static vector<Player> players;
-
     static map<string, Country> allCountries;      //<countryName, countryObject>
     static map<string, Continent> allContinents;   //<continentName, continentObject>
     const static int DEFAULT_PLAYERS = 4;
+
     const static int DEFAULT_NUM_UNDEPLOY;   //defaul num of undeployed armies
+
     static int curPlayerIndex;
     static GameStage curGameStage;
 
@@ -43,6 +44,7 @@ public:
     static void assignCountriesToPlayers();
 
     static void checkInitContinentsOwner();
+
 
     static int deployArmy(Country &country, Player player, int numOfDeployed);
 

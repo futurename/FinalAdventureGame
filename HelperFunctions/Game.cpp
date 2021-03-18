@@ -20,6 +20,8 @@ vector<Player>& Game::getAllPlayers() {
     return players;
 }
 
+static MapManager mapManager;
+
 void Game::initPlayersAndCountries() {
     //init all players
     initPlayers();
@@ -86,6 +88,13 @@ void Game::printAllContinents() {
 
 //Check whether all countries of a continent are conquered by the player. If so, the player is given an amount of
 //armies that corresponding to the continent's control value.
+
+//check whether the army num >1
+//check the defender country is adjacent of the attacking country.
+//check the owner of defending country is different from the attacking country.
+//call attackFrom()
+//updateWorldmap();
+
 void Game::attackFrom(Country attacker, Country defender) {
     for (int i = 0; i < attacker.getCountryArmy(); i++) {
         pair<int, int> attackerDice = Random::RollDie(attacker.getCountryArmy());
@@ -170,13 +179,23 @@ void Game::checkInitContinentsOwner() {
 
 
 /*
+ *0. validate the dragged number is equal to or less than the remaining number.
   1. init undeployed army numbers: 3 by default + bonus from the player attr.
   2. after the player selects a country and a certain number, add the army num to the country and subtract this from the total undeployed army number.
   3. the function is called repeatedly until there is no more undeployed army.
 */
-int Game::deployArmy(Country &country, Player player, int numOfDeployed) {
+
+bool Game::deployArmy(Country& country, Player& player, int numToDeploy) {
     int totalUndeployed = max(DEFAULT_NUM_UNDEPLOY, player.getNumOfCapturedCountries() / 3);
 
+
+    //Num of armies given depends on player's captured countries. Min is 3.
+    int numOfArmyGiven = max(DEFAULT_NUM_UNDEPLOYED, player.getNumOfCapturedCountries() / 3);
+
+    //inital undeployed armies is player's undeployed army number + num of armies given
+    int totalUndeployed = player.getCalUndeployArmyNumber() + numOfArmyGiven;
+
+    //bonus for conquering continent(s)
     for (const auto &item: allContinents) {
         if (item.second.getOwnerIndex() != player.getPlayerIndex()) {
             totalUndeployed += item.second.getBonus();
@@ -184,14 +203,28 @@ int Game::deployArmy(Country &country, Player player, int numOfDeployed) {
     }
 
     //add player's chosen army number to the country
-    int newNumOfArmy = country.getNumOfArmy() + numOfDeployed;
-    country.setNumOfArmy(newNumOfArmy);
+    int newNumOfArmy = country.getNumOfArmy() + numToDeploy;;
+    if (numToDeploy <= totalUndeployed)
 
-    //subtract from total undeployed army number
-    totalUndeployed -= newNumOfArmy;
-    totalUndeployed = max(0, totalUndeployed);
+        country.setNumOfArmy(newNumOfArmy);
 
-    return totalUndeployed;
+        //subtract from total undeployed army number and update player's undeployed
+        totalUndeployed ;
+
+        player.setUndeployArmyNumber(totalUndeployed - newNumOfArmy);
+    }
+
+
+
+//    bool RemainingIsZero = totalUndeployed < 0;
+//
+//    if (totalUndeployed <= 0){
+//        RemainingIsZero = true;
+//    }
+
+
+    return (totalUndeployed <= 0);
+
 
 
 }
@@ -224,6 +257,8 @@ void Game::conquerTheCountry(Country &attackCountry, Country &defendCountry) {
         attacker.addContinentBonus(continent.getBonus());
     }
 
+
+    // func: bool gameIsOver()
     bool gameOver = true;
     for (auto &c: allContinents) {
         if (c.second.getOwnerIndex() != attacker.getPlayerIndex()) {
@@ -235,6 +270,8 @@ void Game::conquerTheCountry(Country &attackCountry, Country &defendCountry) {
     if (gameOver) {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_COLOR_TEXT, "GAME OVER", (attacker.getPlayerName() + " WIN!").c_str(),
                                  NULL);
+
+        // break or reset
     }
 }
 
@@ -252,6 +289,24 @@ void Game::setGameStage(GameStage stage) {
 
 GameStage Game::getGameStage() {
     return curGameStage;
+}
+
+
+void Game::runGame(){
+
+    // MOVE STAGE
+    // validate the player drag from one owned country to an adjacent owned country.
+    //how to display??
+    //A button to confirm finish move.
+
+
+    //ATTACK STAGE
+    //one successful attack in a round can get a card(random)
+    //vector for the player
+    //check cards at the end of the attack.
+
+    //call this after deploy
+    MapManager::updateWholeScreen();
 }
 
 
