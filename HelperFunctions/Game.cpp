@@ -14,7 +14,7 @@ int Game::curPlayerIndex = 0;
 
 const int Game::DEFAULT_NUM_UNDEPLOY = 3;
 
-GameStage Game::curGameStage{ATTACK};
+GameStage Game::curGameStage{DEPLOYMENT};
 
 vector<Player>& Game::getAllPlayers() {
     return players;
@@ -23,11 +23,6 @@ vector<Player>& Game::getAllPlayers() {
 void Game::initPlayersAndCountries() {
     //init all players
     initPlayers();
-
-    //load map file and world list
-    //MapManager::start();
-
-    //MapManager::readMapConfigFromFile();
 
     //randomly assign all countries to the players evenly
     assignCountriesToPlayers();

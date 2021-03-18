@@ -21,7 +21,7 @@ vector<const char *> MapManager::CRAD_IMAGE_PATH_LIST = {"../Images/Artillery.jp
 vector<string> MapManager::CARDS_TYPE_LIST{"Infantry", "Cavalry", "Artillery"};
 
 const tuple<int, int, int, int> MapManager::DEFAULT_BACKGROUND_COLOR = ColorList::WHITE;
-const vector<string> MapManager::NUMBER_STRING_VECTOR{"1", "2", "5", "10", "ALL"};
+vector<string> MapManager::NUMBER_STRING_VECTOR{"1", "2", "5", "10", "ALL"};
 const tuple<int, int, int, int> MapManager::NUMBER_BACKGROUND_COLOR{ColorList::BLACK};
 const tuple<int, int, int, int> MapManager::NUMBER_TEXT_COLOR{ColorList::WHITE};
 tuple<int, int, int, int> MapManager::CARDS_IMAGE_BORDER_COLOR{ColorList::BLACK};
@@ -30,6 +30,9 @@ tuple<int, int, int, int> MapManager::BUTTONS_BORDER_COLOR{ColorList::BLACK};
 tuple<int, int, int, int> MapManager::BUTTONS_TEXT_COLOR{ColorList::BLACK};
 
 vector<string> MapManager::buttonNames{"LOAD", "SAVE", "RESET", "NEXT"};
+
+Country *MapManager::fromCountry{};
+Country *MapManager::toCountry{};
 
 double MapManager::IMAGE_WIDTH_RATIO = 1.0;
 double MapManager::IMAGE_HEIGHT_RATIO = 1.0;
@@ -229,9 +232,9 @@ void MapManager::start(string mapPath) {
                     //User requests quit
                     string message;
                     Country *clickedCountry;
-                    SDL_Point dragStartPoint, dragEndPoint;
                     stringstream ss;
-                    Country *fromCountry, *toCountry;
+                    SDL_Point dragStartPoint, dragEndPoint;
+                    bool countriesDraggedForMove;
 
                     Player &curPlayer = Game::getAllPlayers().at(Game::getCurPlayerIndex());
 
@@ -258,49 +261,58 @@ void MapManager::start(string mapPath) {
                                 clickedCountry = &Game::getAllCountries().find(message)->second;
                                 renderCountryInfoRect(clickedCountry);
                             } else {
-                                clickedCountry = nullptr;
+                                //clickedCountry = nullptr;
                                 clearCountryInfoRect();
                             }
                             SDL_SetWindowTitle(gWindow, message.c_str());
-
                             break;
-
                         case SDL_MOUSEBUTTONDOWN:
                             switch (e.button.button) {
                                 case SDL_BUTTON_LEFT:
                                     dragStartPoint = {e.motion.x, e.motion.y};
-                                    if (clickedCountry != nullptr) {
-                                        renderCountryInfoRect(clickedCountry);
-
+                                    int numberIndex = getIndexOfDraggedNumber(dragStartPoint);
+                                    if (numberIndex >= 0 && countriesDraggedForMove) {
+                                        int number;
+                                        if (numberIndex == NUMBER_STRING_VECTOR.size() - 1) {
+                                            number = fromCountry->getNumOfArmy() - 1;
+                                        } else {
+                                            number = stoi(NUMBER_STRING_VECTOR.at(numberIndex));
+                                        }
+                                        fromCountry->reduceNumOfArmy(number);
+                                        toCountry->addNumOfArmy(number);
+                                        countriesDraggedForMove = false;
                                         updateWholeScreen();
-                                    }
-                                    ButtonType buttonType = clickButtonType(e.motion.x, e.motion.y);
-                                    if (buttonType != NONE) {
-                                        switch (buttonType) {
-                                            case LOAD:
-                                                //FIXEME
-                                                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT, "LOAD",
-                                                                         "Click LOAD", NULL);
+                                    } else {
+                                        ButtonType buttonType = clickButtonType(dragStartPoint);
+                                        if (buttonType != NONE) {
+                                            switch (buttonType) {
+                                                case LOAD:
+                                                    //FIXEME
+                                                    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT,
+                                                                             "LOAD",
+                                                                             "Click LOAD", NULL);
 
-                                                loadGameFromFile();
-                                                break;
-                                            case SAVE:
-                                                //FIXME
-                                                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT, "SAVE",
-                                                                         "Click SAVE", NULL);
-                                                saveGameToFile();
-                                                break;
-                                            case RESET:
-                                                if (SDL_ShowMessageBox(&resetMsgBoxData, &buttonId) < 0) {
-                                                    SDL_Log("error displaying message box");
-                                                }
-                                                if (buttonId == 1) {
-                                                    resetGame();
-                                                }
-                                                break;
-                                            case NEXT:
-                                                nextStage();
-                                                break;
+                                                    loadGameFromFile();
+                                                    break;
+                                                case SAVE:
+                                                    //FIXME
+                                                    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT,
+                                                                             "SAVE",
+                                                                             "Click SAVE", NULL);
+                                                    saveGameToFile();
+                                                    break;
+                                                case RESET:
+                                                    if (SDL_ShowMessageBox(&resetMsgBoxData, &buttonId) < 0) {
+                                                        SDL_Log("error displaying message box");
+                                                    }
+                                                    if (buttonId == 1) {
+                                                        resetGame();
+                                                    }
+                                                    break;
+                                                case NEXT:
+                                                    nextStage();
+                                                    break;
+                                            }
                                         }
                                     }
                                     break;
@@ -330,31 +342,31 @@ void MapManager::start(string mapPath) {
 
                                         //CHEATING mode for testing attack function.
                                         if (fromCountry->getOwnerIndex() != toCountry->getOwnerIndex()) {
-                                            /*  ss.str("");
-                                              ss.clear();
-                                              ss << "From <" << fromCountryName << "> to <" << toCountryName << ">";
-                                              SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT, "Drag",
-                                                                       ss.str().c_str(), NULL);*/
                                             Game::conquerTheCountry(*fromCountry, *toCountry);
-
                                             updateWholeScreen();
-/*
-                                            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT, "Result",
-                                                                     to_string(toCountry->getOwnerIndex()).c_str(), NULL);*/
+                                        }
+                                    }
+
+                                    if (fromCountry != nullptr && toCountry != nullptr &&
+                                        fromCountryName != toCountryName) {
+                                        //Attack stage if drag&drop on two countries from different players
+                                        if (Game::getGameStage() == ATTACK) {
+                                            Game::attackFrom(*fromCountry, *toCountry);
+                                        }
+                                        //Move stage if drag&Drop on two countries from the same player.
+                                        if (Game::getGameStage() == MOVE) {
+                                            countriesDraggedForMove = true;
+                                            renderNumberListRect();
                                         }
                                     }
 
                                     //deploy numbers
-                                    if (isDragFromNumber(dragStartPoint) &&
+                                    if (getIndexOfDraggedNumber(dragStartPoint) >= 0 &&
                                         isDragToOwnCountry(dragEndPoint, curPlayer.getPlayerIndex())) {
                                         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT, "Drag",
                                                                  "Own country", NULL);
 
                                         if (Game::getGameStage() == DEPLOYMENT) {
-                                            //FIXME
-                                        }
-
-                                        if (Game::getGameStage() == MOVE) {
                                             //FIXME
                                         }
                                     }
@@ -661,17 +673,22 @@ void MapManager::renderNumberListRect() {
     numberMarkCoordinates.clear();
     Player &curPlayer = Game::getAllPlayers().at(Game::getCurPlayerIndex());
     stringstream ss;
+    int numOfArmy = 0;
 
     if (Game::getGameStage() == GameStage::DEPLOYMENT) {
         ss << "Undeploy Army:   " << curPlayer.getUndeployArmyNumber();
         renderMessage(NUMBER_LIST_WIDTH / 2, startY, ss.str().c_str(), curPlayer.getTextColor(),
                       NUMBER_LIST_UNDEPLOY_FONT_SIZE);
+        numOfArmy = curPlayer.getUndeployArmyNumber();
     }
 
     if (Game::getGameStage() == GameStage::MOVE) {
         ss << "Stage: Move Army";
         renderMessage(NUMBER_LIST_WIDTH / 2, startY, ss.str().c_str(), curPlayer.getTextColor(),
                       NUMBER_LIST_UNDEPLOY_FONT_SIZE);
+        if (fromCountry != nullptr) {
+            numOfArmy = fromCountry->getNumOfArmy() - 1;
+        }
     }
 
     if (Game::getGameStage() == GameStage::ATTACK) {
@@ -688,7 +705,8 @@ void MapManager::renderNumberListRect() {
 
     startY += NUMBER_LIST_GAP;
 
-    for (string numStr : NUMBER_STRING_VECTOR) {
+    for (int i = 0; i < NUMBER_STRING_VECTOR.size(); i++) {
+        string numStr = NUMBER_STRING_VECTOR.at(i);
         SDL_Rect rect{startX, startY, NUMBER_LIST_MARK_WIDTH, NUMBER_LIST_MARK_WIDTH};
         SDL_SetRenderDrawColor(gRenderer, get<0>(NUMBER_BACKGROUND_COLOR), get<1>(NUMBER_BACKGROUND_COLOR),
                                get<2>(NUMBER_BACKGROUND_COLOR), get<3>(NUMBER_BACKGROUND_COLOR));
@@ -697,8 +715,16 @@ void MapManager::renderNumberListRect() {
         int centerX = startX + NUMBER_LIST_MARK_WIDTH / 2;
         int centerY = startY + NUMBER_LIST_MARK_WIDTH / 2;
 
-        renderMessage(centerX, centerY, numStr.c_str(),
-                      NUMBER_TEXT_COLOR, NUMBER_LIST_FONT_SIZE);
+        if ((Game::getGameStage() == DEPLOYMENT ||
+             (Game::getGameStage() == MOVE && fromCountry != nullptr
+              && toCountry != nullptr)) && (numOfArmy > 1) &&
+            (i == NUMBER_STRING_VECTOR.size() - 1 || stoi(numStr) <= numOfArmy)) {
+            renderMessage(centerX, centerY, numStr.c_str(),
+                          curPlayer.getBgColor(), NUMBER_LIST_FONT_SIZE);
+        } else {
+            renderMessage(centerX, centerY, numStr.c_str(),
+                          NUMBER_TEXT_COLOR, NUMBER_LIST_FONT_SIZE);
+        }
 
         numberMarkCoordinates.push_back(
                 {centerX + MAP_VIEW_PORT_WIDTH, centerY + PLAYER_INFO_HEIGHT + COUNTRY_INFO_HEIGHT});
@@ -713,14 +739,15 @@ void MapManager::renderNumberListRect() {
     resetToDefaultColor();
 }
 
-bool MapManager::isDragFromNumber(SDL_Point point) {
-    for (SDL_Point &p: numberMarkCoordinates) {
+int MapManager::getIndexOfDraggedNumber(SDL_Point point) {
+    for (int i = 0; i < numberMarkCoordinates.size(); i++) {
+        SDL_Point &p = numberMarkCoordinates.at(i);
         if (point.x <= p.x + NUMBER_LIST_MARK_WIDTH / 2 && point.x >= p.x - NUMBER_LIST_MARK_WIDTH / 2
             && point.y >= p.y - NUMBER_LIST_MARK_WIDTH / 2 && point.y <= p.y + NUMBER_LIST_MARK_WIDTH / 2) {
-            return true;
+            return i;
         }
     }
-    return false;
+    return -1;
 }
 
 bool MapManager::isDragToOwnCountry(SDL_Point point, int playerIndex) {
@@ -845,10 +872,11 @@ void MapManager::loadGameFromFile() {
 
 }
 
-ButtonType MapManager::clickButtonType(int x, int y) {
+ButtonType MapManager::clickButtonType(SDL_Point &p) {
     for (auto &item: buttonCoordinates) {
         SDL_Point &point = item.second;
-        if (x >= point.x && x <= point.x + BUTTONS_RECT_WIDTH && y >= point.y && y <= point.y + BUTTONS_RECT_HEIGHT) {
+        if (p.x >= point.x && p.x <= point.x + BUTTONS_RECT_WIDTH && p.y >= point.y &&
+            p.y <= point.y + BUTTONS_RECT_HEIGHT) {
             return item.first;
         }
     }

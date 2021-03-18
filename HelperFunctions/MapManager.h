@@ -44,7 +44,7 @@ private:
     const static int NUMBER_LIST_FONT_SIZE = 18;
     const static int NUMBER_LIST_MARK_WIDTH = 35;
     const static int NUMBER_LIST_UNDEPLOY_FONT_SIZE = 22;
-    const static vector<string> NUMBER_STRING_VECTOR;
+    static vector<string> NUMBER_STRING_VECTOR;
     const static tuple<int, int, int, int> NUMBER_BACKGROUND_COLOR;
     const static tuple<int, int, int, int> NUMBER_TEXT_COLOR;
     static vector<SDL_Point> numberMarkCoordinates;
@@ -109,6 +109,8 @@ private:
     static SDL_Rect cardsListRect;
     static SDL_Rect buttonsRect;
 
+    static Country *fromCountry, *toCountry;
+
     const static SDL_MessageBoxColorScheme MESSAGE_BOX_COLOR_SCHEME;
 
     //Loads individual image as texture
@@ -170,7 +172,7 @@ public:
 
     static void renderNumberListRect();
 
-    static bool isDragFromNumber(SDL_Point point);
+    static int getIndexOfDraggedNumber(SDL_Point point);
 
     static bool isDragToOwnCountry(SDL_Point point, int index);
 
@@ -180,7 +182,7 @@ public:
 
     static void loadGameFromFile();
 
-    static ButtonType clickButtonType(int x, int y);
+    static ButtonType clickButtonType(SDL_Point& p);
 
     static void saveGameToFile();
 

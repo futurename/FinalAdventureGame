@@ -34,7 +34,7 @@ Country::Country(string name, int x, int y, vector<string> &countries, int numOf
     this->numOfArmy = numOfArmy;
     this->ownerIndex = NO_COUNTRY_OWNER;
     vector<string> adjacentCountries;
-    for (const string& str: countries) {
+    for (const string &str: countries) {
         adjacentCountries.push_back(str);
     }
     this->adjacentCountries = adjacentCountries;
@@ -75,15 +75,23 @@ void Country::setOwnerIndex(int index) {
     ownerIndex = index;
 }
 
-void Country::setTextColor(tuple<int,int,int,int> color) {
+void Country::setTextColor(tuple<int, int, int, int> color) {
     this->textColor = color;
 }
 
 
-int Country::getNumOfArmy(){
+int Country::getNumOfArmy() {
     return numOfArmy;
 }
 
-void Country::setNumOfArmy(int newNumOfArmy){
+void Country::setNumOfArmy(int newNumOfArmy) {
     numOfArmy = newNumOfArmy;
+}
+
+void Country::reduceNumOfArmy(int numOfArmy) {
+    this->numOfArmy -= numOfArmy > this->numOfArmy - 1 ? this->numOfArmy - 1 : numOfArmy;
+}
+
+void Country::addNumOfArmy(int numOfArmy) {
+    this->numOfArmy += numOfArmy;
 }
