@@ -215,6 +215,10 @@ void MapManager::start(string mapPath) {
 
             initCountryMarks();
 
+            Player &curPlayer = Game::getAllPlayers().at(Game::getCurPlayerIndex());
+            curPlayer.getCalUndeployArmyNumber();
+            updateWholeScreen();
+
             //*******************************************
             //rendering text view port
             initTextViewPort();
@@ -223,9 +227,7 @@ void MapManager::start(string mapPath) {
             SDL_RenderPresent(gRenderer);
 
             //curplayer cal undeploy army.
-            Player &curPlayer = Game::getAllPlayers().at(Game::getCurPlayerIndex());
-            curPlayer.getCalUndeployArmyNumber();
-            updateWholeScreen();
+
 
             //Event handler
             SDL_Event e;
@@ -902,6 +904,10 @@ void MapManager::resetGame() {
     Game::readMapConfigFromFile();
     Game::initPlayersAndCountries();
     initCountryMarks();
+
+    Player &curPlayer = Game::getAllPlayers().at(Game::getCurPlayerIndex());
+    curPlayer.getCalUndeployArmyNumber();
+
     initTextViewPort();
     SDL_RenderPresent(gRenderer);
 }
