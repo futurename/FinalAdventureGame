@@ -361,13 +361,22 @@ void MapManager::start(string mapPath) {
                                     }
 
                                     //deploy numbers
-                                    if (getIndexOfDraggedNumber(dragStartPoint) >= 0 &&
+                                    int numberIndex = getIndexOfDraggedNumber(dragStartPoint);
+                                    if (numberIndex >= 0 &&
                                         isDragToOwnCountry(dragEndPoint, curPlayer.getPlayerIndex())) {
                                         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT, "Drag",
                                                                  "Own country", NULL);
 
                                         if (Game::getGameStage() == DEPLOYMENT) {
                                             //FIXME
+                                            string countryName = getCountryNameFromCoordinates(dragEndPoint.x, dragEndPoint.y);
+                                            Country& deployCountry = Game::getAllCountries().at(countryName);
+                                            int number = stoi(NUMBER_STRING_VECTOR.at(numberIndex));
+
+                                            //FIXME curplayer remove number from undeploy army.
+
+                                            deployCountry.addNumOfArmy(number);
+                                            updateWholeScreen();
                                         }
                                     }
 
