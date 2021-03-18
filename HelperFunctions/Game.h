@@ -21,9 +21,10 @@ private:
     static int curPlayerIndex;
     static GameStage curGameStage;
     const static string DEFAULT_MAP_CONFIG;
-
 public:
     const static int DEFAULT_NUM_UNDEPLOY;
+    static bool isConquerACountry;
+    static bool ifClickedNext;
 
     static vector<Player> &getAllPlayers();
 

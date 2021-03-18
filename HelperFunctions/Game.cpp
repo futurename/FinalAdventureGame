@@ -4,18 +4,14 @@
 #include "ColorList.h"
 
 const string Game::DEFAULT_MAP_CONFIG = "../Maps/World.map";
-
 map<string, Country> Game::allCountries{map<string, Country>()};
-
 map<string, Continent> Game::allContinents{map<string, Continent>()};
-
 vector<Player> Game::players{vector<Player>()};
-
 int Game::curPlayerIndex = 0;
-
 const int Game::DEFAULT_NUM_UNDEPLOY = 3;
-
 GameStage Game::curGameStage{DEPLOYMENT};
+bool Game::isConquerACountry = false;
+bool Game::ifClickedNext = false;
 
 vector<Player> &Game::getAllPlayers() {
     return players;
@@ -119,20 +115,20 @@ void Game::attackFrom(Country& attackCountry, Country& defendCountry) {
             int moveArmy = attackCountry.getCountryArmy() - 1;
             attackCountry.setNumOfArmy(1);
             defendCountry.setNumOfArmy(moveArmy);
+
+            isConquerACountry= true;
         }
     }
 }
 
 bool Game::isContinentConquered(int index, const string &continentName) {
     vector<string> &countryNames = allContinents.find(continentName)->second.getCountryNames();
-    bool result = true;
     for (const string &countryName: countryNames) {
         if (allCountries.find(countryName)->second.getOwnerIndex() != index) {
-            result = false;
-            break;
+            return false;
         }
     }
-    return result;
+    return true;
 }
 
 void Game::assignCountriesToPlayers() {
@@ -232,6 +228,10 @@ void Game::conquerTheCountry(Country &attackCountry, Country &defendCountry) {
         defender.removeContinentBonus(continent.getBonus());
     }
 
+    defendCountry.setOwnerIndex(attacker.getPlayerIndex());
+    defendCountry.setTextColor(attacker.getTextColor());
+    defendCountry.setCountryColour(attacker.getBgColor());
+
     if (isContinentConquered(attackCountry.getOwnerIndex(), continent.getContinentName())) {
         ss << "Conquer " << continent.getContinentName() << "!";
         string title = ss.str();
@@ -243,11 +243,6 @@ void Game::conquerTheCountry(Country &attackCountry, Country &defendCountry) {
         attacker.addContinentBonus(continent.getBonus());
     }
 
-    defendCountry.setOwnerIndex(attacker.getPlayerIndex());
-    defendCountry.setTextColor(attacker.getTextColor());
-    defendCountry.setCountryColour(attacker.getBgColor());
-
-    // func: bool gameIsOver()
     bool gameOver = true;
     for (auto &c: allContinents) {
         if (c.second.getOwnerIndex() != attacker.getPlayerIndex()) {

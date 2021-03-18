@@ -10,16 +10,9 @@ class Player {
 public:
     Player(int index, string name = "");
 
-    // Accessors and mutators for private attributes
-    void SetPlayerName(string inPlayerName);
-
     string getPlayerName();
 
-    void getPlayerCaptures();
-
     void addCard(CardType card);
-
-    void setCards(vector<CardType>& cards);
 
     vector<CardType>& getCards();
 

@@ -52,7 +52,7 @@ CardType Card::getBonusCard() {
             return ARTILLERY;
         case 1:
             return CAVALRY;
-        case 2:
+        default:
             return INFANTRY;
     }
 }

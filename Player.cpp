@@ -12,20 +12,12 @@ Player::Player(int index, string name) {
     cards = {CAVALRY, INFANTRY, CAVALRY};
 }
 
-void Player::SetPlayerName(string inPlayerName) {
-    playerName = inPlayerName;
-}
-
 string Player::getPlayerName() {
     return playerName;
 }
 
 void Player::addCard(CardType card) {
     cards.push_back(card);
-}
-
-void Player::setCards(vector<CardType> &newCards) {
-    cards = newCards;
 }
 
 vector<CardType> &Player::getCards() {

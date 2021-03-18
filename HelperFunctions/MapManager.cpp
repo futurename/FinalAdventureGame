@@ -217,7 +217,7 @@ void MapManager::start(string mapPath) {
 
             Player &curPlayer = Game::getAllPlayers().at(Game::getCurPlayerIndex());
             curPlayer.getCalUndeployArmyNumber();
-            updateWholeScreen();
+            //updateWholeScreen();
 
             //*******************************************
             //rendering text view port
@@ -293,7 +293,7 @@ void MapManager::start(string mapPath) {
 
                                         //CHECK HERE
                                         nextStage();
-                                        updateWholeScreen();
+
                                     } else {
                                         ButtonType buttonType = clickButtonType(dragStartPoint);
                                         if (buttonType != NONE) {
@@ -351,7 +351,7 @@ void MapManager::start(string mapPath) {
                                     if (fromCountry != nullptr && toCountry != nullptr &&
                                         fromCountryName != toCountryName && isAdjacentCountry(fromCountry, toCountry)
                                         && curPlayer.getPlayerIndex() == fromCountry->getOwnerIndex()) {
-                                        if (isSameOwner(fromCountryName, toCountryName)) {
+                                        if (isSameOwner(fromCountryName, toCountryName) && Game::getGameStage() == ATTACK) {
                                             ss.str("");
                                             ss.clear();
                                             ss << "[" << fromCountryName << "] and [" << toCountryName
@@ -426,6 +426,7 @@ void MapManager::start(string mapPath) {
                                                 if (curPlayer.getUndeployArmyNumber() == 0) {
                                                     Game::setGameStage(ATTACK);
                                                     ss << "ALL";
+                                                    Game::ifClickedNext = false;
                                                 } else {
                                                     ss << number;
                                                 }
@@ -622,6 +623,10 @@ void MapManager::renderPlayerInfoRect() {
     SDL_SetRenderTarget(gRenderer, playerTexture);
     SDL_RenderClear(gRenderer);
     vector<Player> players = Game::getAllPlayers();
+
+    int size = players.size();
+    cout << size << endl;
+
     int startY = PLAYER_INFO_Y;
     for (Player &player: players) {
         SDL_Rect rect{PLAYER_INFO_X, startY - PLAYER_INFO_RECT_WIDTH / 2, PLAYER_INFO_RECT_WIDTH,
@@ -912,28 +917,41 @@ void MapManager::resetGame() {
     SDL_RenderPresent(gRenderer);
 }
 
-//FIXME
+
 void MapManager::nextStage() {
-    GameStage curStage = Game::getGameStage();
-    if (curStage == ATTACK) {
+    if (Game::getGameStage() == ATTACK) {
+        if (Game::isConquerACountry) {
+            Player &curPlayer = Game::getAllPlayers().at(Game::getCurPlayerIndex());
+            CardType card = Card::getBonusCard();
+            curPlayer = Game::getAllPlayers().at(Game::getCurPlayerIndex());
+            curPlayer.addCard(card);
+            Game::isConquerACountry = false;
+        }
         Game::setGameStage(MOVE);
-    }
-    if (curStage == MOVE) {
+        fromCountry = nullptr;
+        toCountry = nullptr;
+    } else if (Game::getGameStage() == MOVE) {
         int curPlayerIndex = Game::getCurPlayerIndex();
-        Game::setCurPlayerIndex((++curPlayerIndex) % (Game::getAllPlayers().size()));
+        int playerIndex = ++curPlayerIndex % Game::getAllPlayers().size();
+        Game::setCurPlayerIndex(playerIndex);
         Game::setGameStage(DEPLOYMENT);
-        //FIXME curPlayer calculate undeploy army
-        Player &player = Game::getAllPlayers().at(Game::getCurPlayerIndex());
-        player.getCalUndeployArmyNumber();
-    }
-    if (curStage == DEPLOYMENT) {
-        //FIXME get undeloy army number
+        Player &curPlayer = Game::getAllPlayers().at(Game::getCurPlayerIndex());
+        curPlayer.getCalUndeployArmyNumber();
+        fromCountry = nullptr;
+        toCountry = nullptr;
+    } else if (Game::getGameStage() == DEPLOYMENT) {
         Player &curPlayer = Game::getAllPlayers().at(Game::getCurPlayerIndex());
         int undeployArmy = curPlayer.getUndeployArmyNumber();
         if (undeployArmy > 0) {
-            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Deploy Stage", "Please deploy armies!", NULL);
+            if (Game::ifClickedNext) {
+                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Deploy Stage",
+                                         "Please deploy armies before attacking!", NULL);
+            } else {
+                Game::ifClickedNext = true;
+            }
         } else {
             Game::setGameStage(ATTACK);
+            Game::ifClickedNext = false;
         }
     }
     updateWholeScreen();
