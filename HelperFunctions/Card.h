@@ -1,3 +1,6 @@
+#ifndef FINALGAMEDESIGN_CARD_H
+#define FINALGAMEDESIGN_CARD_H
+
 #include "imports.h"
 enum CardType {
     ARTILLERY, CAVALRY, INFANTRY
@@ -10,3 +13,4 @@ private:
 public:
     static int exchangeCards(vector<CardType> &cards, int exchangeTimes);
 };
+#endif //FINALGAMEDESIGN_SDF_H

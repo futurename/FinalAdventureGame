@@ -1,3 +1,6 @@
+#ifndef FINALGAMEDESIGN_PLAYER_H
+#define FINALGAMEDESIGN_PLAYER_H
+
 #include "HelperFunctions//imports.h"
 #include "HelperFunctions/Card.h"
 
@@ -59,3 +62,4 @@ private:
     const static vector<string> DEFAULT_PLAYER_NAMES;
     int undeployArmyNumber = 0;
 };
+#endif
