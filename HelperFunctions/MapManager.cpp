@@ -288,13 +288,10 @@ void MapManager::start(string mapPath) {
                                         fromCountry->reduceNumOfArmy(number);
                                         toCountry->addNumOfArmy(number);
                                         countriesDraggedForMove = false;
-                                        updateWholeScreen();
 
-                                        //end move stage, switch to next player
-                                        //FIXME check whether we miss something here.
+                                        //CHECK HERE
                                         nextStage();
-
-
+                                        updateWholeScreen();
                                     } else {
                                         ButtonType buttonType = clickButtonType(dragStartPoint);
                                         if (buttonType != NONE) {
@@ -349,55 +346,95 @@ void MapManager::start(string mapPath) {
                                     } else {
                                         toCountry = nullptr;
                                     }
-
-                                    /*  if (fromCountry != nullptr && toCountry != nullptr &&
-                                          fromCountryName != toCountryName) {
-
-                                          //CHEATING mode for testing attack function.
-                                          if (fromCountry->getOwnerIndex() != toCountry->getOwnerIndex()) {
-                                              Game::conquerTheCountry(*fromCountry, *toCountry);
-                                              updateWholeScreen();
-                                          }
-                                      }*/
-
                                     if (fromCountry != nullptr && toCountry != nullptr &&
-                                        fromCountryName != toCountryName) {
-                                        //Attack stage if drag&drop on two countries from different players
-                                        if (Game::getGameStage() == ATTACK) {
-                                            Game::attackFrom(*fromCountry, *toCountry);
-                                        }
-                                        //Move stage if drag&Drop on two countries from the same player.
-                                        if (Game::getGameStage() == MOVE) {
-                                            countriesDraggedForMove = true;
-                                            renderNumberListRect();
+                                        fromCountryName != toCountryName && isAdjacentCountry(fromCountry, toCountry)
+                                        && curPlayer.getPlayerIndex() == fromCountry->getOwnerIndex()) {
+                                        if (isSameOwner(fromCountryName, toCountryName)) {
+                                            ss.str("");
+                                            ss.clear();
+                                            ss << "[" << fromCountryName << "] and [" << toCountryName
+                                               << "] are both your countries!";
+                                            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT,
+                                                                     "Forbidden",
+                                                                     ss.str().c_str(), NULL);
+                                        } else {
+                                            //Attack stage if drag&drop on two countries from different players
+                                            if (Game::getGameStage() == ATTACK) {
+                                                if (fromCountry->getNumOfArmy() > 1) {
+                                                    ss.str("");
+                                                    ss.clear();
+                                                    ss << curPlayer.getPlayerName() << " ATTACKS [" << toCountryName
+                                                       << "] FROM [" << fromCountryName << "].";
+
+                                                    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT,
+                                                                             "Attack Country",
+                                                                             ss.str().c_str(), NULL);
+                                                    Game::attackFrom(*fromCountry, *toCountry);
+
+                                                    //check whether the player has any country for attacking
+                                                    if (!canAttackFromAnyCountry(curPlayer)) {
+                                                        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT,
+                                                                                 "Next: Move",
+                                                                                 "No any country for further attacking! Next player",
+                                                                                 NULL);
+
+                                                        nextStage();
+                                                        nextStage();
+                                                    }
+                                                    updateWholeScreen();
+                                                } else {
+                                                    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT,
+                                                                             "Attack Country",
+                                                                             "No enough army (>1) for attacking!",
+                                                                             NULL);
+                                                }
+                                            }
+                                            //Move stage if drag&Drop on two countries from the same player.
+                                            if (Game::getGameStage() == MOVE) {
+                                                countriesDraggedForMove = true;
+                                                renderNumberListRect();
+                                            }
                                         }
                                     }
 
                                     //deploy numbers if drag from number rect to an own country
                                     int numberIndex = getIndexOfDraggedNumber(dragStartPoint);
-                                    if (numberIndex >= 0 &&
-                                        isDragToOwnCountry(dragEndPoint, curPlayer.getPlayerIndex())) {
-                                        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT, "Drag",
-                                                                 "Own country", NULL);
-
-                                        if (Game::getGameStage() == DEPLOYMENT) {
+                                    if (numberIndex >= 0) {
+                                        if (isDragToOwnCountry(dragEndPoint, curPlayer.getPlayerIndex())) {
                                             string countryName = getCountryNameFromCoordinates(dragEndPoint.x,
                                                                                                dragEndPoint.y);
-                                            Country &deployCountry = Game::getAllCountries().at(countryName);
-                                            int number;
-                                            if (numberIndex == NUMBER_STRING_VECTOR.size() - 1) {
-                                                number = curPlayer.getUndeployArmyNumber();
-                                            } else {
-                                                number = stoi(NUMBER_STRING_VECTOR.at(numberIndex));
-                                            }
+                                            if (Game::getGameStage() == DEPLOYMENT) {
+                                                Country &deployCountry = Game::getAllCountries().at(countryName);
+                                                int number;
+                                                if (numberIndex == NUMBER_STRING_VECTOR.size() - 1) {
+                                                    number = curPlayer.getUndeployArmyNumber();
+                                                } else {
+                                                    number = stoi(NUMBER_STRING_VECTOR.at(numberIndex));
+                                                }
 
-                                            curPlayer.removeUndeployArmy(number);
-                                            deployCountry.addNumOfArmy(number);
+                                                curPlayer.removeUndeployArmy(number);
+                                                deployCountry.addNumOfArmy(number);
 
-                                            if (curPlayer.getUndeployArmyNumber() == 0) {
-                                                Game::setGameStage(ATTACK);
+                                                //Message box body, show num of army deployed
+                                                ss.str("");
+                                                ss.clear();
+
+                                                ss << curPlayer.getPlayerName() << " deployed <";
+
+                                                if (curPlayer.getUndeployArmyNumber() == 0) {
+                                                    Game::setGameStage(ATTACK);
+                                                    ss << "ALL";
+                                                } else {
+                                                    ss << number;
+                                                }
+                                                ss << "> armies to [" << countryName << "].";
+
+                                                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT,
+                                                                         "Deploy Army",
+                                                                         ss.str().c_str(), NULL);
+
+                                                updateWholeScreen();
                                             }
-                                            updateWholeScreen();
                                         }
                                     }
 
@@ -912,14 +949,53 @@ ButtonType MapManager::getButtonTypeFromStr(string buttonName) {
     return NONE;
 }
 
-CardType MapManager::getCardTypeFromString(string cardStr) {
+CardType MapManager::getCardTypeFromString(string &cardStr) {
     if (cardStr == "Artillery") {
         return ARTILLERY;
     }
     if (cardStr == "Cavalry") {
         return CAVALRY;
     }
-    if (cardStr == "Infantry") {
-        return INFANTRY;
+    return INFANTRY;
+}
+
+bool MapManager::isAdjacentCountry(Country *attackingCountry, Country *defendingCountry) {
+    for (const string &countryName: attackingCountry->getAdjacentCountires()) {
+        if (countryName == defendingCountry->getCountryName()) {
+            return true;
+        }
     }
+    if (attackingCountry->getOwnerIndex() == Game::getCurPlayerIndex()) {
+        stringstream ss;
+        ss << "[" << attackingCountry->getCountryName() << "] and [" << defendingCountry->getCountryName()
+           << "] are NOT adjacent!";
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT,
+                                 "Not Adjacent Countries",
+                                 ss.str().c_str(), NULL);
+    }
+    return false;
+}
+
+bool MapManager::canAttackFromAnyCountry(Player &player) {
+    for (auto *country : getPlayerCountries(player.getPlayerIndex())) {
+        if (country->getNumOfArmy() > 1) {
+            return true;
+        }
+    }
+    return false;
+}
+
+vector<Country *> MapManager::getPlayerCountries(int playerIndex) {
+    vector<Country *> result;
+    for (auto &item : Game::getAllCountries()) {
+        if (item.second.getOwnerIndex() == playerIndex) {
+            result.push_back(&item.second);
+        }
+    }
+    return result;
+}
+
+bool MapManager::isSameOwner(string fromCountryName, string toCountryName) {
+    return Game::getAllCountries().at(fromCountryName).getOwnerIndex() ==
+           Game::getAllCountries().at(toCountryName).getOwnerIndex();
 }

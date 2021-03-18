@@ -9,7 +9,7 @@ Player::Player(int index, string name) {
     if (name.empty()) {
         this->playerName = DEFAULT_PLAYER_NAMES.at(index);
     }
-    cards = {CAVALRY, INFANTRY, CAVALRY, INFANTRY, ARTILLERY, INFANTRY};
+    cards = {CAVALRY, INFANTRY, CAVALRY};
 }
 
 void Player::SetPlayerName(string inPlayerName) {

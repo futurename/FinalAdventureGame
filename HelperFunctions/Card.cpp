@@ -1,4 +1,5 @@
 #include "Card.h"
+#include "Random.h"
 
 int Card::exchangeCards(vector<CardType> &cards, int exchangeTimes) {
     int result = 0;
@@ -42,4 +43,16 @@ int Card::exchangeCards(vector<CardType> &cards, int exchangeTimes) {
         }
     }
     return result;
+}
+
+CardType Card::getBonusCard() {
+    int randIndex = Random::generateRandomNum(0,2);
+    switch (randIndex) {
+        case 0:
+            return ARTILLERY;
+        case 1:
+            return CAVALRY;
+        case 2:
+            return INFANTRY;
+    }
 }

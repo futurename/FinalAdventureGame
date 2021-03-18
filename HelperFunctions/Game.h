@@ -41,7 +41,7 @@ public:
 
     static void printAllContinents();
 
-    static void attackFrom(Country attacker, Country defender);
+    static void attackFrom(Country& attackCountry, Country& defendCountry);
 
     static bool isContinentConquered(int index, const string &continentName);
 

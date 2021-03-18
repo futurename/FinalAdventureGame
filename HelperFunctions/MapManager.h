@@ -4,6 +4,7 @@
 #include <string>
 #include <SDL_ttf.h>
 #include "Card.h"
+#include "../Player.h"
 
 class Country;
 
@@ -123,7 +124,7 @@ private:
 
     void static SDLClose();
 
-    static CardType getCardTypeFromString(string cardStr);
+    static CardType getCardTypeFromString(string& cardStr);
 
 public:
     static void initCountryMarks();
@@ -191,4 +192,12 @@ public:
     static double IMAGE_HEIGHT_RATIO;
     static double IMAGE_WIDTH_RATIO;
     const static string TERRITORIES_TITLE;
+
+    static bool isAdjacentCountry(Country *attackingCountry, Country *defendingCountry);
+
+    static bool canAttackFromAnyCountry(Player &player);
+
+    static vector<Country*> getPlayerCountries(int playerIndex);
+
+    static bool isSameOwner(string fromCountryName, string toCountryName);
 };

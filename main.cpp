@@ -1,7 +1,7 @@
 
 #include "HelperFunctions//MapManager.h"
 #include "HelperFunctions/Game.h"
-#include "Random.h"
+#include "HelperFunctions/Random.h"
 
 int main(int argc, char *args[]) {
     srand((unsigned) time(nullptr));

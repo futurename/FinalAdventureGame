@@ -1,5 +1,5 @@
 #include "Game.h"
-#include "../Random.h"
+#include "Random.h"
 #include "MapManager.h"
 #include "ColorList.h"
 
@@ -96,34 +96,29 @@ void Game::printAllContinents() {
 //call attackFrom()
 //updateWorldmap();
 
-void Game::attackFrom(Country attacker, Country defender) {
-    for (int i = 0; i < attacker.getCountryArmy(); i++) {
-        pair<int, int> attackerDice = Random::RollDie(attacker.getCountryArmy());
-        pair<int, int> defenderDice = Random::RollDie(defender.getCountryArmy());
+void Game::attackFrom(Country& attackCountry, Country& defendCountry) {
+    for (int i = 0; i < attackCountry.getCountryArmy(); i++) {
+        pair<int, int> attackerDice = Random::RollDie(attackCountry.getCountryArmy());
+        pair<int, int> defenderDice = Random::RollDie(defendCountry.getCountryArmy());
 
         if ((attackerDice.first > defenderDice.first)
             || (attackerDice.first == defenderDice.first && attackerDice.second > defenderDice.second)) {
-            defender.loseOneArmy();
+            defendCountry.loseOneArmy();
         } else if (attackerDice.first == defenderDice.first && attackerDice.second == defenderDice.second) {
             continue;
         } else {
-            attacker.loseOneArmy();
+            attackCountry.loseOneArmy();
         }
 
-        if (attacker.getCountryArmy() == 1) {
+        if (attackCountry.getCountryArmy() == 1) {
             break;
         }
 
-        if (defender.getCountryArmy() == 0) {
-            conquerTheCountry(attacker, defender);
-        }
-
-        Continent &continent = allContinents.at(defender.getContinentName());
-
-        if (isContinentConquered(attacker.getOwnerIndex(), continent.getContinentName())) {
-            continent.setOwnerIndex(attacker.getOwnerIndex());
-            players.at(attacker.getOwnerIndex())
-                    .addContinentBonus(continent.getBonus());
+        if (defendCountry.getCountryArmy() == 0) {
+            conquerTheCountry(attackCountry, defendCountry);
+            int moveArmy = attackCountry.getCountryArmy() - 1;
+            attackCountry.setNumOfArmy(1);
+            defendCountry.setNumOfArmy(moveArmy);
         }
     }
 }
@@ -156,7 +151,7 @@ void Game::assignCountriesToPlayers() {
     for (auto &country : allCountries) {
         int rand;
         while (true) {
-            rand = Random::GenerateRandomNum(0, players.size() - 1);
+            rand = Random::generateRandomNum(0, players.size() - 1);
             if (playerCounter.at(rand) > 0) {
                 break;
             }
@@ -230,10 +225,6 @@ void Game::conquerTheCountry(Country &attackCountry, Country &defendCountry) {
 
     stringstream ss;
 
-    defendCountry.setOwnerIndex(attacker.getPlayerIndex());
-    defendCountry.setTextColor(attacker.getTextColor());
-    defendCountry.setCountryColour(attacker.getBgColor());
-
     Continent &continent = allContinents.at(defendCountry.getContinentName());
 
     if (continent.getOwnerIndex() == defender.getPlayerIndex()) {
@@ -252,6 +243,9 @@ void Game::conquerTheCountry(Country &attackCountry, Country &defendCountry) {
         attacker.addContinentBonus(continent.getBonus());
     }
 
+    defendCountry.setOwnerIndex(attacker.getPlayerIndex());
+    defendCountry.setTextColor(attacker.getTextColor());
+    defendCountry.setCountryColour(attacker.getBgColor());
 
     // func: bool gameIsOver()
     bool gameOver = true;
@@ -265,8 +259,6 @@ void Game::conquerTheCountry(Country &attackCountry, Country &defendCountry) {
     if (gameOver) {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_COLOR_TEXT, "GAME OVER", (attacker.getPlayerName() + " WIN!").c_str(),
                                  NULL);
-
-        // break or reset
     }
 }
 
