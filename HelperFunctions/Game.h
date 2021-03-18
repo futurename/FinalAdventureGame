@@ -23,6 +23,8 @@ private:
     const static string DEFAULT_MAP_CONFIG;
 
 public:
+    const static int DEFAULT_NUM_UNDEPLOY;
+
     static vector<Player> &getAllPlayers();
 
     static void initPlayersAndCountries();
@@ -63,6 +65,5 @@ public:
 
     static void runGame();
 
-    const static int DEFAULT_NUM_UNDEPLOY;   //defaul num of undeployed armies
     static void readMapConfigFromFile(string filePath = DEFAULT_MAP_CONFIG);
 };
