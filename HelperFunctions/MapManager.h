@@ -85,23 +85,11 @@ private:
 
     const static tuple<int, int, int, int> DEFAULT_BACKGROUND_COLOR;
     const static string DEFAULT_MAP;
-    const static string DEFAULT_MAP_CONFIG;
-    const static string TERRITORIES_TITLE;
-    const static string CONTINENT_TITLE;
 
     const static int DEFAULT_MAP_FONT_SIZE = 14;
 
-    const static int COUNTRY_NAME_INDEX = 0;
-    const static int COUNTRY_COORDINATE_X = 1;
-    const static int COUNTRY_COORDINATE_Y = 2;
-    const static int ARMY_NUMBER_INDEX = 3;
-    const static int CONTINENT_NAME_INDEX = 4;
-    const static int ADJACENT_COUNTRIES_STARTS = 5;
-
     const static char *DEFAULT_FONT_PATH;
     const static char *DEFAULT_TEXT_FONT_PATH;
-    static double IMAGE_WIDTH_RATIO;
-    static double IMAGE_HEIGHT_RATIO;
 
     static SDL_Rect countryInfoRect;
     static SDL_Rect worldMapRect;
@@ -151,8 +139,6 @@ public:
     static void renderMessage(int x, int y, const char *message, tuple<int, int, int, int> color, int fontSize,
                               const char *fontPath = DEFAULT_FONT_PATH);
 
-    static void readMapConfigFromFile(string filePath = DEFAULT_MAP_CONFIG);
-
     static void detectImageWidthHeightRatio(string &mapPath);
 
     static string getCountryNameFromCoordinates(int x, int y);
@@ -194,4 +180,15 @@ public:
     static void nextStage();
 
     static ButtonType getButtonTypeFromStr(string buttonName);
+
+    const static int ADJACENT_COUNTRIES_STARTS = 5;
+    const static int ARMY_NUMBER_INDEX = 3;
+    const static int CONTINENT_NAME_INDEX = 4;
+    const static string CONTINENT_TITLE;
+    const static int COUNTRY_COORDINATE_X = 1;
+    const static int COUNTRY_COORDINATE_Y = 2;
+    const static int COUNTRY_NAME_INDEX = 0;
+    static double IMAGE_HEIGHT_RATIO;
+    static double IMAGE_WIDTH_RATIO;
+    const static string TERRITORIES_TITLE;
 };

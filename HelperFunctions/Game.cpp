@@ -3,6 +3,8 @@
 #include "MapManager.h"
 #include "ColorList.h"
 
+const string Game::DEFAULT_MAP_CONFIG = "../Maps/World.map";
+
 map<string, Country> Game::allCountries{map<string, Country>()};
 
 map<string, Continent> Game::allContinents{map<string, Continent>()};
@@ -303,3 +305,68 @@ void Game::runGame() {
 }
 
 
+void Game::readMapConfigFromFile(string filePath) {
+    fstream inFIle(filePath);
+    if (!inFIle.is_open()) {
+        cout << "Failed reading file from the path: " << filePath << endl;
+    } else {
+        string line;
+        map<string, Country> allCountries;
+        while (getline(inFIle, line)) {
+            if (line.find(MapManager::CONTINENT_TITLE) != string::npos) {
+                map<string, Continent> allContinents;
+                while (getline(inFIle, line)) {
+                    if (line.length() == 0) {
+                        break;
+                    } else {
+                        stringstream ss(line);
+                        string continentName;
+                        string bonus;
+
+                        getline(ss, continentName, '=');
+                        getline(ss, bonus, '=');
+
+                        Continent continent(continentName, stoi(bonus));
+                        allContinents.insert({continentName, continent});
+                    }
+                }
+                setAllContinents(allContinents);
+            }
+
+            if (line.find(MapManager::TERRITORIES_TITLE) != string::npos) {
+                while (getline(inFIle, line)) {
+                    if (line.length() == 0) {
+                        continue;
+                    } else {
+                        stringstream ss(line);
+                        vector<string> countryTokens;
+
+                        while (ss.good()) {
+                            string subString;
+                            getline(ss, subString, ',');
+                            countryTokens.push_back(subString);
+                        }
+                        ss.str("");
+                        ss.clear();
+
+                        string countryName = countryTokens.at(MapManager::COUNTRY_NAME_INDEX);
+                        int coordinateX = stoi(countryTokens.at(MapManager::COUNTRY_COORDINATE_X)) * MapManager::IMAGE_WIDTH_RATIO;
+                        int coordinateY = stoi(countryTokens.at(MapManager::COUNTRY_COORDINATE_Y)) * MapManager::IMAGE_HEIGHT_RATIO;
+                        string continentName = countryTokens.at(MapManager::CONTINENT_NAME_INDEX);
+                        int numOfArmy = stoi(countryTokens.at(MapManager::ARMY_NUMBER_INDEX));
+                        getAllContinents().find(continentName)->second.addCountryName(countryName);
+
+                        vector<string> adjacentCountries;
+                        for (int i = MapManager::ADJACENT_COUNTRIES_STARTS; i < countryTokens.size(); i++) {
+                            adjacentCountries.push_back(countryTokens.at(i));
+                        }
+                        Country country(countryName, coordinateX, coordinateY, adjacentCountries, numOfArmy);
+                        country.setContinentName(continentName);
+                        allCountries.insert({countryName, country});
+                    }
+                }
+            }
+        }
+        setAllCountries(allCountries);
+    }
+}

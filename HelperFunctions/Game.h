@@ -1,6 +1,11 @@
+#include <SDL.h>
+#include <SDL_image.h>
+#include <string>
+#include <SDL_ttf.h>
 #include "imports.h"
 #include "../Player.h"
 #include "../Continent.h"
+#include "Card.h"
 
 enum GameStage {
     DEPLOYMENT, ATTACK, MOVE, EXCHANGE_CARDS
@@ -15,6 +20,7 @@ private:
 
     static int curPlayerIndex;
     static GameStage curGameStage;
+    const static string DEFAULT_MAP_CONFIG;
 
 public:
     static vector<Player>& getAllPlayers();
@@ -57,4 +63,5 @@ public:
     static void runGame();
 
     const static int DEFAULT_NUM_UNDEPLOY;   //defaul num of undeployed armies
+    static void readMapConfigFromFile(string filePath = DEFAULT_MAP_CONFIG);
 };

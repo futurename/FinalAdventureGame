@@ -8,7 +8,7 @@ SDL_Texture *MapManager::gMapTexture = NULL;
 TTF_Font *MapManager::gFont = NULL;
 
 const string MapManager::DEFAULT_MAP = "../Maps/World.bmp";
-const string MapManager::DEFAULT_MAP_CONFIG = "../Maps/World.map";
+
 const string MapManager::TERRITORIES_TITLE = "Territories";
 const string MapManager::CONTINENT_TITLE = "Continents";
 
@@ -210,7 +210,7 @@ void MapManager::start(string mapPath) {
             //Rendering map vew port
             initMapImage();
 
-            readMapConfigFromFile();
+            Game::readMapConfigFromFile();
             Game::initPlayersAndCountries();
 
             initCountryMarks();
@@ -394,7 +394,7 @@ void MapManager::start(string mapPath) {
                                             curPlayer.removeUndeployArmy(number);
                                             deployCountry.addNumOfArmy(number);
 
-                                            if(curPlayer.getUndeployArmyNumber() == 0){
+                                            if (curPlayer.getUndeployArmyNumber() == 0) {
                                                 Game::setGameStage(ATTACK);
                                             }
                                             updateWholeScreen();
@@ -496,72 +496,6 @@ void MapManager::renderMessage(int x, int y, const char *message, tuple<int, int
     SDL_DestroyTexture(textTexture);
     SDL_FreeSurface(textSurface);
     resetToDefaultColor();
-}
-
-void MapManager::readMapConfigFromFile(string filePath) {
-    fstream inFIle(filePath);
-    if (!inFIle.is_open()) {
-        cout << "Failed reading file from the path: " << filePath << endl;
-    } else {
-        string line;
-        map<string, Country> allCountries;
-        while (getline(inFIle, line)) {
-            if (line.find(CONTINENT_TITLE) != string::npos) {
-                map<string, Continent> allContinents;
-                while (getline(inFIle, line)) {
-                    if (line.length() == 0) {
-                        break;
-                    } else {
-                        stringstream ss(line);
-                        string continentName;
-                        string bonus;
-
-                        getline(ss, continentName, '=');
-                        getline(ss, bonus, '=');
-
-                        Continent continent(continentName, stoi(bonus));
-                        allContinents.insert({continentName, continent});
-                    }
-                }
-                Game::setAllContinents(allContinents);
-            }
-
-            if (line.find(TERRITORIES_TITLE) != string::npos) {
-                while (getline(inFIle, line)) {
-                    if (line.length() == 0) {
-                        continue;
-                    } else {
-                        stringstream ss(line);
-                        vector<string> countryTokens;
-
-                        while (ss.good()) {
-                            string subString;
-                            getline(ss, subString, ',');
-                            countryTokens.push_back(subString);
-                        }
-                        ss.str("");
-                        ss.clear();
-
-                        string countryName = countryTokens.at(COUNTRY_NAME_INDEX);
-                        int coordinateX = stoi(countryTokens.at(COUNTRY_COORDINATE_X)) * IMAGE_WIDTH_RATIO;
-                        int coordinateY = stoi(countryTokens.at(COUNTRY_COORDINATE_Y)) * IMAGE_HEIGHT_RATIO;
-                        string continentName = countryTokens.at(CONTINENT_NAME_INDEX);
-                        int numOfArmy = stoi(countryTokens.at(ARMY_NUMBER_INDEX));
-                        Game::getAllContinents().find(continentName)->second.addCountryName(countryName);
-
-                        vector<string> adjacentCountries;
-                        for (int i = ADJACENT_COUNTRIES_STARTS; i < countryTokens.size(); i++) {
-                            adjacentCountries.push_back(countryTokens.at(i));
-                        }
-                        Country country(countryName, coordinateX, coordinateY, adjacentCountries, numOfArmy);
-                        country.setContinentName(continentName);
-                        allCountries.insert({countryName, country});
-                    }
-                }
-            }
-        }
-        Game::setAllCountries(allCountries);
-    }
 }
 
 void MapManager::detectImageWidthHeightRatio(string &mapPath) {
@@ -928,7 +862,7 @@ void MapManager::resetGame() {
 
     SDL_RenderClear(gRenderer);
     initMapImage();
-    readMapConfigFromFile();
+    Game::readMapConfigFromFile();
     Game::initPlayersAndCountries();
     initCountryMarks();
     initTextViewPort();
