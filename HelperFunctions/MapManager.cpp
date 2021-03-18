@@ -225,6 +225,7 @@ void MapManager::start(string mapPath) {
             //curplayer cal undeploy army.
             Player &curPlayer = Game::getAllPlayers().at(Game::getCurPlayerIndex());
             curPlayer.getCalUndeployArmyNumber();
+            updateWholeScreen();
 
             //Event handler
             SDL_Event e;
@@ -277,7 +278,7 @@ void MapManager::start(string mapPath) {
 
                                     //Move army if in Move stage and click a number button
                                     int numberIndex = getIndexOfDraggedNumber(dragStartPoint);
-                                    if (numberIndex >= 0 && countriesDraggedForMove) {
+                                    if (numberIndex >= 0 && Game::getGameStage() == MOVE && countriesDraggedForMove) {
                                         int number;
                                         if (numberIndex == NUMBER_STRING_VECTOR.size() - 1) {
                                             number = fromCountry->getNumOfArmy() - 1;
@@ -372,7 +373,7 @@ void MapManager::start(string mapPath) {
                                         }
                                     }
 
-                                    //deploy numbers
+                                    //deploy numbers if drag from number rect to an own country
                                     int numberIndex = getIndexOfDraggedNumber(dragStartPoint);
                                     if (numberIndex >= 0 &&
                                         isDragToOwnCountry(dragEndPoint, curPlayer.getPlayerIndex())) {
@@ -380,15 +381,22 @@ void MapManager::start(string mapPath) {
                                                                  "Own country", NULL);
 
                                         if (Game::getGameStage() == DEPLOYMENT) {
-                                            //FIXME
                                             string countryName = getCountryNameFromCoordinates(dragEndPoint.x,
                                                                                                dragEndPoint.y);
                                             Country &deployCountry = Game::getAllCountries().at(countryName);
-                                            int number = stoi(NUMBER_STRING_VECTOR.at(numberIndex));
+                                            int number;
+                                            if (numberIndex == NUMBER_STRING_VECTOR.size() - 1) {
+                                                number = curPlayer.getUndeployArmyNumber();
+                                            } else {
+                                                number = stoi(NUMBER_STRING_VECTOR.at(numberIndex));
+                                            }
 
-                                            //FIXME curplayer remove number from undeploy army.
                                             curPlayer.removeUndeployArmy(number);
                                             deployCountry.addNumOfArmy(number);
+
+                                            if(curPlayer.getUndeployArmyNumber() == 0){
+                                                Game::setGameStage(ATTACK);
+                                            }
                                             updateWholeScreen();
                                         }
                                     }
@@ -970,14 +978,14 @@ ButtonType MapManager::getButtonTypeFromStr(string buttonName) {
     return NONE;
 }
 
-CardType MapManager::getCardTypeFromString(string &cardStr) {
-    if(cardStr == "Artillery"){
+CardType MapManager::getCardTypeFromString(string cardStr) {
+    if (cardStr == "Artillery") {
         return ARTILLERY;
     }
-    if(cardStr == "Cavalry"){
+    if (cardStr == "Cavalry") {
         return CAVALRY;
     }
-    if(cardStr == "Infantry"){
+    if (cardStr == "Infantry") {
         return INFANTRY;
     }
 }

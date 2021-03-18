@@ -135,7 +135,7 @@ private:
 
     void static SDLClose();
 
-    static CardType getCardTypeFromString(string& cardStr);
+    static CardType getCardTypeFromString(string cardStr);
 
 public:
     static void initCountryMarks();
