@@ -1,4 +1,4 @@
-#include "HelperFunctions/Card.h"
+#include "Card.h"
 
 int Card::exchangeCards(vector<CardType> &cards, int exchangeTimes) {
     int result = 0;
