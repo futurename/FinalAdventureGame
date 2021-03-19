@@ -66,4 +66,8 @@ public:
     static void runGame();
 
     static void readMapConfigFromFile(string filePath = DEFAULT_MAP_CONFIG);
+
+    static void SaveMapConfigFromFile(string filePath = DEFAULT_MAP_CONFIG);    // Save
+
+    static void loadGameConfigFromFile(string filePath = DEFAULT_MAP_CONFIG);   // load
 };

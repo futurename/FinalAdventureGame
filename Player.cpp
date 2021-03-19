@@ -1,5 +1,6 @@
 #include "HelperFunctions/Game.h"
 #include "Player.h"
+#include <vector>
 
 const vector<string> Player::DEFAULT_PLAYER_NAMES{vector<string>{"You", "Napoleon", "Trump", "Putin", "Modi"}};
 
@@ -77,7 +78,7 @@ void Player::setUndeployArmyNumber(int newUndeployArmyNumber) {
 /*
  * check cards first: if player can / must exchange cards
    if can exchange: do multiplication.
-   return undeployed army number of the player
+   update undeployed army number of the player
 */
 void Player::getCalUndeployArmyNumber() {
     int exchangeBonus = Card::exchangeCards(cards, exchangeTimes);
@@ -97,4 +98,33 @@ int Player::getCardNumOfType(CardType type) {
         }
     }
     return result;
+}
+
+vector<Country> Player::getCapturedCountries(){
+    return capturedCountries;
+}
+
+int Player::getContinentBonus(){
+    return continentBonus;
+}
+
+int Player::getExchangeTimes(){
+    return exchangeTimes;
+}
+
+vector<string> Player::getCapturedCountryNames() {
+    vector <string> capturedCountryNames;
+
+    for (size_t i = 0; i < capturedCountries.size(); i++) {
+        capturedCountryNames.push_back(capturedCountries.at(i).getCountryName());
+    }
+    return capturedCountryNames;
+}
+
+void Player::setCapturedCountries(vector<Country>& newCapturedCountries){
+    capturedCountries = newCapturedCountries;
+}
+
+void Player::setExchangeTimes(int newExchangeTimes){
+    exchangeTimes = newExchangeTime;
 }
