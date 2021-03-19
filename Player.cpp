@@ -52,7 +52,6 @@ int Player::getPlayerIndex() const {
     return playerIndex;
 }
 
-
 int Player::getUndeployArmyNumber() const {
     return undeployArmyNumber;
 }
