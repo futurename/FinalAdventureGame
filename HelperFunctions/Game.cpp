@@ -9,11 +9,11 @@ vector<Player> Game::players{vector<Player>()};
 int Game::curPlayerIndex = 0;
 const int Game::DEFAULT_NUM_UNDEPLOY = 3;
 
-/*const string Game::DEFAULT_MAP = "../Maps/World.bmp";
-const string Game::DEFAULT_MAP_CONFIG = "../Maps/World.map";*/
+const string Game::DEFAULT_MAP = "../Maps/World.bmp";
+const string Game::DEFAULT_MAP_CONFIG = "../Maps/World.map";
 
-const string Game::DEFAULT_MAP = "../Maps/Atlantis.bmp";
-const string Game::DEFAULT_MAP_CONFIG = "../Maps/Atlantis.map";
+/*const string Game::DEFAULT_MAP = "../Maps/Atlantis.bmp";
+const string Game::DEFAULT_MAP_CONFIG = "../Maps/Atlantis.map";*/
 
 GameStage Game::curGameStage{DEPLOYMENT};
 bool Game::isConquerACountry = false;
