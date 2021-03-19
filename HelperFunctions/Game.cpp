@@ -2,8 +2,6 @@
 #include "Random.h"
 #include "MapManager.h"
 #include "ColorList.h"
-#include <fstream>
-using namespace std;
 
 map<string, Country> Game::allCountries{map<string, Country>()};
 map<string, Continent> Game::allContinents{map<string, Continent>()};
@@ -452,10 +450,9 @@ bool Game::hasAdjEnemyCountry(Country *pCountry) {
 }
 
 
-
 void Game::saveMapConfigFromFile(string filePath) {
 
-    ofstream outFile(filePath, os_base::app);
+    ofstream outFile(filePath, ios_base::app);
     if (!outFile.is_open()) {
         cout << "Failed opening file from the path: " << filePath << endl;
     } else {
@@ -463,10 +460,10 @@ void Game::saveMapConfigFromFile(string filePath) {
         outFile << endl;
         outFile << "[Players] " << endl;
 
-        for (size_t i = 0; i < players.size(); i++){
+        for (size_t i = 0; i < players.size(); i++) {
 
-            string isCurrentPlayer = (players.at(i).getPlayerIndex == curPlayerIndex) ? "True" : "False";
-            vector<CardType>cards = players.at(i).getCards();
+            string isCurrentPlayer = (players.at(i).getPlayerIndex() == curPlayerIndex) ? "True" : "False";
+            vector<CardType> cards = players.at(i).getCards();
 //            vector<Country> capturedCountries = players.at(i).getCapturedCountries();
             vector<string> capturedCountryNames = players.at(i).getCapturedCountryNames();
 
@@ -477,24 +474,24 @@ void Game::saveMapConfigFromFile(string filePath) {
             outFile << "CurrentPlayer=" << isCurrentPlayer << endl;
 
             outFile << "Cards=";
-            for (size_t i = 0; i < cards.size()-1; i++){
+            for (size_t i = 0; i < cards.size() - 1; i++) {
                 outFile << cards.at(i) << ",";
             }
-            outFile << card.at(cards.size()-1) << endl;
+            outFile << cards.at(cards.size() - 1) << endl;
 
             outFile << "Captured Countries=";
-            for (size_t i = 0; i < capturedCountryNames.size()-1; i++){
+            for (size_t i = 0; i < capturedCountryNames.size() - 1; i++) {
                 outFile << capturedCountryNames.at(i) << ",";
             }
-            outFile << capturedCountryNames.at(capturedCountryNames.size()-1) << endl;
+            outFile << capturedCountryNames.at(capturedCountryNames.size() - 1) << endl;
 
             outFile << "ContinentBonus=" << players.at(i).getContinentBonus() << endl;
 
             outFile << "Exchange Times=" << players.at(i).getExchangeTimes() << endl;
 
-            if (isCurrentPlayer){
+            if (isCurrentPlayer == "True") {
                 outFile << "Stage=" << curGameStage << endl;
-                if (curGameStage == DEPLOYMENT){
+                if (curGameStage == DEPLOYMENT) {
                     outFile << "UndeployedArmyNumber=" << players.at(i).getUndeployArmyNumber() << endl;
                 }
             }
@@ -554,8 +551,10 @@ void Game::loadGameConfigFromFile(string filePath) {
                         ss.clear();
 
                         string countryName = countryTokens.at(MapManager::COUNTRY_NAME_INDEX);
-                        int coordinateX = stoi(countryTokens.at(MapManager::COUNTRY_COORDINATE_X)) * MapManager::IMAGE_WIDTH_RATIO;
-                        int coordinateY = stoi(countryTokens.at(MapManager::COUNTRY_COORDINATE_Y)) * MapManager::IMAGE_HEIGHT_RATIO;
+                        int coordinateX = stoi(countryTokens.at(MapManager::COUNTRY_COORDINATE_X)) *
+                                          MapManager::IMAGE_WIDTH_RATIO;
+                        int coordinateY = stoi(countryTokens.at(MapManager::COUNTRY_COORDINATE_Y)) *
+                                          MapManager::IMAGE_HEIGHT_RATIO;
                         string continentName = countryTokens.at(MapManager::CONTINENT_NAME_INDEX);
                         int numOfArmy = stoi(countryTokens.at(MapManager::ARMY_NUMBER_INDEX));
                         getAllContinents().find(continentName)->second.addCountryName(countryName);
@@ -599,15 +598,15 @@ void Game::loadGameConfigFromFile(string filePath) {
                             while (ss.good()) {
                                 string subString;
                                 getline(ss, subString, ',');
-                                card = getCardTypeFromString(subString);
+                                CardType card = MapManager::getCardTypeFromString(subString);
                                 cards.push_back(card);
                             }
                             player.setCards(cards);
 
                             vector<string> capturedCountryNameTokens;
                             vector<Country> capturedCountries;
-
-                            getline(ss, capturedCountryNameTokens, '=');
+                            string countryName;
+                            getline(ss, countryName, '=');
                             while (ss.good()) {
                                 string subString;
                                 getline(ss, subString, ',');
@@ -622,9 +621,9 @@ void Game::loadGameConfigFromFile(string filePath) {
                             getline(ss, exchangeTimes, '=');
 
                             player.addContinentBonus(stoi(continentBonus));
-                            player.setExchangeTime(stoi(exchangeTimes));
+                            player.setExchangeTimes(stoi(exchangeTimes));
 
-                            if (isCurrentPlayer == "True"){
+                            if (isCurrentPlayer == "True") {
 
                                 curPlayerIndex = stoi(playerIndex);
                                 string stage;
@@ -633,7 +632,7 @@ void Game::loadGameConfigFromFile(string filePath) {
                                 getline(ss, stage, '=');
                                 getline(ss, undeployedArmyNumber, '=');
 
-                                curGameStage = getGameStageFromString(stage);
+                                curGameStage = MapManager::getGameStageFromString(stage);
 
                                 player.setUndeployArmyNumber(stoi(undeployedArmyNumber));
                             }
@@ -641,10 +640,11 @@ void Game::loadGameConfigFromFile(string filePath) {
                             players.push_back(player);
                         }
 
+                    }
+
                 }
-
+                setAllCountries(allCountries);
+            }
         }
-        setAllCountries(allCountries);
     }
-
 }

@@ -1081,31 +1081,18 @@ bool MapManager::isSameOwner(const string& fromCountryName, const string& toCoun
            Game::getAllCountries().at(toCountryName).getOwnerIndex();
 }
 
- MapManager::getCardTypeFromString(string cardStr) {
-    if (cardStr == "Artillery") {
-        return ARTILLERY;
-    }
-    if (cardStr == "Cavalry") {
-        return CAVALRY;
-    }
-    if (cardStr == "Infantry") {
-        return INFANTRY;
-    }
-}
+GameStage MapManager::getGameStageFromString(string stageStr){
 
-MapManager::getGameStageFromString(string stageStr){
-
-    if (stageStr == 'DEPLOYMENT'){
+    if (stageStr == "DEPLOYMENT"){
         return DEPLOYMENT;
     }
-    if (stageStr == 'ATTACK,'){
-        return ATTACK,;
+    if (stageStr == "ATTACK"){
+        return ATTACK;
     }
-    if (stageStr == 'MOVE'){
+    if (stageStr == "MOVE"){
     return MOVE;
     }
-    if (stageStr == 'EXCHANGE_CARDS'){
+    if (stageStr == "EXCHANGE_CARDS"){
     return EXCHANGE_CARDS;
     }
-
 }

@@ -117,5 +117,13 @@ void Player::setCapturedCountries(vector<Country>& newCapturedCountries){
 }
 
 void Player::setExchangeTimes(int newExchangeTimes){
-    exchangeTimes = newExchangeTime;
+    exchangeTimes = newExchangeTimes;
+}
+
+vector<CardType> &Player::getCards() {
+    return this->cards;
+}
+
+void Player::setCards(vector<CardType>& cards) {
+    this->cards = cards;
 }

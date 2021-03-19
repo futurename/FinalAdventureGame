@@ -54,6 +54,7 @@ public:
 
     void setCapturedCountries(vector<Country>& newCapturedCountries);
 
+    void setCards(vector<CardType>& cards);
 
 private:
     string playerName;

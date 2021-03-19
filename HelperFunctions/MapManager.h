@@ -124,10 +124,6 @@ private:
 
     void static SDLClose();
 
-    static CardType getCardTypeFromString(string& cardStr);
-
-    static GameStage getGameStageFromString(string stageStr);
-
 public:
     static void initCountryMarks();
 
@@ -201,4 +197,8 @@ public:
     static bool isSameOwner(const string& fromCountryName, const string& toCountryName);
     const static string CONTINENT_TITLE;
     const static string PLAYER_TITLE;
+
+    static CardType getCardTypeFromString(string& cardStr);
+
+    static GameStage getGameStageFromString(string stageStr);
 };
