@@ -243,7 +243,7 @@ void MapManager::start(string mapPath) {
                     const SDL_MessageBoxData resetMsgBoxData = {
                             SDL_MESSAGEBOX_INFORMATION, /* .flags */
                             nullptr, /* .window */
-                            "example message box", /* .title */
+                            "Reset Game", /* .title */
                             "Danger: you are resetting the game!", /* .message */
                             SDL_arraysize(MESSAGE_BOX_BUTTONS), /* .numbuttons */
                             MESSAGE_BOX_BUTTONS, /* .buttons */
