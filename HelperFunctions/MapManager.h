@@ -5,6 +5,7 @@
 #include <SDL_ttf.h>
 #include "Card.h"
 #include "../Player.h"
+#include "Game.h"
 
 class Country;
 
@@ -38,9 +39,9 @@ private:
     const static int COUNTRY_TEXT_HEIGHT_SHIFT = 18;
 
     const static int NUMBER_LIST_WIDTH = PLAYER_INFO_WIDTH;
-    const static int NUMBER_LIST_HEIGHT = 100;
+    const static int NUMBER_LIST_HEIGHT = 140;
     const static int NUMBER_LIST_X = 35;
-    const static int NUMBER_LIST_GAP = 30;
+    const static int NUMBER_LIST_GAP = 25;
     const static int NUMBER_LIST_ABSOLUTE_Y = PLAYER_INFO_HEIGHT + COUNTRY_INFO_HEIGHT;
     const static int NUMBER_LIST_SPACE = 50;
     const static int NUMBER_LIST_FONT_SIZE = 18;
@@ -85,7 +86,6 @@ private:
     static map<ButtonType, SDL_Point> buttonCoordinates;
 
     const static tuple<int, int, int, int> DEFAULT_BACKGROUND_COLOR;
-    const static string DEFAULT_MAP;
 
     const static int DEFAULT_MAP_FONT_SIZE = 14;
 
@@ -120,7 +120,7 @@ private:
 
     bool static SDLInit();
 
-    bool static SDLLoadMedia(string mapPath = DEFAULT_MAP);
+    bool static SDLLoadMedia(string mapPath = Game::DEFAULT_MAP);
 
     void static SDLClose();
 
@@ -129,7 +129,7 @@ private:
 public:
     static void initCountryMarks();
 
-    static void start(string mapPath = DEFAULT_MAP);
+    static void start(string mapPath = Game::DEFAULT_MAP);
 
     static void initMapImage();
 
@@ -196,8 +196,6 @@ public:
     static bool isAdjacentCountry(Country *attackingCountry, Country *defendingCountry);
 
     static bool canAttackFromAnyCountry(Player &player);
-
-    static vector<Country*> getPlayerCountries(int playerIndex);
 
     static bool isSameOwner(string fromCountryName, string toCountryName);
 };

@@ -9,9 +9,11 @@ map<string, Continent> Game::allContinents{map<string, Continent>()};
 vector<Player> Game::players{vector<Player>()};
 int Game::curPlayerIndex = 0;
 const int Game::DEFAULT_NUM_UNDEPLOY = 3;
+const string Game::DEFAULT_MAP = "../Maps/World.bmp";
 GameStage Game::curGameStage{DEPLOYMENT};
 bool Game::isConquerACountry = false;
 bool Game::ifClickedNext = false;
+bool Game::isHumanPlayer = curPlayerIndex == 0;
 
 vector<Player> &Game::getAllPlayers() {
     return players;
@@ -92,7 +94,7 @@ void Game::printAllContinents() {
 //call attackFrom()
 //updateWorldmap();
 
-void Game::attackFrom(Country& attackCountry, Country& defendCountry) {
+void Game::attackFrom(Country &attackCountry, Country &defendCountry) {
     for (int i = 0; i < attackCountry.getCountryArmy(); i++) {
         pair<int, int> attackerDice = Random::RollDie(attackCountry.getCountryArmy());
         pair<int, int> defenderDice = Random::RollDie(defendCountry.getCountryArmy());
@@ -116,7 +118,7 @@ void Game::attackFrom(Country& attackCountry, Country& defendCountry) {
             attackCountry.setNumOfArmy(1);
             defendCountry.setNumOfArmy(moveArmy);
 
-            isConquerACountry= true;
+            isConquerACountry = true;
         }
     }
 }
@@ -169,14 +171,12 @@ void Game::checkInitContinentsOwner() {
     }
 }
 
-
 /*
  *0. validate the dragged number is equal to or less than the remaining number.
   1. init undeployed army numbers: 3 by default + bonus from the player attr.
   2. after the player selects a country and a certain number, add the army num to the country and subtract this from the total undeployed army number.
   3. the function is called repeatedly until there is no more undeployed army.
 */
-
 bool Game::deployArmy(Country &country, Player &player, int numToDeploy) {
     //Num of armies given depends on player's captured countries. Min is 3.
     int numOfArmyGiven = max(DEFAULT_NUM_UNDEPLOY, player.getNumOfCapturedCountries() / 3);
@@ -201,19 +201,8 @@ bool Game::deployArmy(Country &country, Player &player, int numToDeploy) {
 
         player.setUndeployArmyNumber(totalUndeployed - newNumOfArmy);
     }
-
-
-
-//    bool RemainingIsZero = totalUndeployed < 0;
-//
-//    if (totalUndeployed <= 0){
-//        RemainingIsZero = true;
-//    }
-
-
     return totalUndeployed <= 0;
 }
-
 
 void Game::conquerTheCountry(Country &attackCountry, Country &defendCountry) {
     Player &attacker = players.at(attackCountry.getOwnerIndex());
@@ -275,22 +264,8 @@ GameStage Game::getGameStage() {
 
 
 void Game::runGame() {
-
-    // MOVE STAGE
-    // validate the player drag from one owned country to an adjacent owned country.
-    //how to display??
-    //A button to confirm finish move.
-
-
-    //ATTACK STAGE
-    //one successful attack in a round can get a card(random)
-    //vector for the player
-    //check cards at the end of the attack.
-
-    //call this after deploy
-    MapManager::updateWholeScreen();
+    MapManager::start(DEFAULT_MAP);
 }
-
 
 void Game::readMapConfigFromFile(string filePath) {
     fstream inFIle(filePath);
@@ -337,8 +312,10 @@ void Game::readMapConfigFromFile(string filePath) {
                         ss.clear();
 
                         string countryName = countryTokens.at(MapManager::COUNTRY_NAME_INDEX);
-                        int coordinateX = stoi(countryTokens.at(MapManager::COUNTRY_COORDINATE_X)) * MapManager::IMAGE_WIDTH_RATIO;
-                        int coordinateY = stoi(countryTokens.at(MapManager::COUNTRY_COORDINATE_Y)) * MapManager::IMAGE_HEIGHT_RATIO;
+                        int coordinateX = stoi(countryTokens.at(MapManager::COUNTRY_COORDINATE_X)) *
+                                          MapManager::IMAGE_WIDTH_RATIO;
+                        int coordinateY = stoi(countryTokens.at(MapManager::COUNTRY_COORDINATE_Y)) *
+                                          MapManager::IMAGE_HEIGHT_RATIO;
                         string continentName = countryTokens.at(MapManager::CONTINENT_NAME_INDEX);
                         int numOfArmy = stoi(countryTokens.at(MapManager::ARMY_NUMBER_INDEX));
                         getAllContinents().find(continentName)->second.addCountryName(countryName);
@@ -356,4 +333,81 @@ void Game::readMapConfigFromFile(string filePath) {
         }
         setAllCountries(allCountries);
     }
+}
+
+void Game::robotDeploy() {
+    Player &robotPlayer = Game::getAllPlayers().at(Game::curPlayerIndex);
+    vector<Country *> robotCountries = getPlayerCountries(curPlayerIndex);
+    robotPlayer.getCalUndeployArmyNumber();
+    int armyToDeploy = robotPlayer.getUndeployArmyNumber();
+    Country *maxArmyCountry = robotCountries.at(0);
+    for (int i = 1; i < robotCountries.size(); i++) {
+        if (robotCountries.at(i)->getNumOfArmy() > maxArmyCountry->getNumOfArmy()) {
+            if (hasAdjEnemyCountry(robotCountries.at(i))) {
+                maxArmyCountry = robotCountries.at(i);
+            }
+        }
+    }
+    maxArmyCountry->addNumOfArmy(armyToDeploy);
+    robotPlayer.removeUndeployArmy(armyToDeploy);
+}
+
+void Game::robotAttack() {
+    Player &robotPlayer = Game::getAllPlayers().at(Game::curPlayerIndex);
+    vector<Country *> robotCountries = getPlayerCountries(curPlayerIndex);
+    robotPlayer.getCalUndeployArmyNumber();
+
+    Country *maxArmyCountry = robotCountries.at(0);
+    for (int i = 1; i < robotCountries.size(); i++) {
+        if (robotCountries.at(i)->getNumOfArmy() > maxArmyCountry->getNumOfArmy()) {
+            if (hasAdjEnemyCountry(robotCountries.at(i))) {
+                maxArmyCountry = robotCountries.at(i);
+            }
+        }
+    }
+    vector<string> adjacentCountryNames = Game::getAllCountries().at(
+            maxArmyCountry->getCountryName()).getAdjacentCountires();
+    Country *weakestCountry = nullptr;
+    for (auto &countryName : adjacentCountryNames) {
+        Country &adjCountry = Game::getAllCountries().at(countryName);
+        if (adjCountry.getOwnerIndex() == curPlayerIndex) {
+            continue;
+        } else {
+            if (weakestCountry == nullptr) {
+                weakestCountry = &adjCountry;
+            } else {
+                weakestCountry =
+                        weakestCountry->getNumOfArmy() > adjCountry.getCountryArmy() ? &adjCountry : weakestCountry;
+            }
+        }
+    }
+
+    if (weakestCountry != nullptr) {
+        Game::attackFrom(*maxArmyCountry, *weakestCountry);
+    }
+}
+
+void Game::robotMove() {
+
+}
+
+vector<Country *> Game::getPlayerCountries(int playerIndex) {
+    vector<Country *> result;
+    for (auto &item : getAllCountries()) {
+        if (item.second.getOwnerIndex() == playerIndex) {
+            result.push_back(&item.second);
+        }
+    }
+    return result;
+}
+
+bool Game::hasAdjEnemyCountry(Country *pCountry) {
+    vector<string> adjCountryNames = pCountry->getAdjacentCountires();
+    for (auto &countryName: adjCountryNames) {
+        Country &country = Game::getAllCountries().at(countryName);
+        if (country.getOwnerIndex() != pCountry->getOwnerIndex()) {
+            return true;
+        }
+    }
+    return false;
 }

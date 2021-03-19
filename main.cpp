@@ -7,7 +7,7 @@ int main(int argc, char *args[]) {
     srand((unsigned) time(nullptr));
 
     //MOVE TO GAME.RUNGAME()
-    MapManager::start("../Maps/World.bmp");
+    Game::runGame();
 /*
       MapManager::readMapConfigFromFile();
       Game::printAllContinents();
