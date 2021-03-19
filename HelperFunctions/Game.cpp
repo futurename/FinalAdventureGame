@@ -340,12 +340,17 @@ void Game::robotDeploy() {
     vector<Country *> robotCountries = getPlayerCountries(curPlayerIndex);
     robotPlayer.getCalUndeployArmyNumber();
     int armyToDeploy = robotPlayer.getUndeployArmyNumber();
-    Country *maxArmyCountry = robotCountries.at(0);
-    for (int i = 1; i < robotCountries.size(); i++) {
-        if (robotCountries.at(i)->getNumOfArmy() > maxArmyCountry->getNumOfArmy()) {
-            if (hasAdjEnemyCountry(robotCountries.at(i))) {
-                maxArmyCountry = robotCountries.at(i);
-            }
+    Country *maxArmyCountry = nullptr;
+    for (auto &country : robotCountries) {
+        if (hasAdjEnemyCountry(country)) {
+            maxArmyCountry = country;
+            break;
+        }
+    }
+    for (int i = 0; i < robotCountries.size(); i++) {
+        if (hasAdjEnemyCountry(robotCountries.at(i)) &&
+            robotCountries.at(i)->getNumOfArmy() > maxArmyCountry->getNumOfArmy()) {
+            maxArmyCountry = robotCountries.at(i);
         }
     }
     maxArmyCountry->addNumOfArmy(armyToDeploy);
@@ -353,11 +358,10 @@ void Game::robotDeploy() {
 }
 
 void Game::robotAttack() {
-    int randMax = Random::generateRandomNum(ROBOT_MAX_RAND_NUM_LOWER,ROBOT_MAX_RAND_NUM_UPPER);
-    while(true) {
+    int randMax = Random::generateRandomNum(ROBOT_MAX_RAND_NUM_LOWER, ROBOT_MAX_RAND_NUM_UPPER);
+    while (true) {
         Player &robotPlayer = Game::getAllPlayers().at(Game::curPlayerIndex);
         vector<Country *> robotCountries = getPlayerCountries(curPlayerIndex);
-        robotPlayer.getCalUndeployArmyNumber();
 
         Country *maxArmyCountry = robotCountries.at(0);
         for (int i = 1; i < robotCountries.size(); i++) {
@@ -369,7 +373,7 @@ void Game::robotAttack() {
         }
         vector<string> adjacentCountryNames = Game::getAllCountries().at(
                 maxArmyCountry->getCountryName()).getAdjacentCountires();
-        if(maxArmyCountry->getNumOfArmy() < randMax){
+        if (maxArmyCountry->getNumOfArmy() < randMax || !hasAdjEnemyCountry(maxArmyCountry)) {
             break;
         }
         Country *weakestCountry = nullptr;
@@ -382,7 +386,8 @@ void Game::robotAttack() {
                     weakestCountry = &adjCountry;
                 } else {
                     weakestCountry =
-                            weakestCountry->getNumOfArmy() > adjCountry.getCountryArmy() ? &adjCountry : weakestCountry;
+                            weakestCountry->getNumOfArmy() >= adjCountry.getCountryArmy() ? &adjCountry
+                                                                                          : weakestCountry;
                 }
             }
         }
@@ -394,7 +399,26 @@ void Game::robotAttack() {
 }
 
 void Game::robotMove() {
+    Player &robotPlayer = Game::getAllPlayers().at(Game::curPlayerIndex);
+    vector<Country *> robotCountries = getPlayerCountries(curPlayerIndex);
 
+    Country *maxArmyCountry = robotCountries.at(0);
+
+    for (auto &robotCountry : robotCountries) {
+        if (robotCountry->getNumOfArmy() > maxArmyCountry->getNumOfArmy()) {
+            maxArmyCountry = robotCountry;
+        }
+    }
+
+    if (!hasAdjEnemyCountry(maxArmyCountry)) {
+        vector<string> &adjCountries = Game::getAllCountries().at(
+                maxArmyCountry->getCountryName()).getAdjacentCountires();
+        int randNum = Random::generateRandomNum(0, adjCountries.size() - 1);
+        string randCountryName = adjCountries.at(randNum);
+        int armyToMove = Game::getAllCountries().at(maxArmyCountry->getCountryName()).getNumOfArmy() - 1;
+        Game::getAllCountries().at(randCountryName).addNumOfArmy(armyToMove);
+        maxArmyCountry->reduceNumOfArmy(armyToMove);
+    }
 }
 
 vector<Country *> Game::getPlayerCountries(int playerIndex) {

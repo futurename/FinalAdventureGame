@@ -928,13 +928,19 @@ void MapManager::nextStage() {
         } else if (Game::getGameStage() == MOVE) {
             int curPlayerIndex = Game::getCurPlayerIndex();
             int playerIndex = ++curPlayerIndex % Game::getAllPlayers().size();
-            while (Game::getPlayerCountries(playerIndex).empty()) {
+            Game::setCurPlayerIndex(playerIndex);
+            while (Game::getPlayerCountries(Game::getCurPlayerIndex()).empty()) {
+                if (playerIndex == 0) {
+                    Game::isHumanPlayer = true;
+                    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT,
+                                             "You Lose",
+                                             "You lose all countries!", NULL);
+                    break;
+                }
+
                 curPlayerIndex = Game::getCurPlayerIndex();
                 playerIndex = ++curPlayerIndex % Game::getAllPlayers().size();
                 Game::setCurPlayerIndex(playerIndex);
-                if(playerIndex == 0){
-                    Game::isHumanPlayer = true;
-                }
             }
             Game::setCurPlayerIndex(playerIndex);
             Game::setGameStage(DEPLOYMENT);
@@ -954,14 +960,12 @@ void MapManager::nextStage() {
                     updateWholeScreen();
 
                     Game::setGameStage(ATTACK);
-
                     if (Game::isConquerACountry) {
                         CardType card = Card::getBonusCard();
                         robotPlayer = Game::getAllPlayers().at(Game::getCurPlayerIndex());
                         robotPlayer.addCard(card);
                         Game::isConquerACountry = false;
                     }
-
                     updateWholeScreen();
 
                     Game::robotAttack();
@@ -975,14 +979,21 @@ void MapManager::nextStage() {
 
                     int curPlayerIndex = Game::getCurPlayerIndex();
                     int playerIndex = ++curPlayerIndex % Game::getAllPlayers().size();
-                    while (Game::getPlayerCountries(playerIndex).empty()) {
+                    Game::setCurPlayerIndex(playerIndex);
+                    while (Game::getPlayerCountries(Game::getCurPlayerIndex()).empty()) {
+                        if (playerIndex == 0) {
+                            Game::isHumanPlayer = true;
+                            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT,
+                                                     "You Lose",
+                                                     "You lose all countries!", NULL);
+                            break;
+                        }
+
                         curPlayerIndex = Game::getCurPlayerIndex();
                         playerIndex = ++curPlayerIndex % Game::getAllPlayers().size();
                         Game::setCurPlayerIndex(playerIndex);
-                        if(playerIndex == 0){
-                            Game::isHumanPlayer = true;
-                        }
                     }
+
                     Game::setCurPlayerIndex(playerIndex);
                     Game::setGameStage(DEPLOYMENT);
                     Player &curPlayer = Game::getAllPlayers().at(Game::getCurPlayerIndex());
