@@ -64,7 +64,7 @@ private:
     const static int CARDS_TEXT_GAP = 30;
     const static int CARDS_LIST_FONT_SIZE = 22;
     static tuple<int, int, int, int> CARDS_IMAGE_BORDER_COLOR;
-    static vector<const char *> CRAD_IMAGE_PATH_LIST;
+    static vector<const char *> CARD_IMAGE_PATH_LIST;
     static vector<string> CARDS_TYPE_LIST;
 
     const static int BUTTONS_WIDTH = PLAYER_INFO_WIDTH;
@@ -79,8 +79,8 @@ private:
     const static int BUTTONS_UPPER_Y = 20;
     const static int BUTTONS_TEXT_FONT_SIZE = 22;
     static vector<string> buttonNames;
-    static tuple<int, int, int, int> BUTTONS_BACKGROUND_COLOR;
-    static tuple<int, int, int, int> BUTTONS_BORDER_COLOR;
+    const static tuple<int, int, int, int> BUTTONS_BACKGROUND_COLOR;
+    const static tuple<int, int, int, int> BUTTONS_BORDER_COLOR;
     static tuple<int, int, int, int> BUTTONS_TEXT_COLOR;
     const static char* BUTTONS_FONT_PATH;
     static map<ButtonType, SDL_Point> buttonCoordinates;
@@ -92,22 +92,16 @@ private:
     const static char *DEFAULT_FONT_PATH;
     const static char *DEFAULT_TEXT_FONT_PATH;
 
-    static SDL_Rect countryInfoRect;
-    static SDL_Rect worldMapRect;
-    static SDL_Rect playerInfoRect;
-    static SDL_Rect numberListRect;
-    static SDL_Rect cardsListRect;
-    static SDL_Rect buttonsRect;
+    const static SDL_Rect countryInfoRect;
+    const static SDL_Rect worldMapRect;
+    const static SDL_Rect playerInfoRect;
+    const static SDL_Rect numberListRect;
+    const static SDL_Rect cardsListRect;
+    const static SDL_Rect buttonsRect;
 
     static Country *fromCountry, *toCountry;
 
     const static SDL_MessageBoxColorScheme MESSAGE_BOX_COLOR_SCHEME;
-
-    const static int ANIMATION_RECT_WIDTH = 300;
-    const static int ANIMATION_RECT_HEIGHT = 200;
-    const static int ANIMATION_RECT_X = 400;
-    const static int ANIMATION_RECT_Y = 500;
-    static string ANIMATION_IMG_PATH;
 
     //Loads individual image as texture
     static SDL_Texture *loadTexture(std::string path);
@@ -186,7 +180,7 @@ public:
 
     static void nextStage();
 
-    static ButtonType getButtonTypeFromStr(string buttonName);
+    static ButtonType getButtonTypeFromStr(const string& buttonName);
 
     const static int ADJACENT_COUNTRIES_STARTS = 5;
     const static int ARMY_NUMBER_INDEX = 3;
@@ -203,5 +197,5 @@ public:
 
     static bool canAttackFromAnyCountry(Player &player);
 
-    static bool isSameOwner(string fromCountryName, string toCountryName);
+    static bool isSameOwner(const string& fromCountryName, const string& toCountryName);
 };
