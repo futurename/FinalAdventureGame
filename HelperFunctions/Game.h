@@ -1,3 +1,5 @@
+#ifndef FINALGAMEDESIGN_GAME_H
+#define FINALGAMEDESIGN_GAME_H
 #include <SDL.h>
 #include <SDL_image.h>
 #include <string>
@@ -21,9 +23,14 @@ private:
     static int curPlayerIndex;
     static GameStage curGameStage;
     const static string DEFAULT_MAP_CONFIG;
-
+    const static int ROBOT_MAX_RAND_NUM_UPPER = 6;
+    const static int ROBOT_MAX_RAND_NUM_LOWER = 2;
 public:
     const static int DEFAULT_NUM_UNDEPLOY;
+    static bool isConquerACountry;
+    static bool ifClickedNext;
+    static bool isHumanPlayer;
+    const static string DEFAULT_MAP;
 
     static vector<Player> &getAllPlayers();
 
@@ -41,7 +48,7 @@ public:
 
     static void printAllContinents();
 
-    static void attackFrom(Country attacker, Country defender);
+    static void attackFrom(Country& attackCountry, Country& defendCountry);
 
     static bool isContinentConquered(int index, const string &continentName);
 
@@ -67,7 +74,18 @@ public:
 
     static void readMapConfigFromFile(string filePath = DEFAULT_MAP_CONFIG);
 
+    static void robotDeploy();
+
+    static void robotAttack();
+
+    static void robotMove();
+
+    static vector<Country*> getPlayerCountries(int playerIndex);
+
+    static bool hasAdjEnemyCountry(Country *pCountry);
+
     static void SaveMapConfigFromFile(string filePath = DEFAULT_MAP_CONFIG);    // Save
 
     static void loadGameConfigFromFile(string filePath = DEFAULT_MAP_CONFIG);   // load
 };
+#endif

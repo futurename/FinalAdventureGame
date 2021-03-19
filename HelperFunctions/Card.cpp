@@ -1,4 +1,5 @@
 #include "Card.h"
+#include "Random.h"
 
 int Card::exchangeCards(vector<CardType> &cards, int exchangeTimes) {
     int result = 0;
@@ -23,7 +24,7 @@ int Card::exchangeCards(vector<CardType> &cards, int exchangeTimes) {
             diffTypeCounter++;
         }
         if (sameTypeCounter == CARD_EXCHANGE_THRESHOLD) {
-            cards.erase(cards.end() - i, cards.end() - i + sameTypeCounter);
+            cards.erase(cards.begin() + i, cards.begin() + i + sameTypeCounter);
             result += CARD_EXCHANGE_BASE * exchangeTimes;
             break;
         }
@@ -42,4 +43,16 @@ int Card::exchangeCards(vector<CardType> &cards, int exchangeTimes) {
         }
     }
     return result;
+}
+
+CardType Card::getBonusCard() {
+    int randIndex = Random::generateRandomNum(0,2);
+    switch (randIndex) {
+        case 0:
+            return ARTILLERY;
+        case 1:
+            return CAVALRY;
+        default:
+            return INFANTRY;
+    }
 }

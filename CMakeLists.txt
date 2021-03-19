@@ -3,14 +3,7 @@ project(FinalGameDesign)
 
 add_executable(FinalGameDesign main.cpp Continent.cpp Continent.h Country.cpp Country.h
         HelperFunctions/imports.h Player.cpp Player.h HelperFunctions/MapManager.cpp HelperFunctions/MapManager.h HelperFunctions/ColorList.h HelperFunctions/ColorList.cpp
-        HelperFunctions/Game.h HelperFunctions/Game.cpp Random.h Random.cpp HelperFunctions/Card.h HelperFunctions/Card.cpp)
-
-
-#[[
-add_executable(FinalGameDesign SDL2SampleCodes/17_mouse_events/17_mouse_events.cpp)]]
-#[[
-add_executable(FinalGameDesign SDL2SampleCodes/43_render_to_texture/43_render_to_texture.cpp)]]
-
+        HelperFunctions/Game.h HelperFunctions/Game.cpp HelperFunctions/Random.h HelperFunctions/Random.cpp HelperFunctions/Card.h HelperFunctions/Card.cpp)
 
 set(SDL2_LIB_DIR lib_sdl2/lib)
 set(SDL2_INCLUDE_DIR lib_sdl2/include/SDL2)

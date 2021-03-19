@@ -10,11 +10,7 @@ Player::Player(int index, string name) {
     if (name.empty()) {
         this->playerName = DEFAULT_PLAYER_NAMES.at(index);
     }
-    cards = {CAVALRY, INFANTRY, CAVALRY, INFANTRY, ARTILLERY, INFANTRY};
-}
-
-void Player::SetPlayerName(string inPlayerName) {
-    playerName = inPlayerName;
+    cards = {};
 }
 
 string Player::getPlayerName() {
@@ -23,14 +19,6 @@ string Player::getPlayerName() {
 
 void Player::addCard(CardType card) {
     cards.push_back(card);
-}
-
-void Player::setCards(vector<CardType> &newCards) {
-    cards = newCards;
-}
-
-vector<CardType> &Player::getCards() {
-    return cards;
 }
 
 void Player::addContinentBonus(int bonus) {
@@ -83,7 +71,10 @@ void Player::setUndeployArmyNumber(int newUndeployArmyNumber) {
 void Player::getCalUndeployArmyNumber() {
     int exchangeBonus = Card::exchangeCards(cards, exchangeTimes);
     exchangeTimes += exchangeBonus > 0 ? 1 : 0;
-    this->undeployArmyNumber = Game::DEFAULT_NUM_UNDEPLOY + continentBonus + exchangeBonus;
+    int numOfCountries = Game::getPlayerCountries(playerIndex).size();
+    int baseUndeployArmy =
+            Game::DEFAULT_NUM_UNDEPLOY > numOfCountries / 3 ? Game::DEFAULT_NUM_UNDEPLOY : numOfCountries / 3;
+    this->undeployArmyNumber = baseUndeployArmy + continentBonus + exchangeBonus;
 }
 
 void Player::removeUndeployArmy(int numOfArmy) {
@@ -92,8 +83,8 @@ void Player::removeUndeployArmy(int numOfArmy) {
 
 int Player::getCardNumOfType(CardType type) {
     int result;
-    for(CardType c: cards){
-        if(c==type){
+    for (CardType c: cards) {
+        if (c == type) {
             result++;
         }
     }

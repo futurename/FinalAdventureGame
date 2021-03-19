@@ -10,9 +10,6 @@ class Player {
 public:
     Player(int index, string name = "");
 
-    // Accessors and mutators for private attributes
-    void SetPlayerName(string inPlayerName);
-
     string getPlayerName();
 
     vector<Country> getCapturedCountries();
@@ -20,8 +17,6 @@ public:
     vector<string> getCapturedCountryNames();
 
     void addCard(CardType card);
-
-    void setCards(vector<CardType>& cards);
 
     vector<CardType>& getCards();
 

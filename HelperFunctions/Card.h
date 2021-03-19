@@ -12,5 +12,6 @@ private:
     static const int CARD_EXCHANGE_THRESHOLD = 3;
 public:
     static int exchangeCards(vector<CardType> &cards, int exchangeTimes);
+    static CardType getBonusCard();
 };
-#endif //FINALGAMEDESIGN_SDF_H
+#endif

@@ -23,9 +23,9 @@ Argentina,263,407,3,South America,Peru,Brazil
 Brazil,314,337,2,South America,Venezuala,Peru,Argentina,N-Africa
 
 N-Africa,422,264,2,Africa,Brazil,W-Europe,S-Europe,Egypt,E-Africa,Congo
-Congo,470,318,2,Africa,N-Africa,E-Africa,South Africa
+Congo,470,318,2,Africa,N-Africa,E-Africa,S-Africa
 S-Africa,483,371,2,Africa,Congo,E-Africa,Madagascar
-Madagascar,540,361,3,Africa,E-Africa,South Africa
+Madagascar,540,361,3,Africa,E-Africa,S-Africa
 E-Africa,524,295,2,Africa,Egypt,M-East,Congo,N-Africa,S-Africa,Madagascar
 Egypt,480,249,3,Africa,S-Europe,N-Africa,M-East,E-Africa
 
