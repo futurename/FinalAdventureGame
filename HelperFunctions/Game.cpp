@@ -2,6 +2,8 @@
 #include "Random.h"
 #include "MapManager.h"
 #include "ColorList.h"
+#include <fstream>
+using namespace std;
 
 map<string, Country> Game::allCountries{map<string, Country>()};
 map<string, Continent> Game::allContinents{map<string, Continent>()};
@@ -206,6 +208,8 @@ bool Game::deployArmy(Country &country, Player &player, int numToDeploy) {
 
         player.setUndeployArmyNumber(totalUndeployed - newNumOfArmy);
     }
+
+
     return totalUndeployed <= 0;
 }
 
@@ -445,4 +449,202 @@ bool Game::hasAdjEnemyCountry(Country *pCountry) {
         }
     }
     return false;
+}
+
+
+
+void Game::saveMapConfigFromFile(string filePath) {
+
+    ofstream outFile(filePath, os_base::app);
+    if (!outFile.is_open()) {
+        cout << "Failed opening file from the path: " << filePath << endl;
+    } else {
+
+        outFile << endl;
+        outFile << "[Players] " << endl;
+
+        for (size_t i = 0; i < players.size(); i++){
+
+            string isCurrentPlayer = (players.at(i).getPlayerIndex == curPlayerIndex) ? "True" : "False";
+            vector<CardType>cards = players.at(i).getCards();
+//            vector<Country> capturedCountries = players.at(i).getCapturedCountries();
+            vector<string> capturedCountryNames = players.at(i).getCapturedCountryNames();
+
+            outFile << "PlayerName=" << players.at(i).getPlayerName() << endl;
+
+            outFile << "PlayerIndex=" << players.at(i).getPlayerIndex() << endl;
+
+            outFile << "CurrentPlayer=" << isCurrentPlayer << endl;
+
+            outFile << "Cards=";
+            for (size_t i = 0; i < cards.size()-1; i++){
+                outFile << cards.at(i) << ",";
+            }
+            outFile << card.at(cards.size()-1) << endl;
+
+            outFile << "Captured Countries=";
+            for (size_t i = 0; i < capturedCountryNames.size()-1; i++){
+                outFile << capturedCountryNames.at(i) << ",";
+            }
+            outFile << capturedCountryNames.at(capturedCountryNames.size()-1) << endl;
+
+            outFile << "ContinentBonus=" << players.at(i).getContinentBonus() << endl;
+
+            outFile << "Exchange Times=" << players.at(i).getExchangeTimes() << endl;
+
+            if (isCurrentPlayer){
+                outFile << "Stage=" << curGameStage << endl;
+                if (curGameStage == DEPLOYMENT){
+                    outFile << "UndeployedArmyNumber=" << players.at(i).getUndeployArmyNumber() << endl;
+                }
+            }
+
+
+        }
+
+        outFile << "" << endl;
+
+        outFile.close();
+    }
+}
+
+
+void Game::loadGameConfigFromFile(string filePath) {
+    fstream inFIle(filePath);
+    if (!inFIle.is_open()) {
+        cout << "Failed reading file from the path: " << filePath << endl;
+    } else {
+        string line;
+        map<string, Country> allCountries;
+        while (getline(inFIle, line)) {
+            if (line.find(MapManager::CONTINENT_TITLE) != string::npos) {
+                map<string, Continent> allContinents;
+                while (getline(inFIle, line)) {
+                    if (line.length() == 0) {
+                        break;
+                    } else {
+                        stringstream ss(line);
+                        string continentName;
+                        string bonus;
+
+                        getline(ss, continentName, '=');
+                        getline(ss, bonus, '=');
+
+                        Continent continent(continentName, stoi(bonus));
+                        allContinents.insert({continentName, continent});
+                    }
+                }
+                setAllContinents(allContinents);
+            }
+
+            if (line.find(MapManager::TERRITORIES_TITLE) != string::npos) {
+                while (getline(inFIle, line)) {
+                    if (line.length() == 0) {
+                        continue;
+                    } else {
+                        stringstream ss(line);
+                        vector<string> countryTokens;
+
+                        while (ss.good()) {
+                            string subString;
+                            getline(ss, subString, ',');
+                            countryTokens.push_back(subString);
+                        }
+                        ss.str("");
+                        ss.clear();
+
+                        string countryName = countryTokens.at(MapManager::COUNTRY_NAME_INDEX);
+                        int coordinateX = stoi(countryTokens.at(MapManager::COUNTRY_COORDINATE_X)) * MapManager::IMAGE_WIDTH_RATIO;
+                        int coordinateY = stoi(countryTokens.at(MapManager::COUNTRY_COORDINATE_Y)) * MapManager::IMAGE_HEIGHT_RATIO;
+                        string continentName = countryTokens.at(MapManager::CONTINENT_NAME_INDEX);
+                        int numOfArmy = stoi(countryTokens.at(MapManager::ARMY_NUMBER_INDEX));
+                        getAllContinents().find(continentName)->second.addCountryName(countryName);
+
+                        vector<string> adjacentCountries;
+                        for (int i = MapManager::ADJACENT_COUNTRIES_STARTS; i < countryTokens.size(); i++) {
+                            adjacentCountries.push_back(countryTokens.at(i));
+                        }
+                        Country country(countryName, coordinateX, coordinateY, adjacentCountries, numOfArmy);
+                        country.setContinentName(continentName);
+                        allCountries.insert({countryName, country});
+                    }
+                }
+            }
+
+
+            while (getline(inFIle, line)) {
+                if (line.find(MapManager::PLAYER_TITLE) != string::npos) {
+                    while (getline(inFIle, line)) {
+                        if (line.length() == 0) {
+                            break;
+                        } else {
+                            stringstream ss(line);
+
+                            string playerName;
+                            string playerIndex;
+
+                            getline(ss, playerName, '=');
+                            getline(ss, playerIndex, '=');
+
+                            Player player(stoi(playerIndex), playerName);
+
+                            string isCurrentPlayer;
+
+                            getline(ss, isCurrentPlayer, ',');
+
+                            string cardTokens;
+                            vector<CardType> cards;
+
+                            getline(ss, cardTokens, '=');
+                            while (ss.good()) {
+                                string subString;
+                                getline(ss, subString, ',');
+                                card = getCardTypeFromString(subString);
+                                cards.push_back(card);
+                            }
+                            player.setCards(cards);
+
+                            vector<string> capturedCountryNameTokens;
+                            vector<Country> capturedCountries;
+
+                            getline(ss, capturedCountryNameTokens, '=');
+                            while (ss.good()) {
+                                string subString;
+                                getline(ss, subString, ',');
+                                capturedCountryNameTokens.push_back(subString);
+                            }
+                            player.setCapturedCountries(capturedCountries);
+
+                            string continentBonus;
+                            string exchangeTimes;
+
+                            getline(ss, continentBonus, '=');
+                            getline(ss, exchangeTimes, '=');
+
+                            player.addContinentBonus(stoi(continentBonus));
+                            player.setExchangeTime(stoi(exchangeTimes));
+
+                            if (isCurrentPlayer == "True"){
+
+                                curPlayerIndex = stoi(playerIndex);
+                                string stage;
+                                string undeployedArmyNumber;
+
+                                getline(ss, stage, '=');
+                                getline(ss, undeployedArmyNumber, '=');
+
+                                curGameStage = getGameStageFromString(stage);
+
+                                player.setUndeployArmyNumber(stoi(undeployedArmyNumber));
+                            }
+
+                            players.push_back(player);
+                        }
+
+                }
+
+        }
+        setAllCountries(allCountries);
+    }
+
 }

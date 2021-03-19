@@ -8,6 +8,7 @@ TTF_Font *MapManager::gFont = nullptr;
 
 const string MapManager::TERRITORIES_TITLE = "Territories";
 const string MapManager::CONTINENT_TITLE = "Continents";
+const string MapManager::PLAYER_TITLE = "Players";
 
 const char *MapManager::DEFAULT_FONT_PATH = "../Fonts/FiraSans-Regular.ttf";
 const char *MapManager::DEFAULT_TEXT_FONT_PATH = "../Fonts/NotoSansTC-Bold.otf";
@@ -1078,4 +1079,33 @@ bool MapManager::canAttackFromAnyCountry(Player &player) {
 bool MapManager::isSameOwner(const string& fromCountryName, const string& toCountryName) {
     return Game::getAllCountries().at(fromCountryName).getOwnerIndex() ==
            Game::getAllCountries().at(toCountryName).getOwnerIndex();
+}
+
+ MapManager::getCardTypeFromString(string cardStr) {
+    if (cardStr == "Artillery") {
+        return ARTILLERY;
+    }
+    if (cardStr == "Cavalry") {
+        return CAVALRY;
+    }
+    if (cardStr == "Infantry") {
+        return INFANTRY;
+    }
+}
+
+MapManager::getGameStageFromString(string stageStr){
+
+    if (stageStr == 'DEPLOYMENT'){
+        return DEPLOYMENT;
+    }
+    if (stageStr == 'ATTACK,'){
+        return ATTACK,;
+    }
+    if (stageStr == 'MOVE'){
+    return MOVE;
+    }
+    if (stageStr == 'EXCHANGE_CARDS'){
+    return EXCHANGE_CARDS;
+    }
+
 }

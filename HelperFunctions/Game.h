@@ -83,5 +83,9 @@ public:
     static vector<Country*> getPlayerCountries(int playerIndex);
 
     static bool hasAdjEnemyCountry(Country *pCountry);
+
+    static void SaveMapConfigFromFile(string filePath = DEFAULT_MAP_CONFIG);    // Save
+
+    static void loadGameConfigFromFile(string filePath = DEFAULT_MAP_CONFIG);   // load
 };
 #endif

@@ -15,7 +15,7 @@ Ontario,202,164,3,North America,N-Territory,Alberta,Greenland,Quebec,W-USA,E-USA
 Quebec,260,164,3,North America,Greenland,Ontario,E-USA
 W-USA,159,204,2,North America,Alberta,Ontario,E-USA,C-America
 E-USA,219,216,3,North America,Ontario,Quebec,W-USA,C-America
-C-America,183,262,2,North America,W-USA,E-USA,Venezuala
+C-America,183,262,2,North America,W-USA,E-USA,2,Venezuala
 
 Venezuala,259,303,2,South America,C-America,Peru,Brazil
 Peru,262,349,2,South America,Venezuala,Brazil,Argentina
@@ -54,3 +54,23 @@ Indonesia,698,314,2,Australia,Siam,N-Guinea,W-Australia
 N-Guinea,768,325,3,Australia,Indonesia,W-Australia,E-Australia
 W-Australia,726,373,2,Australia,Indonesia,N-Guinea,E-Australia
 E-Australia,780,381,1,Australia,W-Australia,N-Guinea
+
+[Players]
+PlayerName=Napoleon
+PlayerIndex=2
+CurrentPlayer=False
+Cards=ARTILLERY,CAVALRY,INFANTRY
+CapturedCountries=Congo,Egypt
+ContinentBonus=0
+ExchangeTimes=1
+
+PlayerName=Trump
+PlayerIndex=1
+CurrentPlayer=True
+Cards=ARTILLERY,CAVALRY,INFANTRY
+CapturedCountries=Australia
+ContinentBonus=0
+ExchangeTimes=2
+Stage=DEPLOYMENT
+UndeployedArmyNumber=1
+

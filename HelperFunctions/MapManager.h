@@ -126,6 +126,8 @@ private:
 
     static CardType getCardTypeFromString(string& cardStr);
 
+    static GameStage getGameStageFromString(string stageStr);
+
 public:
     static void initCountryMarks();
 
@@ -185,7 +187,6 @@ public:
     const static int ADJACENT_COUNTRIES_STARTS = 5;
     const static int ARMY_NUMBER_INDEX = 3;
     const static int CONTINENT_NAME_INDEX = 4;
-    const static string CONTINENT_TITLE;
     const static int COUNTRY_COORDINATE_X = 1;
     const static int COUNTRY_COORDINATE_Y = 2;
     const static int COUNTRY_NAME_INDEX = 0;
@@ -198,4 +199,6 @@ public:
     static bool canAttackFromAnyCountry(Player &player);
 
     static bool isSameOwner(const string& fromCountryName, const string& toCountryName);
+    const static string CONTINENT_TITLE;
+    const static string PLAYER_TITLE;
 };

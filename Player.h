@@ -12,6 +12,10 @@ public:
 
     string getPlayerName();
 
+    vector<Country> getCapturedCountries();
+
+    vector<string> getCapturedCountryNames();
+
     void addCard(CardType card);
 
     vector<CardType>& getCards();
@@ -41,6 +45,14 @@ public:
     void removeUndeployArmy(int numOfArmy);
 
     int getCardNumOfType(CardType type);
+
+    int getContinentBonus();
+
+    int getExchangeTimes();
+
+    void setExchangeTimes(int newExchangeTimes);
+
+    void setCapturedCountries(vector<Country>& newCapturedCountries);
 
 
 private:
