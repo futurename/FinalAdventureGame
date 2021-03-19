@@ -18,6 +18,8 @@ vector<const char *> MapManager::CRAD_IMAGE_PATH_LIST = {"../Images/Artillery.jp
                                                          "../Images/Infantry.jpg"};
 vector<string> MapManager::CARDS_TYPE_LIST{"Artillery", "Cavalry", "Infantry"};
 
+string MapManager::ANIMATION_IMG_PATH{"../Images/animation_artillery.jpg"};
+
 const tuple<int, int, int, int> MapManager::DEFAULT_BACKGROUND_COLOR = ColorList::WHITE;
 vector<string> MapManager::NUMBER_STRING_VECTOR{"1", "2", "5", "10", "ALL"};
 const tuple<int, int, int, int> MapManager::NUMBER_BACKGROUND_COLOR{ColorList::BLACK};
@@ -223,9 +225,6 @@ void MapManager::start(string mapPath) {
 
             //Update screen
             SDL_RenderPresent(gRenderer);
-
-            //curplayer cal undeploy army.
-
 
             //Event handler
             SDL_Event e;
@@ -442,6 +441,7 @@ void MapManager::start(string mapPath) {
                                     }
                                     break;
                             }
+
                     }
                 }
             }
@@ -928,6 +928,14 @@ void MapManager::nextStage() {
         } else if (Game::getGameStage() == MOVE) {
             int curPlayerIndex = Game::getCurPlayerIndex();
             int playerIndex = ++curPlayerIndex % Game::getAllPlayers().size();
+            while (Game::getPlayerCountries(playerIndex).empty()) {
+                curPlayerIndex = Game::getCurPlayerIndex();
+                playerIndex = ++curPlayerIndex % Game::getAllPlayers().size();
+                Game::setCurPlayerIndex(playerIndex);
+                if(playerIndex == 0){
+                    Game::isHumanPlayer = true;
+                }
+            }
             Game::setCurPlayerIndex(playerIndex);
             Game::setGameStage(DEPLOYMENT);
             Player &curPlayer = Game::getAllPlayers().at(Game::getCurPlayerIndex());
@@ -946,6 +954,14 @@ void MapManager::nextStage() {
                     updateWholeScreen();
 
                     Game::setGameStage(ATTACK);
+
+                    if (Game::isConquerACountry) {
+                        CardType card = Card::getBonusCard();
+                        robotPlayer = Game::getAllPlayers().at(Game::getCurPlayerIndex());
+                        robotPlayer.addCard(card);
+                        Game::isConquerACountry = false;
+                    }
+
                     updateWholeScreen();
 
                     Game::robotAttack();
@@ -959,6 +975,14 @@ void MapManager::nextStage() {
 
                     int curPlayerIndex = Game::getCurPlayerIndex();
                     int playerIndex = ++curPlayerIndex % Game::getAllPlayers().size();
+                    while (Game::getPlayerCountries(playerIndex).empty()) {
+                        curPlayerIndex = Game::getCurPlayerIndex();
+                        playerIndex = ++curPlayerIndex % Game::getAllPlayers().size();
+                        Game::setCurPlayerIndex(playerIndex);
+                        if(playerIndex == 0){
+                            Game::isHumanPlayer = true;
+                        }
+                    }
                     Game::setCurPlayerIndex(playerIndex);
                     Game::setGameStage(DEPLOYMENT);
                     Player &curPlayer = Game::getAllPlayers().at(Game::getCurPlayerIndex());

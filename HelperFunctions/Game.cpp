@@ -353,37 +353,43 @@ void Game::robotDeploy() {
 }
 
 void Game::robotAttack() {
-    Player &robotPlayer = Game::getAllPlayers().at(Game::curPlayerIndex);
-    vector<Country *> robotCountries = getPlayerCountries(curPlayerIndex);
-    robotPlayer.getCalUndeployArmyNumber();
+    int randMax = Random::generateRandomNum(ROBOT_MAX_RAND_NUM_LOWER,ROBOT_MAX_RAND_NUM_UPPER);
+    while(true) {
+        Player &robotPlayer = Game::getAllPlayers().at(Game::curPlayerIndex);
+        vector<Country *> robotCountries = getPlayerCountries(curPlayerIndex);
+        robotPlayer.getCalUndeployArmyNumber();
 
-    Country *maxArmyCountry = robotCountries.at(0);
-    for (int i = 1; i < robotCountries.size(); i++) {
-        if (robotCountries.at(i)->getNumOfArmy() > maxArmyCountry->getNumOfArmy()) {
-            if (hasAdjEnemyCountry(robotCountries.at(i))) {
-                maxArmyCountry = robotCountries.at(i);
+        Country *maxArmyCountry = robotCountries.at(0);
+        for (int i = 1; i < robotCountries.size(); i++) {
+            if (robotCountries.at(i)->getNumOfArmy() > maxArmyCountry->getNumOfArmy()) {
+                if (hasAdjEnemyCountry(robotCountries.at(i))) {
+                    maxArmyCountry = robotCountries.at(i);
+                }
             }
         }
-    }
-    vector<string> adjacentCountryNames = Game::getAllCountries().at(
-            maxArmyCountry->getCountryName()).getAdjacentCountires();
-    Country *weakestCountry = nullptr;
-    for (auto &countryName : adjacentCountryNames) {
-        Country &adjCountry = Game::getAllCountries().at(countryName);
-        if (adjCountry.getOwnerIndex() == curPlayerIndex) {
-            continue;
-        } else {
-            if (weakestCountry == nullptr) {
-                weakestCountry = &adjCountry;
+        vector<string> adjacentCountryNames = Game::getAllCountries().at(
+                maxArmyCountry->getCountryName()).getAdjacentCountires();
+        if(maxArmyCountry->getNumOfArmy() < randMax){
+            break;
+        }
+        Country *weakestCountry = nullptr;
+        for (auto &countryName : adjacentCountryNames) {
+            Country &adjCountry = Game::getAllCountries().at(countryName);
+            if (adjCountry.getOwnerIndex() == curPlayerIndex) {
+                continue;
             } else {
-                weakestCountry =
-                        weakestCountry->getNumOfArmy() > adjCountry.getCountryArmy() ? &adjCountry : weakestCountry;
+                if (weakestCountry == nullptr) {
+                    weakestCountry = &adjCountry;
+                } else {
+                    weakestCountry =
+                            weakestCountry->getNumOfArmy() > adjCountry.getCountryArmy() ? &adjCountry : weakestCountry;
+                }
             }
         }
-    }
 
-    if (weakestCountry != nullptr) {
-        Game::attackFrom(*maxArmyCountry, *weakestCountry);
+        if (weakestCountry != nullptr) {
+            Game::attackFrom(*maxArmyCountry, *weakestCountry);
+        }
     }
 }
 

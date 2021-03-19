@@ -24,7 +24,7 @@ int Card::exchangeCards(vector<CardType> &cards, int exchangeTimes) {
             diffTypeCounter++;
         }
         if (sameTypeCounter == CARD_EXCHANGE_THRESHOLD) {
-            cards.erase(cards.end() - i, cards.end() - i + sameTypeCounter);
+            cards.erase(cards.begin() + i, cards.begin() + i + sameTypeCounter);
             result += CARD_EXCHANGE_BASE * exchangeTimes;
             break;
         }

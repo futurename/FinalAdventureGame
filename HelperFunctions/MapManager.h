@@ -103,6 +103,12 @@ private:
 
     const static SDL_MessageBoxColorScheme MESSAGE_BOX_COLOR_SCHEME;
 
+    const static int ANIMATION_RECT_WIDTH = 300;
+    const static int ANIMATION_RECT_HEIGHT = 200;
+    const static int ANIMATION_RECT_X = 400;
+    const static int ANIMATION_RECT_Y = 500;
+    static string ANIMATION_IMG_PATH;
+
     //Loads individual image as texture
     static SDL_Texture *loadTexture(std::string path);
 

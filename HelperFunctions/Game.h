@@ -23,6 +23,8 @@ private:
     static int curPlayerIndex;
     static GameStage curGameStage;
     const static string DEFAULT_MAP_CONFIG;
+    const static int ROBOT_MAX_RAND_NUM_UPPER = 6;
+    const static int ROBOT_MAX_RAND_NUM_LOWER = 2;
 public:
     const static int DEFAULT_NUM_UNDEPLOY;
     static bool isConquerACountry;
