@@ -26,7 +26,9 @@ const tuple<int, int, int, int> MapManager::BUTTONS_BACKGROUND_COLOR{ColorList::
 const tuple<int, int, int, int> MapManager::BUTTONS_BORDER_COLOR{ColorList::BLACK};
 tuple<int, int, int, int> MapManager::BUTTONS_TEXT_COLOR{ColorList::BLACK};
 
-vector<string> MapManager::buttonNames{"LOAD", "SAVE", "RESET", "NEXT"};
+vector<string> MapManager::buttonNames{"LOAD", "SAVE", "RESET", "NEXT", "SWITCH_MAP"};
+
+const string MapManager::SAVE_FILE_PATH = "../Save/Save.txt";
 
 Country *MapManager::fromCountry{};
 Country *MapManager::toCountry{};
@@ -250,6 +252,16 @@ void MapManager::start(string mapPath) {
                             &MESSAGE_BOX_COLOR_SCHEME /* .colorScheme */
                     };
 
+                    const SDL_MessageBoxData switchMapMsgBoxData = {
+                            SDL_MESSAGEBOX_INFORMATION, /* .flags */
+                            nullptr, /* .window */
+                            "Switch Map", /* .title */
+                            "Danger: you will lose data!", /* .message */
+                            SDL_arraysize(MESSAGE_BOX_BUTTONS), /* .numbuttons */
+                            MESSAGE_BOX_BUTTONS, /* .buttons */
+                            &MESSAGE_BOX_COLOR_SCHEME /* .colorScheme */
+                    };
+
                     switch (e.type) {
                         case SDL_QUIT:
                             quit = true;
@@ -317,6 +329,14 @@ void MapManager::start(string mapPath) {
                                                     break;
                                                 case NEXT:
                                                     nextStage();
+                                                    break;
+                                                case SWITCH_MAP:
+                                                    if (SDL_ShowMessageBox(&switchMapMsgBoxData, &buttonId) < 0) {
+                                                        SDL_Log("error displaying message box");
+                                                    }
+                                                    if (buttonId == 1) {
+                                                        switchMap();
+                                                    }
                                                     break;
                                                 default:
                                                     break;
@@ -818,7 +838,7 @@ void MapManager::renderCardsListRect() {
 
 void MapManager::renderButtonsRect() {
     SDL_Texture *buttonsTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
-                                                    COUNTRY_INFO_WIDTH, COUNTRY_INFO_HEIGHT);
+                                                    BUTTONS_WIDTH, BUTTONS_HEIGHT);
     SDL_SetRenderTarget(gRenderer, buttonsTexture);
     SDL_RenderClear(gRenderer);
 
@@ -862,6 +882,25 @@ void MapManager::renderButtonsRect() {
         startY += BUTTONS_RECT_HEIGHT + BUTTONS_GAP;
     }
 
+    //render switch map button
+    startX =    BUTTONS_SWITCH_MAP_X;
+
+    SDL_Rect buttonSwitchMapRect{startX, startY, BUTTONS_RECT_SWITCH_MAP_WIDTH, BUTTONS_RECT_HEIGHT};
+    SDL_SetRenderDrawColor(gRenderer, get<0>(BUTTONS_BACKGROUND_COLOR), get<1>(BUTTONS_BACKGROUND_COLOR),
+                           get<2>(BUTTONS_BACKGROUND_COLOR), get<3>(BUTTONS_BACKGROUND_COLOR));
+    SDL_RenderFillRect(gRenderer, &buttonSwitchMapRect);
+    SDL_SetRenderDrawColor(gRenderer, get<0>(BUTTONS_BORDER_COLOR), get<1>(BUTTONS_BORDER_COLOR),
+                           get<2>(BUTTONS_BORDER_COLOR), get<3>(BUTTONS_BORDER_COLOR));
+    SDL_RenderDrawRect(gRenderer, &buttonSwitchMapRect);
+    string buttonSwitchMapStr = buttonNames.at(4);
+    renderMessage(startX + BUTTONS_RECT_SWITCH_MAP_WIDTH / 2, startY + BUTTONS_RECT_HEIGHT / 2,
+                  buttonSwitchMapStr.c_str(),
+                  BUTTONS_TEXT_COLOR, BUTTONS_TEXT_FONT_SIZE, BUTTONS_FONT_PATH);
+
+    SDL_Point buttonSwitchMap{MAP_VIEW_PORT_WIDTH + startX, BUTTONS_ABSOLUTE_Y + startY};
+    buttonCoordinates.insert({getButtonTypeFromStr(buttonSwitchMapStr), buttonSwitchMap});
+
+    //clear rect, render screen
     SDL_SetRenderTarget(gRenderer, nullptr);
     SDL_RenderCopy(gRenderer, buttonsTexture, nullptr, &buttonsRect);
     SDL_RenderPresent(gRenderer);
@@ -877,9 +916,16 @@ void MapManager::loadGameFromFile() {
 ButtonType MapManager::clickButtonType(SDL_Point &p) {
     for (auto &item: buttonCoordinates) {
         SDL_Point &point = item.second;
-        if (p.x >= point.x && p.x <= point.x + BUTTONS_RECT_WIDTH && p.y >= point.y &&
-            p.y <= point.y + BUTTONS_RECT_HEIGHT) {
-            return item.first;
+        if (item.first != SWITCH_MAP) {
+            if (p.x >= point.x && p.x <= point.x + BUTTONS_RECT_WIDTH && p.y >= point.y &&
+                p.y <= point.y + BUTTONS_RECT_HEIGHT) {
+                return item.first;
+            }
+        } else {
+            if (p.x >= point.x && p.x <= point.x + BUTTONS_RECT_SWITCH_MAP_WIDTH && p.y >= point.y &&
+                p.y <= point.y + BUTTONS_RECT_HEIGHT) {
+                return item.first;
+            }
         }
     }
     return NONE;
@@ -1036,6 +1082,9 @@ ButtonType MapManager::getButtonTypeFromStr(const string& buttonName) {
     if (buttonName == buttonNames.at(3)) {
         return NEXT;
     }
+    if(buttonName == buttonNames.at(4)){
+        return SWITCH_MAP;
+    }
     return NONE;
 }
 
@@ -1078,4 +1127,13 @@ bool MapManager::canAttackFromAnyCountry(Player &player) {
 bool MapManager::isSameOwner(const string& fromCountryName, const string& toCountryName) {
     return Game::getAllCountries().at(fromCountryName).getOwnerIndex() ==
            Game::getAllCountries().at(toCountryName).getOwnerIndex();
+}
+
+void MapManager::switchMap() {
+    int preMapIndex = Game::curMapIndex;
+    int newMapIndex = ++preMapIndex % Game::MAP_CONFIG_FILES_LIST.size();
+    Game::curMapIndex = newMapIndex;
+    SDLClose();
+    start();
+    resetGame();
 }

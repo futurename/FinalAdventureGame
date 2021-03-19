@@ -22,7 +22,6 @@ private:
 
     static int curPlayerIndex;
     static GameStage curGameStage;
-    const static string DEFAULT_MAP_CONFIG;
     const static int ROBOT_MAX_RAND_NUM_UPPER = 6;
     const static int ROBOT_MAX_RAND_NUM_LOWER = 2;
 public:
@@ -30,7 +29,11 @@ public:
     static bool isConquerACountry;
     static bool ifClickedNext;
     static bool isHumanPlayer;
-    const static string DEFAULT_MAP;
+
+    static string DEFAULT_MAP;
+    static string DEFAULT_MAP_CONFIG;
+    static int curMapIndex;
+    const static vector<pair<string,string>> MAP_CONFIG_FILES_LIST;
 
     static vector<Player> &getAllPlayers();
 

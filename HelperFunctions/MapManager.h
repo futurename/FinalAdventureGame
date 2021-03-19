@@ -9,7 +9,7 @@
 
 class Country;
 
-enum ButtonType{LOAD, SAVE, RESET, NEXT, NONE};
+enum ButtonType{LOAD, SAVE, RESET, NEXT, SWITCH_MAP, NONE};
 
 class MapManager {
 private:
@@ -29,9 +29,9 @@ private:
     const static int PLAYER_INFO_FONT_SIZE = 18;
 
     const static int COUNTRY_INFO_WIDTH = PLAYER_INFO_WIDTH;
-    const static int COUNTRY_INFO_HEIGHT = 140;
+    const static int COUNTRY_INFO_HEIGHT = 110;
     const static int COUNTRY_INFO_CENTER_X = COUNTRY_INFO_WIDTH / 2;
-    const static int COUNTRY_INFO_START_Y = 15;
+    const static int COUNTRY_INFO_START_Y = 10;
     const static int COUNTRY_INFO_GAP = 30;
     const static int COUNTRY_INFO_FONT_SIZE = 20;
     const static int COUNTRY_MARK_WIDTH = 74;
@@ -39,7 +39,7 @@ private:
     const static int COUNTRY_TEXT_HEIGHT_SHIFT = 18;
 
     const static int NUMBER_LIST_WIDTH = PLAYER_INFO_WIDTH;
-    const static int NUMBER_LIST_HEIGHT = 140;
+    const static int NUMBER_LIST_HEIGHT = 130;
     const static int NUMBER_LIST_X = 35;
     const static int NUMBER_LIST_GAP = 25;
     const static int NUMBER_LIST_ABSOLUTE_Y = PLAYER_INFO_HEIGHT + COUNTRY_INFO_HEIGHT;
@@ -59,7 +59,7 @@ private:
     const static int CARDS_LIST_IMAGE_WIDTH = 120;
     const static int CARDS_LIST_SPACE = 180;
     const static int CARDS_LIST_X = 40;
-    const static int CARDS_LIST_Y = 20;
+    const static int CARDS_LIST_Y = 10;
     const static int CARDS_LIST_GAP = 10;
     const static int CARDS_TEXT_GAP = 30;
     const static int CARDS_LIST_FONT_SIZE = 22;
@@ -68,15 +68,17 @@ private:
     static vector<string> CARDS_TYPE_LIST;
 
     const static int BUTTONS_WIDTH = PLAYER_INFO_WIDTH;
-    const static int BUTTONS_HEIGHT = 150;
+    const static int BUTTONS_HEIGHT = 240;
     const static int BUTTONS_ABSOLUTE_Y =
             PLAYER_INFO_HEIGHT + COUNTRY_INFO_HEIGHT + NUMBER_LIST_HEIGHT + CARDS_LIST_HEIGHT;
-    const static int BUTTONS_RECT_HEIGHT = 50;
+    const static int BUTTONS_RECT_HEIGHT = 40;
     const static int BUTTONS_RECT_WIDTH = 100;
-    const static int BUTTONS_GAP = 20;
+    const static int BUTTONS_RECT_SWITCH_MAP_WIDTH = 160;
+    const static int BUTTONS_GAP = 15;
     const static int BUTTONS_SPACE = 30;
     const static int BUTTONS_LEFT_X = 30;
-    const static int BUTTONS_UPPER_Y = 20;
+    const static int BUTTONS_UPPER_Y = 0;
+    const static int BUTTONS_SWITCH_MAP_X = 60;
     const static int BUTTONS_TEXT_FONT_SIZE = 22;
     static vector<string> buttonNames;
     const static tuple<int, int, int, int> BUTTONS_BACKGROUND_COLOR;
@@ -98,6 +100,8 @@ private:
     const static SDL_Rect numberListRect;
     const static SDL_Rect cardsListRect;
     const static SDL_Rect buttonsRect;
+
+    const static string SAVE_FILE_PATH;
 
     static Country *fromCountry, *toCountry;
 
@@ -198,4 +202,6 @@ public:
     static bool canAttackFromAnyCountry(Player &player);
 
     static bool isSameOwner(const string& fromCountryName, const string& toCountryName);
+
+    static void switchMap();
 };

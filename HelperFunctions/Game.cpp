@@ -3,13 +3,23 @@
 #include "MapManager.h"
 #include "ColorList.h"
 
-const string Game::DEFAULT_MAP_CONFIG = "../Maps/World.map";
 map<string, Country> Game::allCountries{map<string, Country>()};
 map<string, Continent> Game::allContinents{map<string, Continent>()};
 vector<Player> Game::players{vector<Player>()};
 int Game::curPlayerIndex = 0;
 const int Game::DEFAULT_NUM_UNDEPLOY = 3;
-const string Game::DEFAULT_MAP = "../Maps/World.bmp";
+
+const vector<pair<string, string>> Game::MAP_CONFIG_FILES_LIST{{"../Maps/World.bmp",    "../Maps/World.map"},
+                                                               {"../Maps/Atlantis.bmp", "../Maps/Atlantis.map"}};
+
+int Game::curMapIndex = 0;
+
+string Game::DEFAULT_MAP = MAP_CONFIG_FILES_LIST.at(curMapIndex).first;
+string Game::DEFAULT_MAP_CONFIG = MAP_CONFIG_FILES_LIST.at(curMapIndex).second;
+
+/*const string Game::DEFAULT_MAP = "../Maps/Atlantis.bmp";
+const string Game::DEFAULT_MAP_CONFIG = "../Maps/Atlantis.map";*/
+
 GameStage Game::curGameStage{DEPLOYMENT};
 bool Game::isConquerACountry = false;
 bool Game::ifClickedNext = false;
